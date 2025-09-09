@@ -17,17 +17,28 @@ class TestOpenRouterProvider:
         """Test OpenRouter provider initialization."""
         provider = OpenRouterProvider(api_key="test-key")
         assert provider.api_key == "test-key"
-        assert provider.base_url == "https://openrouter.ai/api/v1"
+        # Now using KiloCode's OpenRouter proxy endpoint
+        assert provider.base_url == "https://api.kilocode.ai/api/openrouter/"
         assert provider.FRIENDLY_NAME == "OpenRouter"
 
     def test_custom_headers(self):
         """Test OpenRouter custom headers."""
-        # Test default headers
+        # Test default headers required for KiloCode proxy
         assert "HTTP-Referer" in OpenRouterProvider.DEFAULT_HEADERS
         assert "X-Title" in OpenRouterProvider.DEFAULT_HEADERS
+        assert "X-KiloCode-Version" in OpenRouterProvider.DEFAULT_HEADERS
+        assert "User-Agent" in OpenRouterProvider.DEFAULT_HEADERS
 
         # Test with environment variables
-        with patch.dict(os.environ, {"OPENROUTER_REFERER": "https://myapp.com", "OPENROUTER_TITLE": "My App"}):
+        with patch.dict(
+            os.environ,
+            {
+                "OPENROUTER_REFERER": "https://myapp.com",
+                "OPENROUTER_TITLE": "My App",
+                "KILO_CODE_VERSION": "1.0.0",
+                "OPENROUTER_USER_AGENT": "MyApp/1.0.0",
+            },
+        ):
             from importlib import reload
 
             import providers.openrouter
@@ -37,6 +48,8 @@ class TestOpenRouterProvider:
             provider = providers.openrouter.OpenRouterProvider(api_key="test-key")
             assert provider.DEFAULT_HEADERS["HTTP-Referer"] == "https://myapp.com"
             assert provider.DEFAULT_HEADERS["X-Title"] == "My App"
+            assert provider.DEFAULT_HEADERS["X-KiloCode-Version"] == "1.0.0"
+            assert provider.DEFAULT_HEADERS["User-Agent"] == "MyApp/1.0.0"
 
     def test_model_validation(self):
         """Test model validation."""
@@ -312,25 +325,32 @@ class TestOpenRouterFunctionality:
     """Test OpenRouter-specific functionality."""
 
     def test_openrouter_always_uses_correct_url(self):
-        """Test that OpenRouter always uses the correct base URL."""
+        """Test that OpenRouter always uses the KiloCode proxy URL."""
         provider = OpenRouterProvider(api_key="test-key")
-        assert provider.base_url == "https://openrouter.ai/api/v1"
+        # Now using KiloCode's proxy endpoint for OpenRouter access
+        assert provider.base_url == "https://api.kilocode.ai/api/openrouter/"
 
-        # Even if we try to change it, it should remain the OpenRouter URL
-        # (This is a characteristic of the OpenRouter provider)
+        # Even if we try to change it, new instances should use the KiloCode proxy URL
         provider.base_url = "http://example.com"  # Try to change it
-        # But new instances should always use the correct URL
+        # But new instances should always use the KiloCode proxy URL
         provider2 = OpenRouterProvider(api_key="test-key")
-        assert provider2.base_url == "https://openrouter.ai/api/v1"
+        assert provider2.base_url == "https://api.kilocode.ai/api/openrouter/"
 
     def test_openrouter_headers_set_correctly(self):
         """Test that OpenRouter specific headers are set."""
         provider = OpenRouterProvider(api_key="test-key")
 
-        # Check default headers
+        # Check default headers required for KiloCode proxy
         assert "HTTP-Referer" in provider.DEFAULT_HEADERS
         assert "X-Title" in provider.DEFAULT_HEADERS
-        assert provider.DEFAULT_HEADERS["X-Title"] == "Zen MCP Server"
+        assert "X-KiloCode-Version" in provider.DEFAULT_HEADERS
+        assert "User-Agent" in provider.DEFAULT_HEADERS
+
+        # Check default values
+        assert provider.DEFAULT_HEADERS["X-Title"] == "Kilo Code"
+        assert provider.DEFAULT_HEADERS["HTTP-Referer"] == "https://kilocode.ai"
+        assert provider.DEFAULT_HEADERS["X-KiloCode-Version"] == "4.91.0"
+        assert provider.DEFAULT_HEADERS["User-Agent"] == "Kilo-Code/4.91.0"
 
     def test_openrouter_model_registry_initialized(self):
         """Test that model registry is properly initialized."""

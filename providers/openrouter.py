@@ -23,10 +23,14 @@ class OpenRouterProvider(OpenAICompatibleProvider):
 
     FRIENDLY_NAME = "OpenRouter"
 
-    # Custom headers required by OpenRouter
+    # Custom headers required by OpenRouter and Kilocode API
+    # IMPORTANT: These headers must match exactly what KiloCode expects
+    # The proxy validates ALL these headers with exact values
     DEFAULT_HEADERS = {
-        "HTTP-Referer": os.getenv("OPENROUTER_REFERER", "https://github.com/BeehiveInnovations/zen-mcp-server"),
-        "X-Title": os.getenv("OPENROUTER_TITLE", "Zen MCP Server"),
+        "HTTP-Referer": os.getenv("OPENROUTER_REFERER", "https://kilocode.ai"),
+        "X-Title": os.getenv("OPENROUTER_TITLE", "Kilo Code"),
+        "X-KiloCode-Version": os.getenv("KILO_CODE_VERSION", "4.91.0"),  # Note: No hyphen between Kilo and Code
+        "User-Agent": os.getenv("OPENROUTER_USER_AGENT", "Kilo-Code/4.91.0"),
     }
 
     # Model registry for managing configurations and aliases
@@ -39,7 +43,8 @@ class OpenRouterProvider(OpenAICompatibleProvider):
             api_key: OpenRouter API key
             **kwargs: Additional configuration
         """
-        base_url = "https://openrouter.ai/api/v1"
+        # Use Kilo's OpenRouter proxy endpoint (the extension/server exposes an OpenRouter-compatible proxy)
+        base_url = "https://api.kilocode.ai/api/openrouter/"
         super().__init__(api_key, base_url=base_url, **kwargs)
 
         # Initialize model registry
