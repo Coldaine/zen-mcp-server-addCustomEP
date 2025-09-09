@@ -2,7 +2,9 @@
 Tests for the Consensus tool using WorkflowTool architecture.
 """
 
-from unittest.mock import Mock
+import asyncio
+import json
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
@@ -330,6 +332,112 @@ class TestConsensusTool:
         response_data = {}
         result = tool.customize_workflow_response(response_data, request)
         assert result["consensus_workflow_status"] == "ready_for_synthesis"
+
+    @patch('tools.consensus.run_models_concurrently')
+    @patch('tools.consensus.ConsensusTool._consult_model_with_timing')
+    def test_concurrent_execution_step1(self, mock_consult_with_timing, mock_run_concurrent):
+        """Test that step 1 executes all model consultations concurrently."""
+        tool = ConsensusTool()
+
+        # Mock the concurrent execution
+        mock_model_responses = [
+            {
+                "model": "flash",
+                "stance": "neutral",
+                "status": "success",
+                "content": "Flash analysis",
+                "error_message": None,
+                "latency_ms": 500,
+            },
+            {
+                "model": "o3-mini",
+                "stance": "for",
+                "status": "success",
+                "content": "O3 analysis",
+                "error_message": None,
+                "latency_ms": 800,
+            }
+        ]
+        mock_run_concurrent.return_value = mock_model_responses
+
+        # Create step 1 request
+        request = ConsensusRequest(
+            step="Test proposal for concurrent execution",
+            step_number=1,
+            total_steps=1,  # Will be overridden to 1
+            next_step_required=False,
+            findings="Initial findings",
+            models=[
+                {"model": "flash", "stance": "neutral"},
+                {"model": "o3-mini", "stance": "for"}
+            ]
+        )
+
+        # Execute workflow
+        result = asyncio.run(tool.execute_workflow({
+            "step": request.step,
+            "step_number": request.step_number,
+            "total_steps": request.total_steps,
+            "next_step_required": request.next_step_required,
+            "findings": request.findings,
+            "models": request.models
+        }))
+
+        # Verify concurrent execution was called
+        mock_run_concurrent.assert_called_once()
+        args, kwargs = mock_run_concurrent.call_args
+        model_specs = args[0]
+        assert len(model_specs) == 2
+        assert model_specs[0]["model"] == "flash"
+        assert model_specs[1]["model"] == "o3-mini"
+
+        # Verify response structure
+        response_text = result[0].text
+        response_data = json.loads(response_text)
+
+        assert response_data["status"] == "consensus_workflow_complete"
+        assert response_data["consensus_complete"] is True
+        assert len(response_data["all_model_responses"]) == 2
+        assert response_data["all_model_responses"][0]["model"] == "flash"
+        assert response_data["all_model_responses"][1]["model"] == "o3-mini"
+
+    def test_concurrent_execution_error_handling(self):
+        """Test concurrent execution with mixed success/error results."""
+        tool = ConsensusTool()
+
+        # Simulate mixed results
+        tool.models_to_consult = [
+            {"model": "flash", "stance": "neutral"},
+            {"model": "o3-mini", "stance": "for"}
+        ]
+        tool.accumulated_responses = [
+            {
+                "model": "flash",
+                "stance": "neutral",
+                "status": "success",
+                "content": "Success analysis",
+                "error_message": None,
+                "latency_ms": 500,
+            },
+            {
+                "model": "o3-mini",
+                "stance": "for",
+                "status": "error",
+                "content": None,
+                "error_message": "Model timeout",
+                "latency_ms": 30000,
+            }
+        ]
+
+        # Test metadata customization
+        response_data = {}
+        request = Mock(step_number=1, total_steps=1)
+        result = tool._customize_consensus_metadata(response_data, request)
+
+        assert result["workflow_type"] == "concurrent_multi_model_consensus"
+        assert result["execution_mode"] == "concurrent"
+        assert len(result["models_consulted"]) == 2
+        assert result["consensus_complete"] is True
 
 
 if __name__ == "__main__":
