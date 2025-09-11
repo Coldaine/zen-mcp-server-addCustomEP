@@ -44,7 +44,7 @@ class TestConsensusThreeModels(BaseSimulatorTest):
                             "stance_prompt": "You are a software architecture advocate. Focus on the benefits of a sync manager class: separation of concerns, testability, maintainability, and how it can improve the overall architecture. Consider scalability and code organization advantages.",
                         },
                         {
-                            "model": "local-llama",
+                            "model": "qwen3:0.6b",
                             "stance": "neutral",
                             "stance_prompt": "You are a pragmatic software engineer. Provide a balanced analysis considering both the benefits and drawbacks. Focus on the specific context of a CoolTodos app and what factors would determine if this is the right choice.",
                         },

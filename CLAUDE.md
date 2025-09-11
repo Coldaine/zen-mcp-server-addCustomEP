@@ -232,7 +232,7 @@ python -m pytest tests/test_prompt_regression.py::TestPromptIntegration::test_ch
 python -m pytest tests/ -v
 ```
 
-**Note**: Integration tests use the local-llama model via Ollama, which is completely FREE to run unlimited times. Requires `CUSTOM_API_URL` environment variable set to your local Ollama endpoint. They can be run safely in CI/CD but are excluded from code quality checks to keep them fast.
+**Note**: Integration tests use the qwen3:0.6b model via Ollama, which is completely FREE to run unlimited times. Requires `CUSTOM_API_URL` environment variable set to your local Ollama endpoint. They can be run safely in CI/CD but are excluded from code quality checks to keep them fast.
 
 ### Development Workflow
 

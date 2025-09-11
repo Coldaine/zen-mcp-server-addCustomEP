@@ -154,7 +154,7 @@ def mock_provider_availability(request, monkeypatch):
             # Set up the model capabilities mock with actual values
             capabilities = MagicMock()
             if model_name == "local-llama":
-                capabilities.context_window = 128000  # 128K tokens for local-llama
+                capabilities.context_window = 32000  # 32K tokens for qwen3:0.6b
                 capabilities.supports_extended_thinking = False
                 capabilities.input_cost_per_1k = 0.0  # Free local model
                 capabilities.output_cost_per_1k = 0.0  # Free local model

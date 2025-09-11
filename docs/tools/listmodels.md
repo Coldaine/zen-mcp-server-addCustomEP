@@ -55,7 +55,7 @@ The tool displays:
   • o4-mini (o4-mini) - 200K context, latest reasoning
 
 🔹 Custom/Local - ✅ Configured
-  • local-llama (llama3.2) - 128K context, local inference
+  • local-llama (qwen3:0.6b) - 32K context, local inference
   • Available at: http://localhost:11434/v1
 
 🔹 OpenRouter - ❌ Not configured

@@ -6,12 +6,12 @@ normal-sized prompts using real integration testing instead of mocks.
 
 INTEGRATION TESTS:
 These tests are marked with @pytest.mark.integration and make real API calls.
-They use the local-llama model which is FREE and runs locally via Ollama.
+They use the qwen3:0.6b model which is FREE and runs locally via Ollama.
 
 Prerequisites:
 - Ollama installed and running locally
 - CUSTOM_API_URL environment variable set to your Ollama endpoint (e.g., http://localhost:11434)
-- local-llama model available through custom provider configuration
+- qwen3:0.6b model available through custom provider configuration
 - No API keys required - completely FREE to run unlimited times!
 
 Running Tests:
@@ -39,7 +39,7 @@ from tools.thinkdeep import ThinkDeepTool
 
 load_dotenv()
 
-# Check if CUSTOM_API_URL is available for local-llama
+# Check if CUSTOM_API_URL is available for qwen3:0.6b
 CUSTOM_API_AVAILABLE = os.getenv("CUSTOM_API_URL") is not None
 
 
@@ -47,7 +47,7 @@ def skip_if_no_custom_api():
     """Helper to skip integration tests if CUSTOM_API_URL is not available."""
     if not CUSTOM_API_AVAILABLE:
         pytest.skip(
-            "CUSTOM_API_URL not set. To run integration tests with local-llama, ensure CUSTOM_API_URL is set in .env file (e.g., http://localhost:11434/v1)"
+            "CUSTOM_API_URL not set. To run integration tests with qwen3:0.6b, ensure CUSTOM_API_URL is set in .env file (e.g., http://localhost:11434/v1)"
         )
 
 
@@ -65,7 +65,7 @@ class TestPromptIntegration:
         result = await tool.execute(
             {
                 "prompt": "Explain Python decorators in one sentence",
-                "model": "local-llama",  # Use available model for integration tests
+                "model": "qwen3:0.6b",  # Use available lightweight model for integration tests
             }
         )
 
@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
         try:
             result = await tool.execute(
-                {"prompt": "What does this Python code do?", "files": [temp_file], "model": "local-llama"}
+                {"prompt": "What does this Python code do?", "files": [temp_file], "model": "qwen3:0.6b"}
             )
 
             assert len(result) == 1
@@ -129,7 +129,7 @@ if __name__ == "__main__":
                 "findings": "Building a high-traffic API - considering scalability and reliability",
                 "problem_context": "Building a high-traffic API",
                 "focus_areas": ["scalability", "reliability"],
-                "model": "local-llama",
+                "model": "qwen3:0.6b",
             }
         )
 
@@ -175,7 +175,7 @@ def main():
                     "relevant_files": [temp_file],
                     "review_type": "security",
                     "focus_on": "Look for SQL injection vulnerabilities",
-                    "model": "local-llama",
+                    "model": "qwen3:0.6b",
                 }
             )
 
@@ -270,7 +270,7 @@ class UserController:
                     "findings": "Initial architectural analysis",
                     "relevant_files": [temp_file],
                     "analysis_type": "architecture",
-                    "model": "local-llama",
+                    "model": "qwen3:0.6b",
                 }
             )
 
@@ -292,7 +292,7 @@ class UserController:
         tool = ChatTool()
 
         # Test with no files parameter
-        result = await tool.execute({"prompt": "Hello", "model": "local-llama"})
+        result = await tool.execute({"prompt": "Hello", "model": "qwen3:0.6b"})
 
         assert len(result) == 1
         output = json.loads(result[0].text)
@@ -312,7 +312,7 @@ class UserController:
                 "prompt": "Explain quantum computing briefly",
                 "thinking_mode": "low",
                 "temperature": 0.8,
-                "model": "local-llama",
+                "model": "qwen3:0.6b",
             }
         )
 
@@ -334,7 +334,7 @@ class UserController:
         special_prompt = (
             'Test with "quotes" and\nnewlines\tand tabs. Please just respond with the number that is the answer to 1+1.'
         )
-        result = await tool.execute({"prompt": special_prompt, "model": "local-llama"})
+        result = await tool.execute({"prompt": special_prompt, "model": "qwen3:0.6b"})
 
         assert len(result) == 1
         output = json.loads(result[0].text)
@@ -372,7 +372,7 @@ class UserController:
                     "next_step_required": False,
                     "findings": "Initial file analysis",
                     "relevant_files": temp_files,
-                    "model": "local-llama",
+                    "model": "qwen3:0.6b",
                 }
             )
 
@@ -400,7 +400,7 @@ class UserController:
         tool = ChatTool()
 
         unicode_prompt = "Explain what these mean: 你好世界 (Chinese) and مرحبا بالعالم (Arabic)"
-        result = await tool.execute({"prompt": unicode_prompt, "model": "local-llama"})
+        result = await tool.execute({"prompt": unicode_prompt, "model": "qwen3:0.6b"})
 
         assert len(result) == 1
         output = json.loads(result[0].text)

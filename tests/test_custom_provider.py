@@ -62,7 +62,7 @@ class TestCustomProvider:
 
             # Test with a custom model (is_custom=true)
             capabilities = provider.get_capabilities("local-llama")
-            assert capabilities.provider == ProviderType.CUSTOM  # local-llama has is_custom=true
+            assert capabilities.provider == ProviderType.CUSTOM  # qwen3:0.6b has is_custom=true
             assert capabilities.context_window > 0
 
         finally:

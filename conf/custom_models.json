@@ -229,17 +229,17 @@
       "description": "OpenAI's o4-mini model - optimized for shorter contexts with rapid reasoning and vision"
     },
     {
-      "model_name": "llama3.2",
-      "aliases": ["local-llama", "local", "llama3.2", "ollama-llama"],
-      "context_window": 128000,
-      "max_output_tokens": 64000,
+      "model_name": "qwen3:0.6b",
+      "aliases": ["local-llama", "local", "qwen3:0.6b", "ollama-qwen"],
+      "context_window": 32000,
+      "max_output_tokens": 16000,
       "supports_extended_thinking": false,
       "supports_json_mode": false,
       "supports_function_calling": false,
       "supports_images": false,
       "max_image_size_mb": 0.0,
       "is_custom": true,
-      "description": "Local Llama 3.2 model via custom endpoint (Ollama/vLLM) - 128K context window (text-only)"
+      "description": "Local Qwen3 0.6B model via Ollama - lightweight and fast for development testing"
     }
   ]
 }

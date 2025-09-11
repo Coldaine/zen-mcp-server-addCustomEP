@@ -276,7 +276,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 "chat",
                 {
                     "prompt": "Please use low thinking mode. Can you see this image?",
-                    "model": "local-llama",  # Text-only model
+                    "model": "qwen3:0.6b",  # Text-only model
                     "images": [small_image],
                     "thinking_mode": "low",
                 },
