@@ -784,7 +784,25 @@ async def handle_call_tool(name: str, arguments: dict[str, Any]) -> list[TextCon
             arguments["model"] = model_name
 
         # Validate model availability at MCP boundary
-        provider = ModelProviderRegistry.get_provider_for_model(model_name)
+        # Hybrid routing: prefer direct CLI routing for known CLI models to
+        # preserve the lightweight subprocess design and avoid forcing CLI
+        # providers through API-shaped registry validation.
+        provider = None
+        try:
+            from providers.cli_bridge import CLIBridgeProvider
+
+            # If model is supported by the CLI bridge, route directly to it
+            if model_name in getattr(CLIBridgeProvider, "CLI_MODEL_SPECS", {}):
+                logger.debug(f"Direct CLI routing for model '{model_name}'")
+                # Initialize a fresh CLI bridge provider instance (stateless)
+                provider = CLIBridgeProvider(api_key="")
+        except Exception:
+            # If CLI bridge is not available or fails import, fall back to registry
+            provider = None
+
+        # Fall back to registry-based provider lookup if not a direct CLI model
+        if not provider:
+            provider = ModelProviderRegistry.get_provider_for_model(model_name)
         if not provider:
             # Get list of available models for error message
             available_models = list(ModelProviderRegistry.get_available_models(respect_restrictions=True).keys())

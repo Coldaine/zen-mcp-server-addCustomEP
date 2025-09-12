@@ -80,7 +80,7 @@ Choose your AI coding assistant and add the corresponding configuration:
     "zen": {
       "command": "sh",
       "args": [
-        "-c", 
+        "-c",
         "for p in $(which uvx 2>/dev/null) $HOME/.local/bin/uvx /opt/homebrew/bin/uvx /usr/local/bin/uvx uvx; do [ -x \"$p\" ] && exec \"$p\" --from git+https://github.com/BeehiveInnovations/zen-mcp-server.git zen-mcp-server; done; echo 'uvx not found' >&2; exit 1"
       ],
       "env": {
@@ -150,6 +150,7 @@ GEMINI_API_KEY = "your_api_key_here"
 See `docs/cli-codex-integration.md` for details on running the live CLI test and troubleshooting.
 
 **Benefits of uvx method:**
+
 - ✅ Zero manual setup required
 - ✅ Always pulls latest version
 - ✅ No local dependencies to manage
@@ -165,7 +166,7 @@ cd zen-mcp-server
 # One-command setup (handles everything)
 ./run-server.sh
 
-# Or for Windows PowerShell:
+# Or for Windows PowerShell
 ./run-server.ps1
 
 # View configuration for Claude Desktop
@@ -174,34 +175,40 @@ cd zen-mcp-server
 # See all options
 ./run-server.sh --help
 ```
+ 
 
 **What the setup script does:**
+
 - ✅ Creates Python virtual environment
-- ✅ Installs all dependencies  
+- ✅ Installs all dependencies
 - ✅ Creates .env file for API keys
 - ✅ Configures Claude integrations
 - ✅ Provides copy-paste configuration
 
 **After updates:** Always run `./run-server.sh` again after `git pull`.
+ 
 
 **Windows users**: See the [WSL Setup Guide](wsl-setup.md) for detailed WSL configuration.
 
 ## Step 3: Configure API Keys
 
-### For uvx installation:
+ 
+\n### For uvx installation
 Add your API keys directly to the MCP configuration shown above.
 
-### For clone installation:
+\n### For clone installation
 Edit the `.env` file:
+ 
 
 ```bash
 nano .env
 ```
 
+ 
 Add your API keys (at least one required):
-```env
+\n```env
 # Choose your providers (at least one required)
-GEMINI_API_KEY=your-gemini-api-key-here      # For Gemini models  
+GEMINI_API_KEY=your-gemini-api-key-here      # For Gemini models
 OPENAI_API_KEY=your-openai-api-key-here      # For O3, GPT-5
 XAI_API_KEY=your-xai-api-key-here            # For Grok models
 OPENROUTER_API_KEY=your-openrouter-key       # For multiple models
@@ -209,8 +216,8 @@ OPENROUTER_API_KEY=your-openrouter-key       # For multiple models
 # DIAL Platform (optional)
 DIAL_API_KEY=your-dial-api-key-here
 DIAL_API_HOST=https://core.dialx.ai          # Default host (optional)
-DIAL_API_VERSION=2024-12-01-preview          # API version (optional) 
-DIAL_ALLOWED_MODELS=o3,gemini-2.5-pro       # Restrict models (optional)
+DIAL_API_VERSION=2024-12-01-preview          # API version (optional)
+DIAL_ALLOWED_MODELS=o3,gemini-2.5-pro        # Restrict models (optional)
 
 # Custom/Local models (Ollama, vLLM, etc.)
 CUSTOM_API_URL=http://localhost:11434/v1     # Ollama example
@@ -219,66 +226,86 @@ CUSTOM_MODEL_NAME=llama3.2                   # Default model name
 ```
 
 **Important notes:**
-- ⭐ **No restart needed** - Changes take effect immediately 
+
+- ⭐ No restart needed – changes take effect immediately
 - ⭐ If multiple APIs configured, native APIs take priority over OpenRouter
 - ⭐ Configure model aliases in [`conf/custom_models.json`](../conf/custom_models.json)
 
+```
 ## Step 4: Test the Installation
 
 ### For Claude Desktop:
+```env
 1. Restart Claude Desktop
 2. Open a new conversation
 3. Try: `"Use zen to list available models"`
 
 ### For Claude Code CLI:
+```
 1. Exit any existing Claude session
 2. Run `claude` from your project directory  
+
 3. Try: `"Use zen to chat about Python best practices"`
 
-### For Gemini CLI:
+\n### For Gemini CLI
 **Note**: While Zen MCP connects to Gemini CLI, tool invocation isn't working correctly yet. See [Gemini CLI Setup](gemini-setup.md) for updates.
 
-### For Codex CLI:
+\n### For Codex CLI
 1. Restart Codex CLI if running
 2. Open a new conversation
 3. Try: `"Use zen to list available models"`
 
-### Test Commands:
-```
+### Test Commands
+
+```text
 "Use zen to list available models"
 "Chat with zen about the best approach for API design"
 "Use zen thinkdeep with gemini pro about scaling strategies"  
 "Debug this error with o3: [paste error]"
+
+## Hybrid CLI Routing (How CLI models are handled)
+
+To preserve the lightweight design of local CLI bridges (Codex, Ollama CLI, etc.), Zen MCP uses a hybrid routing strategy:
+
+- **Direct CLI routing:** If a requested model matches a known CLI model (configured via `CODEX_CLI_ENABLED` and `CODEX_CLI_BINARY`), the server will route the request directly to the `CLIBridgeProvider`. This avoids forcing CLI tools through API-style validation and authentication logic.
+- **Registry discovery for everything else:** The provider registry is still used for discovery and for all native or networked providers (Gemini, OpenAI, X.AI, DIAL, Custom, OpenRouter).
+
+Why this matters:
+- Keeps CLI execution simple and reliable (subprocess calls, no API key checks).
+- Prevents registry-level auth checks from blocking local CLI providers.
+- Maintains unified `listmodels` discovery while ensuring execution uses the best path.
+
+If you rely on CLI tools, ensure `CODEX_CLI_ENABLED=1` and `CODEX_CLI_BINARY` point to the CLI binary in your `PATH`.
 ```
 
 **Note**: Codex CLI provides excellent MCP integration with automatic environment variable configuration when using the setup script.
 
 ## Step 5: Start Using Zen
 
-### Basic Usage Patterns:
+### Basic Usage Patterns
 
 **Let Claude pick the model:**
-```
+```text
 "Use zen to analyze this code for security issues"
 "Debug this race condition with zen"
 "Plan the database migration with zen"
 ```
 
 **Specify the model:**
-```  
+```text
 "Use zen with gemini pro to review this complex algorithm"
 "Debug with o3 using zen for logical analysis"
 "Get flash to quickly format this code via zen"
 ```
 
 **Multi-model workflows:**
-```
+```text
 "Use zen to get consensus from pro and o3 on this architecture"
 "Code review with gemini, then precommit validation with o3"  
 "Analyze with flash, then deep dive with pro if issues found"
 ```
 
-### Quick Tool Reference:
+### Quick Tool Reference
 
 **🤝 Collaboration**: `chat`, `thinkdeep`, `planner`, `consensus`
 **🔍 Code Analysis**: `analyze`, `codereview`, `debug`, `precommit`  
