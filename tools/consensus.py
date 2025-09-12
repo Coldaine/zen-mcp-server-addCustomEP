@@ -495,6 +495,11 @@ of the evidence, even when it strongly points in one direction.""",
                 logger.debug(f"consensus dispatch models={[m['model'] for m in self.models_to_consult]}")
                 start_time = time.time()
 
+                # TODO(issue:CONSENSUS-STREAMING): Consider streaming partial synthesis:
+                # - Hook into an asyncio.Queue to emit 'partial' synth events when models return.
+                # - Provide opt-in via `CONSENSUS_STREAMING=true`.
+                # - Add tests validating stream events structure.
+
                 # Run all model consultations concurrently
                 concurrent_results = await run_models_concurrently(
                     self.models_to_consult, lambda spec: self._consult_model_with_timing(spec, request)
@@ -643,6 +648,10 @@ of the evidence, even when it strongly points in one direction.""",
             # Log any temperature corrections
             for warning in temp_warnings:
                 logger.warning(warning)
+
+            # TODO(issue:VISION-INTEGRATION): Add per-call request dump and timing for vision-enabled models.
+            # - When model_config supports images, include a short human-readable summary of images attached.
+            # - Provide a toggle via env `ZEN_DEBUG_VISION` to write request payload to `logs/mcp_activity.log` or a temp file.
 
             # Call the model with validated temperature
             response = provider.generate_content(

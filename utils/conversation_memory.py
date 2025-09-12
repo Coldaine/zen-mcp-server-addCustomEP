@@ -549,6 +549,13 @@ def get_conversation_image_list(context: ThreadContext) -> list[str]:
 
     logger.debug(f"[IMAGES] Collecting images from {len(context.turns)} turns (newest first)")
 
+    # TODO(issue:IMAGE-NORMALIZATION): Normalize image data for conversation memory:
+    # - Accept file paths and data URLs as input
+    # - Convert file paths to base64 data URLs or b64_json format
+    # - Deduplicate images by content hash to avoid redundant processing
+    # - Cache normalized images to improve performance across turns
+    # - Handle MIME type validation and size limits consistently
+
     # Process turns in reverse order (newest first) - this is the CORE of newest-first prioritization
     # By iterating from len-1 down to 0, we encounter newer turns before older turns
     # When we find a duplicate image, we skip it because the newer version is already in our list

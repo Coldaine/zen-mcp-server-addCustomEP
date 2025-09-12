@@ -561,6 +561,10 @@ class OpenAICompatibleProvider(ModelProvider):
         for attempt in range(max_retries):
             actual_attempts = attempt + 1  # Convert from 0-based index to human-readable count
             try:
+                # TODO(issue:VISION-PIPELINE): Add debug logging of outbound request body when `ZEN_DEBUG_VISION=1`.
+                # - Purpose: capture raw multipart/JSON payload for failing vision calls.
+                # - Acceptance: log includes Content-Type, field names, and any base64 image strings (masked to first/last 16 chars).
+
                 # Generate completion
                 response = self.client.chat.completions.create(**completion_params)
 
@@ -846,6 +850,11 @@ class OpenAICompatibleProvider(ModelProvider):
     def _process_image(self, image_path: str) -> Optional[dict]:
         """Process an image for OpenAI-compatible API."""
         try:
+            # TODO(issue:VISION-ENCODING): Normalize image inputs:
+            # - Accept file path strings and data URLs.
+            # - If path -> read file bytes, convert to base64, attach as `images: [<base64>]` or `b64_json` depending on provider.
+            # - Ensure MIME type and size checks (max_image_size_mb from `conf/custom_models.json`).
+
             if image_path.startswith("data:"):
                 # Validate the data URL
                 self.validate_image(image_path)
