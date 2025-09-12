@@ -116,7 +116,7 @@ class TestModelEnumeration:
         models = tool._get_available_models()
 
         # Custom-only models should NOT be present
-        custom_only_models = ["local-llama", "llama3.2"]
+        custom_only_models = ["local-llama", "qwen3:0.6b"]
         found_count = sum(1 for m in custom_only_models if m in models)
 
         assert found_count == 0, "Custom models should not be included without CUSTOM_API_URL"

@@ -36,7 +36,7 @@ class TestPromptSizeLimitBugFix:
         tool._current_arguments = {
             "prompt": enhanced_prompt,  # Enhanced with history
             "_original_user_prompt": short_user_prompt,  # Original user input (our fix)
-            "model": "local-llama",
+            "model": "qwen3:0.6b",
         }
 
         # Test the hook method directly
@@ -83,7 +83,7 @@ class TestPromptSizeLimitBugFix:
         # _current_arguments exists but no _original_user_prompt field
         tool._current_arguments = {
             "prompt": user_content,
-            "model": "local-llama",
+            "model": "qwen3:0.6b",
             # No _original_user_prompt field
         }
 

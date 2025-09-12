@@ -56,7 +56,7 @@ The server uses `conf/custom_models.json` to map convenient aliases to both Open
 
 | Alias | Maps to Local Model | Note |
 |-------|-------------------|------|
-| `local-llama`, `local` | `llama3.2` | Requires `CUSTOM_API_URL` configured |
+| `local-llama`, `local` | `qwen3:0.6b` | Requires `CUSTOM_API_URL` configured |
 
 View the full list in [`conf/custom_models.json`](conf/custom_models.json). 
 
@@ -158,8 +158,8 @@ CUSTOM_MODEL_NAME=your-loaded-model
 "Use mistral via zen to optimize"    # → mistral/mistral-large
 
 # Local models (with custom URL configured):
-"Use local-llama to analyze this code"     # → llama3.2 (local)
-"Use local to debug this function"         # → llama3.2 (local)
+"Use local-llama to analyze this code"     # → qwen3:0.6b (local)
+"Use local to debug this function"         # → qwen3:0.6b (local)
 ```
 
 **Using full model names:**

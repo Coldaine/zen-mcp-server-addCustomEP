@@ -479,7 +479,7 @@ class ConfigurationManager:
                     ],
                     "confidence": "high",
                     "continuation_id": continuation_id,
-                    "model": "flash",  # Use flash for expert analysis
+                    "model": "qwen3:0.6b",  # Use flash for expert analysis
                 },
             )
 
@@ -568,7 +568,7 @@ class ConfigurationManager:
                         {"severity": "high", "description": "Performance bottleneck in payment history"},
                     ],
                     "review_validation_type": "internal",  # This should skip expert analysis
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -665,7 +665,7 @@ def validate_credit_card(card_number):
                     "files": [utils_file, validator_file],  # Required for step 1
                     "relevant_context": ["calculate_discount"],
                     "confidence": "low",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -708,7 +708,7 @@ def validate_credit_card(card_number):
                         {"severity": "medium", "description": "Credit card validation logic could be more robust"},
                     ],
                     "confidence": "medium",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -774,7 +774,7 @@ def validate_credit_card(card_number):
                     "relevant_context": [],
                     "confidence": "low",
                     "review_type": "security",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -811,7 +811,7 @@ def validate_credit_card(card_number):
                         {"severity": "critical", "description": "API key stored in plain text"},
                     ],
                     "confidence": "medium",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -852,7 +852,7 @@ def validate_credit_card(card_number):
                         {"severity": "medium", "description": "Unbounded failed_payments list"},
                     ],
                     "confidence": "high",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -890,7 +890,7 @@ def validate_credit_card(card_number):
                         {"severity": "medium", "description": "Over-engineered architecture patterns"},
                     ],
                     "confidence": "high",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 

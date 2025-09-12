@@ -23,33 +23,33 @@ class TestConsensusThreeModels(BaseSimulatorTest):
         try:
             self.logger.info("Testing consensus tool with three models: flash:against, flash:for, local-llama:neutral")
 
-            # Send request with three objects using new workflow parameters
+            # Send request with three objects using concurrent single-step workflow
             response, continuation_id = self.call_mcp_tool(
                 "consensus",
                 {
                     "step": "Is a sync manager class a good idea for my CoolTodos app?",
                     "step_number": 1,
-                    "total_steps": 3,  # 3 models = 3 steps
-                    "next_step_required": True,
+                    "total_steps": 1,  # Concurrent: all 3 models in single step
+                    "next_step_required": False,
                     "findings": "Initial analysis needed on sync manager class architecture decision for CoolTodos app",
                     "models": [
                         {
-                            "model": "flash",
+                            "model": "qwen3:0.6b",
                             "stance": "against",
                             "stance_prompt": "You are a software architecture critic. Focus on the potential downsides of adding a sync manager class: complexity overhead, maintenance burden, potential for over-engineering, and whether simpler alternatives exist. Consider if this adds unnecessary abstraction layers.",
                         },
                         {
-                            "model": "flash",
+                            "model": "qwen3:0.6b",
                             "stance": "for",
                             "stance_prompt": "You are a software architecture advocate. Focus on the benefits of a sync manager class: separation of concerns, testability, maintainability, and how it can improve the overall architecture. Consider scalability and code organization advantages.",
                         },
                         {
-                            "model": "local-llama",
+                            "model": "qwen3:0.6b",
                             "stance": "neutral",
                             "stance_prompt": "You are a pragmatic software engineer. Provide a balanced analysis considering both the benefits and drawbacks. Focus on the specific context of a CoolTodos app and what factors would determine if this is the right choice.",
                         },
                     ],
-                    "model": "flash",  # Default model for Claude's execution
+                    "model": "qwen3:0.6b",  # Default model for Claude's execution
                 },
             )
 
@@ -72,11 +72,11 @@ class TestConsensusThreeModels(BaseSimulatorTest):
                 self.logger.error("Missing 'status' field in three-model consensus response")
                 return False
 
-            # Check for step 1 status (Claude analysis + first model consultation)
-            expected_status = "analysis_and_first_model_consulted"
+            # Check for concurrent completion status
+            expected_status = "consensus_workflow_complete"
             if consensus_data["status"] != expected_status:
                 self.logger.error(
-                    f"Three-model consensus step 1 failed with status: {consensus_data['status']}, expected: {expected_status}"
+                    f"Three-model consensus concurrent step failed with status: {consensus_data['status']}, expected: {expected_status}"
                 )
 
                 # Log additional error details for debugging
@@ -91,31 +91,48 @@ class TestConsensusThreeModels(BaseSimulatorTest):
 
                 return False
 
-            # Check that we have model response from step 1
-            model_response = consensus_data.get("model_response")
-            if not model_response:
-                self.logger.error("Three-model consensus step 1 response missing model_response")
+            # Validate concurrent response structure with 3 accumulated responses
+            accumulated_responses = consensus_data.get("accumulated_responses") or consensus_data.get(
+                "all_model_responses"
+            )
+            if not accumulated_responses or len(accumulated_responses) != 3:
+                self.logger.error(
+                    f"Expected 3 accumulated responses, got {len(accumulated_responses) if accumulated_responses else 0}"
+                )
                 return False
 
-            # Check that model response has expected structure
-            if not model_response.get("model") or not model_response.get("verdict"):
-                self.logger.error("Model response missing required fields (model or verdict)")
-                return False
+            expected_models_stances = [("flash", "against"), ("flash", "for"), ("qwen3:0.6b", "neutral")]
 
-            # Check step information
+            for i, (expected_model, expected_stance) in enumerate(expected_models_stances):
+                if i >= len(accumulated_responses):
+                    self.logger.error(f"Missing response {i+1}")
+                    return False
+
+                response = accumulated_responses[i]
+                if response.get("model") != expected_model or response.get("stance") != expected_stance:
+                    self.logger.error(
+                        f"Response {i+1} expected {expected_model}:{expected_stance}, got {response.get('model')}:{response.get('stance')}"
+                    )
+                    return False
+
+                if response.get("status") != "success":
+                    self.logger.error(f"Response {i+1} expected 'success', got {response.get('status')}")
+                    return False
+
+                if not response.get("content"):
+                    self.logger.error(f"Response {i+1} missing content")
+                    return False
+
+            # Check step information for single step
             if consensus_data.get("step_number") != 1:
                 self.logger.error(f"Expected step_number 1, got: {consensus_data.get('step_number')}")
                 return False
 
-            if not consensus_data.get("next_step_required"):
-                self.logger.error("Expected next_step_required=True for step 1")
+            if consensus_data.get("next_step_required"):
+                self.logger.error("Expected next_step_required=False for single concurrent step")
                 return False
 
-            self.logger.info(f"Consensus step 1 consulted model: {model_response.get('model')}")
-            self.logger.info(f"Model stance: {model_response.get('stance', 'neutral')}")
-            self.logger.info(f"Response status: {model_response.get('status', 'unknown')}")
-
-            # Check metadata contains model name
+            # Check metadata contains model name (Claude's model)
             metadata = consensus_data.get("metadata", {})
             if not metadata.get("model_name"):
                 self.logger.error("Missing model_name in metadata")
@@ -126,17 +143,28 @@ class TestConsensusThreeModels(BaseSimulatorTest):
             # Verify we have analysis from Claude
             agent_analysis = consensus_data.get("agent_analysis")
             if not agent_analysis:
-                self.logger.error("Missing Claude's analysis in step 1")
+                self.logger.error("Missing Claude's analysis in concurrent step")
                 return False
 
             analysis_text = agent_analysis.get("initial_analysis", "")
             self.logger.info(f"Claude analysis length: {len(analysis_text)} characters")
 
-            self.logger.info("✓ Three-model consensus tool test completed successfully")
-            self.logger.info(f"✓ Step 1 completed with model: {model_response.get('model')}")
+            # Verify complete_consensus
+            complete_consensus = consensus_data.get("complete_consensus")
+            if not complete_consensus:
+                self.logger.error("Missing complete_consensus in response")
+                return False
+
+            if complete_consensus.get("total_responses") != 3:
+                self.logger.error(f"Expected total_responses 3, got {complete_consensus.get('total_responses')}")
+                return False
+
+            self.logger.info("✓ Three-model concurrent consensus tool test completed successfully")
+            self.logger.info("✓ Concurrent step completed with 3 models consulted")
+            self.logger.info("✓ All responses validated: flash:against, flash:for, qwen3:0.6b:neutral")
             self.logger.info(f"✓ Analysis provided: {len(analysis_text)} characters")
             self.logger.info(f"✓ Model metadata properly included: {metadata.get('model_name')}")
-            self.logger.info("✓ Ready for step 2 continuation")
+            self.logger.info("✓ Consensus complete in single step")
 
             return True
 

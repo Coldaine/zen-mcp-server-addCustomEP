@@ -78,7 +78,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 "chat",
                 {
                     "prompt": "Hello! Please use low thinking mode. Can you explain what MCP tools are?",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "temperature": 0.7,
                     "thinking_mode": "low",
                 },
@@ -120,7 +120,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 {
                     "prompt": "Please use low thinking mode. Can you give me a specific example of how an MCP tool might work?",
                     "continuation_id": self.new_continuation_id,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "thinking_mode": "low",
                 },
             )
@@ -160,7 +160,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 {
                     "prompt": "Please use low thinking mode. Analyze this Python code and tell me what the Calculator class does",
                     "files": [self.test_files["python"]],
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "thinking_mode": "low",
                 },
             )
@@ -176,7 +176,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                     "prompt": "Please use low thinking mode. What methods does the Calculator class have?",
                     "files": [self.test_files["python"]],  # Same file
                     "continuation_id": continuation_id,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "thinking_mode": "low",
                 },
             )
@@ -209,7 +209,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 "chat",
                 {
                     "prompt": "Please use low thinking mode. Hello, this is a test with max temperature",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "temperature": 1.0,  # At the limit
                     "thinking_mode": "low",
                 },
@@ -224,7 +224,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 "chat",
                 {
                     "prompt": "Please use low thinking mode. Another test message with min temperature",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "temperature": 0.0,  # At minimum
                     "thinking_mode": "low",
                 },
@@ -241,7 +241,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                     "chat",
                     {
                         "prompt": "Please use low thinking mode. Test with invalid temperature",
-                        "model": "flash",
+                        "model": "qwen3:0.6b",
                         "temperature": 1.5,  # Too high - should be validated
                         "thinking_mode": "low",
                     },
@@ -276,7 +276,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 "chat",
                 {
                     "prompt": "Please use low thinking mode. Can you see this image?",
-                    "model": "local-llama",  # Text-only model
+                    "model": "qwen3:0.6b",  # Text-only model
                     "images": [small_image],
                     "thinking_mode": "low",
                 },
@@ -293,7 +293,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 "chat",
                 {
                     "prompt": "Please use low thinking mode. Analyze these images",
-                    "model": "gemini-2.5-flash",  # Supports max 16 images
+                    "model": "qwen3:0.6b",  # Supports max 16 images
                     "images": many_images,
                     "thinking_mode": "low",
                 },
@@ -308,7 +308,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 "chat",
                 {
                     "prompt": "Please use low thinking mode. This is a test with one image",
-                    "model": "gemini-2.5-flash",
+                    "model": "qwen3:0.6b",
                     "images": [small_image],
                     "thinking_mode": "low",
                 },
@@ -335,7 +335,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 "chat",
                 {
                     "prompt": "Please use low thinking mode. My name is TestUser and I'm working on a Python project called TestProject",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "thinking_mode": "low",
                 },
             )
@@ -350,7 +350,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 {
                     "prompt": "Please use low thinking mode. What's my name and what project am I working on?",
                     "continuation_id": continuation_id,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "thinking_mode": "low",
                 },
             )
@@ -386,7 +386,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 {
                     "prompt": "Please use low thinking mode. I'm sharing an image with you. Can you acknowledge that you received it?",
                     "images": [small_image],
-                    "model": "gemini-2.5-flash",  # Model that supports images
+                    "model": "llama3.2-vision:11b",  # Model that supports images
                     "thinking_mode": "low",
                 },
             )
@@ -405,7 +405,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 {
                     "prompt": "Please use low thinking mode. What did you see in that image I shared earlier?",
                     "continuation_id": continuation_id,
-                    "model": "gemini-2.5-flash",
+                    "model": "llama3.2-vision:11b",
                     "thinking_mode": "low",
                 },
             )
@@ -421,7 +421,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 {
                     "prompt": "Please use low thinking mode. Here are two images for comparison",
                     "images": multiple_images,
-                    "model": "gemini-2.5-flash",
+                    "model": "llama3.2-vision:11b",
                     "thinking_mode": "low",
                 },
             )
@@ -451,7 +451,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 {
                     "prompt": "Please use low thinking mode. Here are some files for you to analyze",
                     "files": [self.test_files["python"], self.test_files["config"]],
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "thinking_mode": "low",
                 },
             )
@@ -466,7 +466,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 {
                     "prompt": "Please use low thinking mode. From the files I shared earlier, what types of files were there?",
                     "continuation_id": continuation_id,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "thinking_mode": "low",
                 },
             )
@@ -485,7 +485,7 @@ class ChatSimpleValidationTest(ConversationBaseTest):
                 {
                     "prompt": "Please use low thinking mode. Can you tell me what functions were defined in the Python file from our earlier discussion?",
                     "continuation_id": continuation_id,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "thinking_mode": "low",
                 },
             )

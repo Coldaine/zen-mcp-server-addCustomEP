@@ -179,7 +179,7 @@ if __name__ == "__main__":
                 {
                     "prompt": "Please analyze this math functions file and explain what it does.",
                     "files": [file1_path],
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "temperature": 0.7,
                 },
             )
@@ -213,7 +213,7 @@ if __name__ == "__main__":
                     "findings": "Continuing from chat conversation to analyze performance implications of recursive functions.",
                     "relevant_files": [file1_path],
                     "continuation_id": continuation_id1,  # Continue the chat conversation
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -250,7 +250,7 @@ if __name__ == "__main__":
                     "prompt": "Now compare the math functions with this calculator class. How do they differ in approach?",
                     "files": [file1_path, file2_path],
                     "continuation_id": continuation_id2,  # Continue the conversation from step 2
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "temperature": 0.7,
                 },
             )

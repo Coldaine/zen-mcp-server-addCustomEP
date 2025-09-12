@@ -551,7 +551,7 @@ class UserData:
                     ],
                     "confidence": "partial",  # Use partial to trigger expert analysis
                     "continuation_id": continuation_id,
-                    "model": "flash",  # Use flash for expert analysis
+                    "model": "qwen3:0.6b",  # Use flash for expert analysis
                 },
             )
 
@@ -652,7 +652,7 @@ class UserData:
                     ],
                     "confidence": "complete",  # Complete confidence should skip expert analysis
                     "refactor_type": "codesmells",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -752,7 +752,7 @@ class DataContainer:
                     "relevant_context": ["calculate_total"],
                     "confidence": "incomplete",
                     "refactor_type": "codesmells",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -796,7 +796,7 @@ class DataContainer:
                         {"type": "codesmells", "severity": "low", "description": "Duplicate formatting logic"},
                     ],
                     "confidence": "partial",  # Use partial to trigger expert analysis
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -873,7 +873,7 @@ class DataContainer:
                     ],
                     "confidence": "complete",
                     "refactor_type": "decompose",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -920,7 +920,7 @@ class DataContainer:
                     ],
                     "confidence": "complete",
                     "refactor_type": "modernize",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 

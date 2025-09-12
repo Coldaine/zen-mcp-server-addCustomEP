@@ -28,7 +28,7 @@ jobs:
       - name: Run unit tests
         run: |
           # Run only unit tests (exclude simulation tests and integration tests)
-          # Integration tests require local-llama which isn't available in CI
+          # Integration tests require qwen3:0.6b which isn't available in CI
           python -m pytest tests/ -v --ignore=simulator_tests/ -m "not integration"
         env:
           # Ensure no API key is accidentally used in CI

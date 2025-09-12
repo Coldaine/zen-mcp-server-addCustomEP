@@ -82,7 +82,7 @@ protocol View {
                 {
                     "prompt": initial_prompt,
                     "files": [test_file_path],
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -109,7 +109,7 @@ protocol View {
                     {
                         "prompt": prompt,
                         "continuation_id": continuation_id,
-                        "model": "flash",
+                        "model": "qwen3:0.6b",
                     },
                 )
 
@@ -132,7 +132,7 @@ protocol View {
                 {
                     "prompt": short_prompt,
                     "continuation_id": continuation_id,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 

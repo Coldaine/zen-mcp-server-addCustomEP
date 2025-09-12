@@ -88,7 +88,7 @@ class OpenRouterFallbackTest(BaseSimulatorTest):
                     "next_step_required": False,
                     "findings": "Starting code review of sum function",
                     "relevant_files": [test_file],
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "temperature": 0.1,
                 },
             )
@@ -111,7 +111,7 @@ class OpenRouterFallbackTest(BaseSimulatorTest):
                     "next_step_required": False,
                     "findings": "Starting code structure analysis",
                     "relevant_files": [self.test_files["python"]],
-                    "model": "pro",
+                    "model": "qwen3:0.6b",
                     "temperature": 0.1,
                 },
             )
@@ -133,7 +133,7 @@ class OpenRouterFallbackTest(BaseSimulatorTest):
                     "total_steps": 1,
                     "next_step_required": False,
                     "findings": "Starting debug investigation of None return values",
-                    "model": "flash",  # Should map to OpenRouter
+                    "model": "qwen3:0.6b",  # Should map to OpenRouter
                     "temperature": 0.1,
                 },
             )

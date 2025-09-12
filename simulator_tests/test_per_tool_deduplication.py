@@ -68,7 +68,7 @@ def divide(x, y):
                 "path": os.getcwd(),  # Use current working directory as the git repo path
                 "relevant_files": [dummy_file_path],
                 "thinking_mode": "low",
-                "model": "flash",
+                "model": "qwen3:0.6b",
             }
 
             response1, continuation_id = self.call_mcp_tool("precommit", precommit_params)
@@ -97,7 +97,7 @@ def divide(x, y):
                 "findings": "Starting code review of dummy_code.py",
                 "relevant_files": [dummy_file_path],
                 "thinking_mode": "low",
-                "model": "flash",
+                "model": "qwen3:0.6b",
             }
 
             response2, _ = self.call_mcp_tool("codereview", codereview_params)
@@ -131,7 +131,7 @@ def subtract(a, b):
                 "path": os.getcwd(),  # Use current working directory as the git repo path
                 "relevant_files": [dummy_file_path, new_file_path],  # Old + new file
                 "thinking_mode": "low",
-                "model": "flash",
+                "model": "qwen3:0.6b",
             }
 
             response3, _ = self.call_mcp_tool("precommit", continue_params)

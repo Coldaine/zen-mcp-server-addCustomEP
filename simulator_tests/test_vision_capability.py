@@ -2,10 +2,10 @@
 """
 Vision Capability Test
 
-Tests vision capability with the chat tool using O3 model:
+Tests vision capability with the chat tool using llama3.2-vision model:
 - Test file path image (PNG triangle)
 - Test base64 data URL image
-- Use chat tool with O3 model to analyze the images
+- Use chat tool with llama3.2-vision model to analyze the images
 - Verify the model correctly identifies shapes
 """
 
@@ -16,7 +16,7 @@ from .base_test import BaseSimulatorTest
 
 
 class VisionCapabilityTest(BaseSimulatorTest):
-    """Test vision capability with chat tool and O3 model"""
+    """Test vision capability with chat tool and llama3.2-vision model"""
 
     @property
     def test_name(self) -> str:
@@ -24,7 +24,7 @@ class VisionCapabilityTest(BaseSimulatorTest):
 
     @property
     def test_description(self) -> str:
-        return "Vision capability test with chat tool and O3 model"
+        return "Vision capability test with chat tool and llama3.2-vision model"
 
     def get_triangle_png_path(self) -> str:
         """Get the path to the triangle.png file in tests directory"""
@@ -51,9 +51,9 @@ class VisionCapabilityTest(BaseSimulatorTest):
         return data_url
 
     def run_test(self) -> bool:
-        """Test vision capability with O3 model"""
+        """Test vision capability with llama3.2-vision model"""
         try:
-            self.logger.info("Test: Vision capability with O3 model")
+            self.logger.info("Test: Vision capability with llama3.2-vision model")
 
             # Test 1: File path image
             self.logger.info("  1.1: Testing file path image (PNG triangle)")
@@ -65,12 +65,12 @@ class VisionCapabilityTest(BaseSimulatorTest):
                 {
                     "prompt": "What shape do you see in this image? Please be specific and only mention the shape name.",
                     "images": [triangle_path],
-                    "model": "o3",
+                    "model": "llama3.2-vision:11b",
                 },
             )
 
             if not response1:
-                self.logger.error("Failed to get response from O3 model for file path test")
+                self.logger.error("Failed to get response from flash model for file path test")
                 return False
 
             # Check for error indicators first
@@ -87,16 +87,18 @@ class VisionCapabilityTest(BaseSimulatorTest):
                     "error",
                 ]
             ):
-                self.logger.error(f"  ❌ O3 model cannot access file path image. Response: {response1[:300]}...")
+                self.logger.error(
+                    f"  ❌ llama3.2-vision model cannot access file path image. Response: {response1[:300]}..."
+                )
                 return False
 
             if "triangle" not in response1_lower:
                 self.logger.error(
-                    f"  ❌ O3 did not identify triangle in file path test. Response: {response1[:200]}..."
+                    f"  ❌ llama3.2-vision did not identify triangle in file path test. Response: {response1[:200]}..."
                 )
                 return False
 
-            self.logger.info("  ✅ O3 correctly identified file path image as triangle")
+            self.logger.info("  ✅ llama3.2-vision correctly identified file path image as triangle")
 
             # Test 2: Base64 data URL image
             self.logger.info("  1.2: Testing base64 data URL image")
@@ -107,12 +109,12 @@ class VisionCapabilityTest(BaseSimulatorTest):
                 {
                     "prompt": "What shape do you see in this image? Please be specific and only mention the shape name.",
                     "images": [data_url],
-                    "model": "o3",
+                    "model": "llama3.2-vision:11b",
                 },
             )
 
             if not response2:
-                self.logger.error("Failed to get response from O3 model for base64 test")
+                self.logger.error("Failed to get response from llama3.2-vision model for base64 test")
                 return False
 
             response2_lower = response2.lower()
@@ -128,14 +130,18 @@ class VisionCapabilityTest(BaseSimulatorTest):
                     "error",
                 ]
             ):
-                self.logger.error(f"  ❌ O3 model cannot access base64 image. Response: {response2[:300]}...")
+                self.logger.error(
+                    f"  ❌ llama3.2-vision model cannot access base64 image. Response: {response2[:300]}..."
+                )
                 return False
 
             if "triangle" not in response2_lower:
-                self.logger.error(f"  ❌ O3 did not identify triangle in base64 test. Response: {response2[:200]}...")
+                self.logger.error(
+                    f"  ❌ llama3.2-vision did not identify triangle in base64 test. Response: {response2[:200]}..."
+                )
                 return False
 
-            self.logger.info("  ✅ O3 correctly identified base64 image as triangle")
+            self.logger.info("  ✅ llama3.2-vision correctly identified base64 image as triangle")
 
             # Optional: Test continuation with same image
             if continuation_id:
@@ -146,7 +152,7 @@ class VisionCapabilityTest(BaseSimulatorTest):
                         "prompt": "What color is this triangle?",
                         "images": [triangle_path],  # Same image should be deduplicated
                         "continuation_id": continuation_id,
-                        "model": "o3",
+                        "model": "llama3.2-vision:11b",
                     },
                 )
 

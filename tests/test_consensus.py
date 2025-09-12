@@ -2,6 +2,8 @@
 Tests for the Consensus tool using WorkflowTool architecture.
 """
 
+import asyncio
+import json
 from unittest.mock import Mock
 
 import pytest
@@ -25,7 +27,7 @@ class TestConsensusTool:
 
     def test_request_validation_step1(self):
         """Test Pydantic request model validation for step 1."""
-        # Valid step 1 request with models
+        # Valid step 1 request with models - using cheaper alternatives
         step1_request = ConsensusRequest(
             step="Analyzing the real-time collaboration proposal",
             step_number=1,
@@ -33,8 +35,14 @@ class TestConsensusTool:
             next_step_required=True,
             findings="Initial assessment shows strong value but technical complexity",
             confidence="medium",
-            models=[{"model": "flash", "stance": "neutral"}, {"model": "o3-mini", "stance": "for"}],
+            models=[{"model": "flash", "stance": "neutral"}, {"model": "haiku", "stance": "for"}],
             relevant_files=["/proposal.md"],
+            model="auto",  # Required by ToolRequest
+            continuation_id=None,
+            hypothesis=None,
+            backtrack_from_step=None,
+            use_assistant_model=True,
+            current_model_index=0,
         )
 
         assert step1_request.step_number == 1
@@ -51,6 +59,12 @@ class TestConsensusTool:
                 total_steps=3,
                 next_step_required=True,
                 findings="Test findings",
+                model="auto",
+                continuation_id=None,
+                hypothesis=None,
+                backtrack_from_step=None,
+                use_assistant_model=True,
+                current_model_index=0,
                 # Missing models field
             )
 
@@ -66,6 +80,11 @@ class TestConsensusTool:
             confidence="medium",
             continuation_id="test-id",
             current_model_index=1,
+            model="auto",
+            hypothesis=None,
+            backtrack_from_step=None,
+            use_assistant_model=True,
+            models=None,  # Not required for step 2+
         )
 
         assert step2_request.step_number == 2
@@ -86,6 +105,11 @@ class TestConsensusTool:
                 {"model": "flash", "stance": "neutral"},
             ],
             continuation_id="test-id",
+            model="auto",
+            hypothesis=None,
+            backtrack_from_step=None,
+            use_assistant_model=True,
+            current_model_index=0,
         )
         assert len(valid_request.models) == 3
 
@@ -103,6 +127,11 @@ class TestConsensusTool:
                     {"model": "o3", "stance": "for"},  # Duplicate!
                 ],
                 continuation_id="test-id",
+                model="auto",
+                hypothesis=None,
+                backtrack_from_step=None,
+                use_assistant_model=True,
+                current_model_index=0,
             )
 
     def test_input_schema_generation(self):
@@ -154,18 +183,13 @@ class TestConsensusTool:
         """Test required actions for different consensus phases."""
         tool = ConsensusTool()
 
-        # Step 1: Claude's initial analysis
+        # Step 1: Claude's initial analysis + concurrent model consultations + synthesis
         actions = tool.get_required_actions(1, "exploring", "Initial findings", 4)
-        assert any("initial analysis" in action for action in actions)
-        assert any("consult other models" in action for action in actions)
-
-        # Step 2-3: Model consultations
-        actions = tool.get_required_actions(2, "medium", "Model findings", 4)
-        assert any("Review the model response" in action for action in actions)
-
-        # Final step: Synthesis
-        actions = tool.get_required_actions(4, "high", "All findings", 4)
-        assert any("All models have been consulted" in action for action in actions)
+        assert any(
+            "initial analysis is complete and all models have been consulted concurrently" in action
+            for action in actions
+        )
+        assert any("Review all model responses provided in this step" in action for action in actions)
         assert any("Synthesize all perspectives" in action for action in actions)
 
     def test_prepare_step_data(self):
@@ -180,6 +204,12 @@ class TestConsensusTool:
             confidence="medium",
             models=[{"model": "test"}],
             relevant_files=["/test.py"],
+            model="auto",
+            continuation_id=None,
+            hypothesis=None,
+            backtrack_from_step=None,
+            use_assistant_model=True,
+            current_model_index=0,
         )
 
         step_data = tool.prepare_step_data(request)
@@ -232,14 +262,16 @@ class TestConsensusTool:
             "total_steps": 2,
             "next_step_required": True,
             "findings": "Found pros and cons",
-            "models": [{"model": "flash", "stance": "neutral"}, {"model": "o3-mini", "stance": "for"}],
+            "models": [{"model": "flash", "stance": "neutral"}, {"model": "haiku", "stance": "for"}],
         }
 
         # Verify models_to_consult is set correctly from step 1
         request = tool.get_workflow_request_model()(**arguments)
-        assert len(request.models) == 2
-        assert request.models[0]["model"] == "flash"
-        assert request.models[1]["model"] == "o3-mini"
+        assert request.models is not None  # Type guard for mypy
+        models = request.models  # Type narrowing
+        assert len(models) == 2
+        assert models[0]["model"] == "flash"
+        assert models[1]["model"] == "haiku"
 
     def test_execute_workflow_total_steps_calculation(self):
         """Test that total_steps is calculated correctly from models."""
@@ -252,7 +284,7 @@ class TestConsensusTool:
             "total_steps": 4,  # This should be corrected to 2
             "next_step_required": True,
             "findings": "Analysis complete",
-            "models": [{"model": "flash", "stance": "neutral"}, {"model": "o3-mini", "stance": "for"}],
+            "models": [{"model": "flash", "stance": "neutral"}, {"model": "haiku", "stance": "for"}],
         }
 
         request = tool.get_workflow_request_model()(**arguments)
@@ -295,7 +327,7 @@ class TestConsensusTool:
     def test_handle_work_continuation(self):
         """Test work continuation handling - legacy method for compatibility."""
         tool = ConsensusTool()
-        tool.models_to_consult = [{"model": "flash", "stance": "neutral"}, {"model": "o3-mini", "stance": "for"}]
+        tool.models_to_consult = [{"model": "flash", "stance": "neutral"}, {"model": "haiku", "stance": "for"}]
 
         # Note: In the new workflow, model consultation happens DURING steps in execute_workflow
         # This method is kept for compatibility but not actively used in the step-by-step flow
@@ -320,16 +352,125 @@ class TestConsensusTool:
         tool = ConsensusTool()
         tool.accumulated_responses = [{"model": "test", "response": "data"}]
 
-        # Test different step numbers (new workflow: 2 models = 2 steps)
-        request = Mock(step_number=1, total_steps=2)
+        # Test different step numbers (new workflow: concurrent execution in step 1)
+        request = Mock(step_number=1, total_steps=1)
         response_data = {}
         result = tool.customize_workflow_response(response_data, request)
-        assert result["consensus_workflow_status"] == "initial_analysis_complete"
+        assert result["consensus_workflow_status"] == "concurrent_execution_complete"
 
-        request = Mock(step_number=2, total_steps=2)
+    def test_concurrent_execution_step1(self, mocker):
+        """Test that step 1 executes all model consultations concurrently."""
+        tool = ConsensusTool()
+
+        # Mock the concurrent execution
+        mock_model_responses = [
+            {
+                "model": "flash",
+                "stance": "neutral",
+                "status": "success",
+                "content": "Flash analysis",
+                "error_message": None,
+                "latency_ms": 500,
+            },
+            {
+                "model": "haiku",
+                "stance": "for",
+                "status": "success",
+                "content": "O3 analysis",
+                "error_message": None,
+                "latency_ms": 800,
+            },
+        ]
+
+        # Mock the run_models_concurrently function
+        mock_run_concurrent = mocker.patch("tools.consensus.run_models_concurrently")
+        mock_run_concurrent.return_value = mock_model_responses
+
+        # Mock the _consult_model_with_timing method (return value not needed explicitly)
+        mocker.patch.object(ConsensusTool, "_consult_model_with_timing")
+
+        # Create step 1 request
+        request = ConsensusRequest(
+            step="Test proposal for concurrent execution",
+            step_number=1,
+            total_steps=1,  # Will be overridden to 1
+            next_step_required=False,
+            findings="Initial findings",
+            models=[{"model": "flash", "stance": "neutral"}, {"model": "haiku", "stance": "for"}],
+            model="auto",
+            continuation_id=None,
+            hypothesis=None,
+            backtrack_from_step=None,
+            use_assistant_model=True,
+            current_model_index=0,
+        )
+
+        # Execute workflow
+        result = asyncio.run(
+            tool.execute_workflow(
+                {
+                    "step": request.step,
+                    "step_number": request.step_number,
+                    "total_steps": request.total_steps,
+                    "next_step_required": request.next_step_required,
+                    "findings": request.findings,
+                    "models": request.models,
+                }
+            )
+        )
+
+        # Verify concurrent execution was called
+        mock_run_concurrent.assert_called_once()
+        args, kwargs = mock_run_concurrent.call_args
+        model_specs = args[0]
+        assert len(model_specs) == 2
+        assert model_specs[0]["model"] == "flash"
+        assert model_specs[1]["model"] == "haiku"
+
+        # Verify response structure
+        response_text = result[0].text
+        response_data = json.loads(response_text)
+
+        assert response_data["status"] == "consensus_workflow_complete"
+        assert response_data["consensus_complete"] is True
+        assert len(response_data["all_model_responses"]) == 2
+        assert response_data["all_model_responses"][0]["model"] == "flash"
+        assert response_data["all_model_responses"][1]["model"] == "haiku"
+
+    def test_concurrent_execution_error_handling(self):
+        """Test concurrent execution with mixed success/error results."""
+        tool = ConsensusTool()
+
+        # Simulate mixed results
+        tool.models_to_consult = [{"model": "flash", "stance": "neutral"}, {"model": "haiku", "stance": "for"}]
+        tool.accumulated_responses = [
+            {
+                "model": "flash",
+                "stance": "neutral",
+                "status": "success",
+                "content": "Success analysis",
+                "error_message": None,
+                "latency_ms": 500,
+            },
+            {
+                "model": "haiku",
+                "stance": "for",
+                "status": "error",
+                "content": None,
+                "error_message": "Model timeout",
+                "latency_ms": 30000,
+            },
+        ]
+
+        # Test metadata customization
         response_data = {}
-        result = tool.customize_workflow_response(response_data, request)
-        assert result["consensus_workflow_status"] == "ready_for_synthesis"
+        request = Mock(step_number=1, total_steps=1)
+        tool._customize_consensus_metadata(response_data, request)
+
+        assert response_data["metadata"]["workflow_type"] == "concurrent_multi_model_consensus"
+        assert response_data["metadata"]["execution_mode"] == "concurrent"
+        assert len(response_data["metadata"]["models_consulted"]) == 2
+        assert response_data["metadata"]["consensus_complete"] is True
 
 
 if __name__ == "__main__":

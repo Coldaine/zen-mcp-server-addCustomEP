@@ -78,7 +78,7 @@ class PlannerValidationTest(ConversationBaseTest):
                     "step_number": 1,
                     "total_steps": 4,
                     "next_step_required": True,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -128,7 +128,7 @@ class PlannerValidationTest(ConversationBaseTest):
                     "total_steps": 4,
                     "next_step_required": True,
                     "continuation_id": continuation_id,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -169,7 +169,7 @@ class PlannerValidationTest(ConversationBaseTest):
                     "total_steps": 3,  # Adjusted total
                     "next_step_required": False,  # Final step - should complete without expert analysis
                     "continuation_id": continuation_id,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -227,7 +227,7 @@ class PlannerValidationTest(ConversationBaseTest):
                         "step_number": 1,
                         "total_steps": 2,
                         "next_step_required": True,
-                        "model": "flash",
+                        "model": "qwen3:0.6b",
                     },
                 )
                 if not response0 or not continuation_id:
@@ -244,7 +244,7 @@ class PlannerValidationTest(ConversationBaseTest):
                     "total_steps": 2,
                     "next_step_required": True,
                     "continuation_id": continuation_id,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -286,7 +286,7 @@ class PlannerValidationTest(ConversationBaseTest):
                     "step_number": 1,
                     "total_steps": 8,  # Complex plan ≥5 steps
                     "next_step_required": True,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -331,7 +331,7 @@ class PlannerValidationTest(ConversationBaseTest):
                     "total_steps": 8,
                     "next_step_required": True,
                     "continuation_id": continuation_id,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -360,7 +360,7 @@ class PlannerValidationTest(ConversationBaseTest):
                     "total_steps": 8,
                     "next_step_required": True,
                     "continuation_id": continuation_id,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -402,7 +402,7 @@ class PlannerValidationTest(ConversationBaseTest):
                     "step_number": 1,
                     "total_steps": 2,
                     "next_step_required": True,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -420,7 +420,7 @@ class PlannerValidationTest(ConversationBaseTest):
                     "total_steps": 2,
                     "next_step_required": False,  # Final step
                     "continuation_id": continuation_id,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -479,7 +479,7 @@ class PlannerValidationTest(ConversationBaseTest):
                     "step_number": 1,
                     "total_steps": 4,
                     "next_step_required": True,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -500,7 +500,7 @@ class PlannerValidationTest(ConversationBaseTest):
                     "branch_from_step": 1,
                     "branch_id": "react-native",
                     "continuation_id": continuation_id,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -540,7 +540,7 @@ class PlannerValidationTest(ConversationBaseTest):
                     "is_step_revision": True,
                     "revises_step_number": 2,
                     "continuation_id": continuation_id,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -583,7 +583,7 @@ class PlannerValidationTest(ConversationBaseTest):
                     "step_number": 1,
                     "total_steps": 2,
                     "next_step_required": True,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -609,7 +609,7 @@ class PlannerValidationTest(ConversationBaseTest):
                     "total_steps": 2,
                     "next_step_required": False,
                     "continuation_id": continuation_id,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 

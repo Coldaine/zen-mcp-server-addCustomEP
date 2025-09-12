@@ -57,7 +57,7 @@ class TestConsensusConversation(ConversationBaseTest):
                 {
                     "prompt": "Please use low thinking mode. I'm working on a web application and need advice on authentication. Can you look at this code?",
                     "files": [self.test_files["python"]],
-                    "model": "flash",
+                    "model": "qwen3:0.6b",  # Use local/custom model to avoid external API dependency
                 },
             )
 
@@ -73,30 +73,29 @@ class TestConsensusConversation(ConversationBaseTest):
             self.logger.info(f"Initial chat response preview: {initial_response[:200]}...")
             self.logger.info(f"Got continuation_id: {continuation_id}")
 
-            # Phase 2: Use consensus with continuation_id to test conversation building
-            self.logger.info("Phase 2: Using consensus with continuation_id to test conversation building")
+            # Phase 2: Use consensus with continuation_id (concurrent single-step execution)
+            self.logger.info("Phase 2: Using consensus with continuation_id (concurrent single-step)")
             consensus_response, _ = self.call_mcp_tool(
                 "consensus",
                 {
                     "step": "Based on our previous discussion about authentication, I need expert consensus: Should we implement OAuth2 or stick with simple session-based auth?",
                     "step_number": 1,
-                    "total_steps": 2,
-                    "next_step_required": True,
+                    "total_steps": 1,  # Concurrent model execution collapses to a single step
+                    "next_step_required": False,
                     "findings": "Initial analysis needed on OAuth2 vs session-based authentication approaches for our web application",
                     "models": [
                         {
-                            "model": "flash",
+                            "model": "qwen3:0.6b",
                             "stance": "for",
                             "stance_prompt": "Focus on OAuth2 benefits: security, scalability, and industry standards.",
                         },
                         {
-                            "model": "flash",
+                            "model": "qwen3:0.6b",
                             "stance": "against",
                             "stance_prompt": "Focus on OAuth2 complexity: implementation challenges and simpler alternatives.",
                         },
                     ],
                     "continuation_id": continuation_id,
-                    "model": "flash",
                 },
             )
 
@@ -119,15 +118,34 @@ class TestConsensusConversation(ConversationBaseTest):
                 self.logger.error(f"Failed to parse consensus response as JSON. Full response: {consensus_response}")
                 return False
 
-            # Check for step 1 status (Claude analysis + first model consultation)
-            expected_status = "analysis_and_first_model_consulted"
+            # Check for concurrent completion status
+            expected_status = "consensus_workflow_complete"
             if consensus_data.get("status") != expected_status:
                 self.logger.error(
-                    f"Consensus step 1 failed with status: {consensus_data.get('status')}, expected: {expected_status}"
+                    f"Consensus concurrent step failed with status: {consensus_data.get('status')}, expected: {expected_status}"
                 )
                 if "error" in consensus_data:
                     self.logger.error(f"Error: {consensus_data['error']}")
                 return False
+
+            # Validate all model responses for qwen3:0.6b success
+            all_responses = consensus_data.get("all_model_responses") or consensus_data.get("accumulated_responses")
+            if len(all_responses) != 2:
+                self.logger.error(f"Expected 2 model responses, got {len(all_responses)}")
+                return False
+
+            for i, response in enumerate(all_responses):
+                if response.get("model") != "qwen3:0.6b":
+                    self.logger.error(f"Model {i+1} expected 'qwen3:0.6b', got {response.get('model')}")
+                    return False
+                if response.get("status") != "success":
+                    self.logger.error(f"Model {i+1} expected 'success', got {response.get('status')}")
+                    return False
+                if not response.get("content"):
+                    self.logger.error(f"Model {i+1} missing content")
+                    return False
+
+            self.logger.info("All qwen3:0.6b model responses validated as successful")
 
             # Phase 3: Check server logs for conversation building
             self.logger.info("Phase 3: Checking server logs for conversation building")
@@ -177,32 +195,11 @@ class TestConsensusConversation(ConversationBaseTest):
                         self.logger.error(f"  ERROR: {error}")
                     return False
 
-            # Phase 4: Verify response structure
-            self.logger.info("Phase 4: Verifying consensus response structure")
+            # Phase 4: Verify concurrent response structure
+            self.logger.info("Phase 4: Verifying concurrent consensus response structure")
 
-            # Check that we have model response from step 1
-            model_response = consensus_data.get("model_response")
-            if not model_response:
-                self.logger.error("Consensus step 1 response missing model_response")
-                return False
-
-            # Check that model response has expected structure
-            if not model_response.get("model") or not model_response.get("verdict"):
-                self.logger.error("Model response missing required fields (model or verdict)")
-                return False
-
-            # Check step information
-            if consensus_data.get("step_number") != 1:
-                self.logger.error(f"Expected step_number 1, got: {consensus_data.get('step_number')}")
-                return False
-
-            if not consensus_data.get("next_step_required"):
-                self.logger.error("Expected next_step_required=True for step 1")
-                return False
-
-            self.logger.info(f"Consensus step 1 consulted model: {model_response.get('model')}")
-            self.logger.info(f"Model stance: {model_response.get('stance', 'neutral')}")
-            self.logger.info(f"Response status: {model_response.get('status', 'unknown')}")
+            # This validation is now handled above with qwen3:0.6b specific checks
+            self.logger.info("✓ Concurrent response structure validated with qwen3:0.6b models")
 
             # Phase 5: Cross-tool continuation test
             self.logger.info("Phase 5: Testing cross-tool continuation from consensus")
@@ -213,7 +210,7 @@ class TestConsensusConversation(ConversationBaseTest):
                 {
                     "prompt": "Based on our consensus discussion about authentication, can you summarize the key points?",
                     "continuation_id": continuation_id,
-                    "model": "flash",
+                    "model": "llama3.2",
                 },
             )
 
