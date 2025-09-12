@@ -131,7 +131,22 @@ class ConversationBaseTest(BaseSimulatorTest):
 
             # Set up minimal model context if not provided
             if "model" not in params:
-                params["model"] = "flash"  # Use fast model for testing
+                # Prefer local small models (Ollama) for deterministic, cost-free testing
+                from providers.registry import ModelProviderRegistry as _Registry
+                try:
+                    available = list(_Registry.get_available_models(respect_restrictions=True).keys())
+                except Exception:
+                    available = []
+                preferred = ["llama3.2", "qwen3:0.6b"]
+                chosen = None
+                for candidate in preferred:
+                    if candidate in available:
+                        chosen = candidate
+                        break
+                if not chosen and available:
+                    chosen = available[0]
+                if chosen:
+                    params["model"] = chosen
 
             # Execute tool directly using asyncio
             loop = self._get_event_loop()

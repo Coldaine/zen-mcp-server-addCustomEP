@@ -18,6 +18,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 import time
 from typing import TYPE_CHECKING, Any
 
@@ -94,7 +95,7 @@ def _normalize_model_result(model_spec: dict, result) -> dict:
             "model": result.get("model", model_name),
             "stance": result.get("stance", stance),
             "status": result.get("status", "success"),
-            "content": result.get("verdict"),  # Map 'verdict' to 'content' for consistency
+            "content": result.get("content"),  # Extract 'content' directly
             "error_message": result.get("error"),
             "latency_ms": 0,  # Could be added if timing is tracked
         }
@@ -567,6 +568,14 @@ of the evidence, even when it strongly points in one direction.""",
                 "execution_mode": "concurrent",
             }
 
+            # Save to markdown (always enabled)
+            try:
+                from utils.consensus_output import save_consensus_response_to_markdown
+                markdown_path = save_consensus_response_to_markdown(response_data)
+                logger.info(f"Consensus response saved to markdown: {markdown_path}")
+            except Exception as e:
+                logger.warning(f"Failed to save consensus response to markdown: {e}")
+
             return [TextContent(type="text", text=json.dumps(response_data, indent=2, ensure_ascii=False))]
 
         # Otherwise, use standard workflow execution
@@ -596,6 +605,8 @@ of the evidence, even when it strongly points in one direction.""",
                 "error_message": str(e),
                 "latency_ms": latency_ms,
             }
+
+    async def _consult_model(self, model_config: dict, request) -> dict:
         """Consult a single model and return its response."""
         try:
             # Get the provider for this model

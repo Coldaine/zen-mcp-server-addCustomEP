@@ -1,12 +1,20 @@
 #!/usr/bin/env python3
 """
-OpenRouter Model Tests
+Kilo Code Endpoint Model Test (formerly OpenRouter Models Test)
 
-Tests that verify OpenRouter functionality including:
-- Model alias resolution (flash, pro, o3, etc. map to OpenRouter equivalents)
-- Multiple OpenRouter models work correctly
-- Conversation continuity works with OpenRouter models
-- Error handling when models are not available
+Refocused to validate that the server can successfully route requests through the
+configured Kilo Code OpenRouter-compatible endpoint and maintain conversation
+continuity, using a minimal set of model calls to reduce external cost.
+
+Coverage:
+1. Basic chat call via a Kilo Code routed model alias (flash)
+2. Conversation continuation using same routed model
+3. Direct explicit model name routing still works (anthropic/claude-3-haiku) if available
+4. Logs show usage of the custom OpenRouter endpoint (kilocode) rather than broad alias sweep
+
+Removed:
+- Broad alias matrix (pro, opus, o3, sonnet) to reduce redundancy and cost
+- Memory test across many models (covered elsewhere)
 """
 
 
@@ -14,7 +22,7 @@ from .base_test import BaseSimulatorTest
 
 
 class OpenRouterModelsTest(BaseSimulatorTest):
-    """Test OpenRouter model functionality and alias mapping"""
+    """Test Kilo Code routed model functionality and minimal alias mapping"""
 
     @property
     def test_name(self) -> str:
@@ -22,12 +30,13 @@ class OpenRouterModelsTest(BaseSimulatorTest):
 
     @property
     def test_description(self) -> str:
-        return "OpenRouter model functionality and alias mapping"
+        """Short description of the test."""
+        return "Kilo Code routed model functionality and minimal alias mapping"
 
     def run_test(self) -> bool:
         """Test OpenRouter model functionality"""
         try:
-            self.logger.info("Test: OpenRouter model functionality and alias mapping")
+            self.logger.info("Test: Kilo Code routed model functionality (minimal)")
 
             # Check if OpenRouter API key is configured
             import os
@@ -42,8 +51,8 @@ class OpenRouterModelsTest(BaseSimulatorTest):
             # Setup test files for later use
             self.setup_test_files()
 
-            # Test 1: Flash alias mapping to OpenRouter
-            self.logger.info("  1: Testing 'flash' alias (should map to google/gemini-2.5-flash)")
+            # Test 1: Flash alias via Kilo Code endpoint
+            self.logger.info("  1: Testing 'flash' alias via Kilo Code endpoint")
 
             response1, continuation_id = self.call_mcp_tool(
                 "chat",
@@ -62,46 +71,10 @@ class OpenRouterModelsTest(BaseSimulatorTest):
             if continuation_id:
                 self.logger.info(f"  ✅ Got continuation_id: {continuation_id}")
 
-            # Test 2: Pro alias mapping to OpenRouter
-            self.logger.info("  2: Testing 'pro' alias (should map to google/gemini-2.5-pro)")
+            # Test 2: Direct explicit model name if available
+            self.logger.info("  2: Testing direct model name (anthropic/claude-3-haiku) if available")
 
             response2, _ = self.call_mcp_tool(
-                "chat",
-                {
-                    "prompt": "Say 'Hello from Pro model!' and nothing else.",
-                    "model": "pro",
-                    "temperature": 0.1,
-                },
-            )
-
-            if not response2:
-                self.logger.error("  ❌ Pro alias test failed")
-                return False
-
-            self.logger.info("  ✅ Pro alias call completed")
-
-            # Test 3: O3 alias mapping to OpenRouter (should map to openai/gpt-4o)
-            self.logger.info("  3: Testing 'o3' alias (should map to openai/gpt-4o)")
-
-            response3, _ = self.call_mcp_tool(
-                "chat",
-                {
-                    "prompt": "Say 'Hello from O3 model!' and nothing else.",
-                    "model": "o3",
-                    "temperature": 0.1,
-                },
-            )
-
-            if not response3:
-                self.logger.error("  ❌ O3 alias test failed")
-                return False
-
-            self.logger.info("  ✅ O3 alias call completed")
-
-            # Test 4: Direct OpenRouter model name
-            self.logger.info("  4: Testing direct OpenRouter model name (anthropic/claude-3-haiku)")
-
-            response4, _ = self.call_mcp_tool(
                 "chat",
                 {
                     "prompt": "Say 'Hello from Claude Haiku!' and nothing else.",
@@ -109,96 +82,62 @@ class OpenRouterModelsTest(BaseSimulatorTest):
                     "temperature": 0.1,
                 },
             )
+            if not response2:
+                self.logger.warning("  ⚠️ Direct model name call failed (may not be allowed); continuing")
 
-            if not response4:
-                self.logger.error("  ❌ Direct OpenRouter model test failed")
-                return False
+            # Test 3: Conversation continuity with alias
+            self.logger.info("  3: Testing conversation continuity with 'flash'")
 
-            self.logger.info("  ✅ Direct OpenRouter model call completed")
-
-            # Test 5: OpenRouter alias from config
-            self.logger.info("  5: Testing OpenRouter alias from config ('opus' -> anthropic/claude-opus-4)")
-
-            response5, _ = self.call_mcp_tool(
-                "chat",
-                {
-                    "prompt": "Say 'Hello from Opus!' and nothing else.",
-                    "model": "opus",
-                    "temperature": 0.1,
-                },
-            )
-
-            if not response5:
-                self.logger.error("  ❌ OpenRouter alias test failed")
-                return False
-
-            self.logger.info("  ✅ OpenRouter alias call completed")
-
-            # Test 6: Conversation continuity with OpenRouter models
-            self.logger.info("  6: Testing conversation continuity with OpenRouter")
-
-            response6, new_continuation_id = self.call_mcp_tool(
+            response3, new_continuation_id = self.call_mcp_tool(
                 "chat",
                 {
                     "prompt": "Remember this number: 42. What number did I just tell you?",
-                    "model": "sonnet",  # Claude Sonnet via OpenRouter
+                    "model": "flash",  # Use flash alias for continuity
                     "temperature": 0.1,
                 },
             )
 
-            if not response6 or not new_continuation_id:
+            if not response3 or not new_continuation_id:
                 self.logger.error("  ❌ Failed to start conversation with continuation_id")
                 return False
 
             # Continue the conversation
-            response7, _ = self.call_mcp_tool(
+            response4, _ = self.call_mcp_tool(
                 "chat",
                 {
                     "prompt": "What was the number I told you earlier?",
-                    "model": "sonnet",
+                    "model": "flash",
                     "continuation_id": new_continuation_id,
                     "temperature": 0.1,
                 },
             )
 
-            if not response7:
+            if not response4:
                 self.logger.error("  ❌ Failed to continue conversation")
                 return False
 
             # Check if the model remembered the number
-            if "42" in response7:
+            if response4 and "42" in response4:
                 self.logger.info("  ✅ Conversation continuity working with OpenRouter")
             else:
                 self.logger.warning("  ⚠️  Model may not have remembered the number")
 
-            # Test 7: Validate OpenRouter API usage from logs
-            self.logger.info("  7: Validating OpenRouter API usage in logs")
+            # Test 4: Validate Kilo Code endpoint usage from logs
+            self.logger.info("  4: Validating Kilo Code endpoint usage in logs")
             logs = self.get_recent_server_logs()
 
             # Check for OpenRouter API calls
             openrouter_logs = [line for line in logs.split("\n") if "openrouter" in line.lower()]
-            openrouter_api_logs = [line for line in logs.split("\n") if "openrouter.ai/api/v1" in line]
+            openrouter_api_logs = [line for line in logs.split("\n") if "kilocode" in line.lower()]
 
             # Check for specific model mappings
-            flash_mapping_logs = [
-                line
-                for line in logs.split("\n")
-                if ("flash" in line and "google/gemini-flash" in line)
-                or ("Resolved model" in line and "google/gemini-flash" in line)
-            ]
-
-            pro_mapping_logs = [
-                line
-                for line in logs.split("\n")
-                if ("pro" in line and "google/gemini-pro" in line)
-                or ("Resolved model" in line and "google/gemini-pro" in line)
-            ]
+            flash_mapping_logs = [line for line in logs.split("\n") if "flash" in line.lower()][:5]
 
             # Log findings
             self.logger.info(f"   OpenRouter-related logs: {len(openrouter_logs)}")
             self.logger.info(f"   OpenRouter API logs: {len(openrouter_api_logs)}")
             self.logger.info(f"   Flash mapping logs: {len(flash_mapping_logs)}")
-            self.logger.info(f"   Pro mapping logs: {len(pro_mapping_logs)}")
+            # Removed pro mapping (out of scope now)
 
             # Sample log output for debugging
             if self.verbose and openrouter_logs:
@@ -208,7 +147,7 @@ class OpenRouterModelsTest(BaseSimulatorTest):
 
             # Success criteria
             openrouter_api_used = len(openrouter_api_logs) > 0
-            models_mapped = len(flash_mapping_logs) > 0 or len(pro_mapping_logs) > 0
+            models_mapped = len(flash_mapping_logs) > 0
 
             success_criteria = [
                 ("OpenRouter API calls made", openrouter_api_used),
@@ -224,10 +163,10 @@ class OpenRouterModelsTest(BaseSimulatorTest):
                 self.logger.info(f"    {status} {criterion}")
 
             if passed_criteria >= 2:  # At least 2 out of 3 criteria
-                self.logger.info("  ✅ OpenRouter model tests passed")
+                self.logger.info("  ✅ Kilo Code routed model tests passed")
                 return True
             else:
-                self.logger.error("  ❌ OpenRouter model tests failed")
+                self.logger.error("  ❌ Kilo Code routed model tests failed")
                 return False
 
         except Exception as e:

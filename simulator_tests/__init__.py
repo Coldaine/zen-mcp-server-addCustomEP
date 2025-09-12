@@ -10,9 +10,7 @@ from .test_analyze_validation import AnalyzeValidationTest
 from .test_basic_conversation import BasicConversationTest
 from .test_chat_simple_validation import ChatSimpleValidationTest
 from .test_codereview_validation import CodeReviewValidationTest
-from .test_consensus_conversation import TestConsensusConversation
-from .test_consensus_three_models import TestConsensusThreeModels
-from .test_consensus_workflow_accurate import TestConsensusWorkflowAccurate
+from .test_consensus_comprehensive import TestConsensusComprehensive
 from .test_content_validation import ContentValidationTest
 from .test_conversation_chain_validation import ConversationChainValidationTest
 from .test_cross_tool_comprehensive import CrossToolComprehensiveTest
@@ -22,8 +20,6 @@ from .test_debug_validation import DebugValidationTest
 from .test_line_number_validation import LineNumberValidationTest
 from .test_logs_validation import LogsValidationTest
 from .test_model_thinking_config import TestModelThinkingConfig
-from .test_o3_model_selection import O3ModelSelectionTest
-from .test_o3_pro_expensive import O3ProExpensiveTest
 from .test_ollama_custom_url import OllamaCustomUrlTest
 from .test_openrouter_fallback import OpenRouterFallbackTest
 from .test_openrouter_models import OpenRouterModelsTest
@@ -55,7 +51,6 @@ TEST_REGISTRY = {
     "logs_validation": LogsValidationTest,
     # "redis_validation": RedisValidationTest,  # Removed - no longer needed for standalone server
     "model_thinking_config": TestModelThinkingConfig,
-    "o3_model_selection": O3ModelSelectionTest,
     "ollama_custom_url": OllamaCustomUrlTest,
     "openrouter_fallback": OpenRouterFallbackTest,
     "openrouter_models": OpenRouterModelsTest,
@@ -72,9 +67,8 @@ TEST_REGISTRY = {
     "conversation_chain_validation": ConversationChainValidationTest,
     "vision_capability": VisionCapabilityTest,
     "xai_models": XAIModelsTest,
-    "consensus_conversation": TestConsensusConversation,
-    "consensus_workflow_accurate": TestConsensusWorkflowAccurate,
-    "consensus_three_models": TestConsensusThreeModels,
+    # Consolidated comprehensive consensus test (aliases removed)
+    "consensus_comprehensive": TestConsensusComprehensive,
     "analyze_validation": AnalyzeValidationTest,
     "prompt_size_limit_bug": PromptSizeLimitBugTest,
     # "o3_pro_expensive": O3ProExpensiveTest,  # COMMENTED OUT - too expensive to run by default
@@ -92,8 +86,6 @@ __all__ = [
     "LineNumberValidationTest",
     "LogsValidationTest",
     "TestModelThinkingConfig",
-    "O3ModelSelectionTest",
-    "O3ProExpensiveTest",
     "OllamaCustomUrlTest",
     "OpenRouterFallbackTest",
     "OpenRouterModelsTest",
@@ -110,9 +102,7 @@ __all__ = [
     "ConversationChainValidationTest",
     "VisionCapabilityTest",
     "XAIModelsTest",
-    "TestConsensusConversation",
-    "TestConsensusWorkflowAccurate",
-    "TestConsensusThreeModels",
+    "TestConsensusComprehensive",
     "AnalyzeValidationTest",
     "PromptSizeLimitBugTest",
     "TEST_REGISTRY",

@@ -188,3 +188,6 @@ logs/
 /worktrees/
 test_simulation_files/
 .mcp.json
+
+# Consensus output files
+consensus_outputs/
