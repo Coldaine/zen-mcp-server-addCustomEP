@@ -26,6 +26,7 @@ class ProviderType(Enum):
     OPENROUTER = "openrouter"
     CUSTOM = "custom"
     DIAL = "dial"
+    CLI = "cli"
 
 
 class TemperatureConstraint(ABC):

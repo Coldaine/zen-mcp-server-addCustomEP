@@ -16,12 +16,13 @@ class ModelProviderRegistry:
     _instance = None
 
     # Provider priority order for model selection
-    # Native APIs first, then custom endpoints, then catch-all providers
+    # Native APIs first, then local CLI tools, then custom endpoints, then catch-all providers
     PROVIDER_PRIORITY_ORDER = [
         ProviderType.GOOGLE,  # Direct Gemini access
         ProviderType.OPENAI,  # Direct OpenAI access
         ProviderType.XAI,  # Direct X.AI GROK access
         ProviderType.DIAL,  # DIAL unified API access
+        ProviderType.CLI,  # Local CLI tools (Codex, etc.)
         ProviderType.CUSTOM,  # Local/self-hosted models
         ProviderType.OPENROUTER,  # Catch-all for cloud models
     ]
@@ -71,6 +72,10 @@ class ModelProviderRegistry:
 
         # Get API key from environment
         api_key = cls._get_api_key_for_provider(provider_type)
+
+        # Special case: CLI providers don't require an API key
+        if provider_type == ProviderType.CLI:
+            api_key = ""  # Use empty string for CLI providers
 
         # Get provider class or factory function
         provider_class = instance._providers[provider_type]
@@ -236,6 +241,7 @@ class ModelProviderRegistry:
             ProviderType.OPENROUTER: "OPENROUTER_API_KEY",
             ProviderType.CUSTOM: "CUSTOM_API_KEY",  # Can be empty for providers that don't need auth
             ProviderType.DIAL: "DIAL_API_KEY",
+            ProviderType.CLI: None,  # CLI providers don't use API keys
         }
 
         env_var = key_mapping.get(provider_type)

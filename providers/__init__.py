@@ -1,6 +1,7 @@
 """Model provider abstractions for supporting multiple AI providers."""
 
 from .base import ModelCapabilities, ModelProvider, ModelResponse
+from .cli_bridge import CLIBridgeProvider
 from .gemini import GeminiModelProvider
 from .openai_compatible import OpenAICompatibleProvider
 from .openai_provider import OpenAIModelProvider
@@ -12,6 +13,7 @@ __all__ = [
     "ModelResponse",
     "ModelCapabilities",
     "ModelProviderRegistry",
+    "CLIBridgeProvider",
     "GeminiModelProvider",
     "OpenAIModelProvider",
     "OpenAICompatibleProvider",
