@@ -667,7 +667,7 @@ class PerformanceTimer:
                     ],
                     "confidence": "high",
                     "continuation_id": continuation_id,
-                    "model": "flash",  # Use flash for expert validation
+                    "model": "qwen3:0.6b",  # Use flash for expert validation
                 },
             )
 
@@ -754,7 +754,7 @@ class PerformanceTimer:
                     ],
                     "prompt": "Comprehensive architectural analysis",
                     "analysis_type": "architecture",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -814,7 +814,7 @@ class PerformanceTimer:
                     "confidence": "low",
                     "prompt": "Analyze service architecture patterns",
                     "analysis_type": "architecture",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -857,7 +857,7 @@ class PerformanceTimer:
                         {"severity": "medium", "description": "Configuration management lacks flexibility"},
                     ],
                     "confidence": "high",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -922,7 +922,7 @@ class PerformanceTimer:
                     "confidence": "high",
                     "prompt": "Analyze security patterns and vulnerabilities",
                     "analysis_type": "security",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -963,7 +963,7 @@ class PerformanceTimer:
                     "confidence": "high",
                     "prompt": "Analyze code quality and maintainability patterns",
                     "analysis_type": "quality",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 

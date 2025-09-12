@@ -73,7 +73,7 @@ class TestClass:
                 {
                     "prompt": "Analyze this test file and explain what it does.",
                     "files": [test_file_path],
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "temperature": 0.7,
                 },
             )
@@ -98,7 +98,7 @@ class TestClass:
                     "findings": "Continuing analysis from previous chat conversation to analyze code quality.",
                     "relevant_files": [test_file_path],
                     "continuation_id": continuation_id_a1,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -117,7 +117,7 @@ class TestClass:
                 {
                     "prompt": "Thank you for the analysis. Can you summarize the key points?",
                     "continuation_id": continuation_id_a2,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "temperature": 0.7,
                 },
             )
@@ -139,7 +139,7 @@ class TestClass:
                 "chat",
                 {
                     "prompt": "This is a completely new conversation. Please greet me.",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "temperature": 0.7,
                 },
             )
@@ -164,7 +164,7 @@ class TestClass:
                     "findings": "Analyzing the greeting from previous conversation and suggesting improvements.",
                     "relevant_files": [test_file_path],
                     "continuation_id": continuation_id_b1,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -186,7 +186,7 @@ class TestClass:
                 {
                     "prompt": "Going back to our original discussion, I have another question about the code structure.",
                     "continuation_id": continuation_id_a1,  # Go back to original!
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "temperature": 0.7,
                 },
             )

@@ -58,7 +58,7 @@ class OpenRouterModelsTest(BaseSimulatorTest):
                 "chat",
                 {
                     "prompt": "Say 'Hello from Flash model!' and nothing else.",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "temperature": 0.1,
                 },
             )
@@ -92,7 +92,7 @@ class OpenRouterModelsTest(BaseSimulatorTest):
                 "chat",
                 {
                     "prompt": "Remember this number: 42. What number did I just tell you?",
-                    "model": "flash",  # Use flash alias for continuity
+                    "model": "qwen3:0.6b",  # Use flash alias for continuity
                     "temperature": 0.1,
                 },
             )
@@ -106,7 +106,7 @@ class OpenRouterModelsTest(BaseSimulatorTest):
                 "chat",
                 {
                     "prompt": "What was the number I told you earlier?",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                     "continuation_id": new_continuation_id,
                     "temperature": 0.1,
                 },

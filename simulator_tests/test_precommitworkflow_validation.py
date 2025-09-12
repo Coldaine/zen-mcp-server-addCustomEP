@@ -397,7 +397,7 @@ REQUIREMENTS:
                     ],
                     # Confidence field removed - using precommit_type instead
                     "continuation_id": continuation_id,
-                    "model": "flash",  # Use flash for expert analysis
+                    "model": "qwen3:0.6b",  # Use flash for expert analysis
                 },
             )
 
@@ -490,7 +490,7 @@ REQUIREMENTS:
                     ],
                     "precommit_type": "internal",  # This should skip expert analysis
                     "path": self.test_dir,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -679,7 +679,7 @@ def rate_limiting_middleware(app):
                     "relevant_context": ["require_auth"],
                     # Assessment fields removed - using precommit_type instead
                     "path": self.test_dir,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -721,7 +721,7 @@ def rate_limiting_middleware(app):
                         {"severity": "medium", "description": "Basic token validation might be insufficient"}
                     ],
                     # Assessment fields removed - using precommit_type instead
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -772,7 +772,7 @@ def rate_limiting_middleware(app):
                     ],
                     # Assessment field removed - using precommit_type instead
                     # Confidence field removed - using precommit_type instead
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -912,7 +912,7 @@ if __name__ == '__main__':
                     "relevant_context": [],
                     # Assessment fields removed - using precommit_type instead
                     "path": self.test_dir,
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -945,7 +945,7 @@ if __name__ == '__main__':
                     "relevant_files": [db_file, test_file],
                     "relevant_context": ["DatabaseManager.create_user", "TestDatabaseManager.test_create_user"],
                     # Assessment fields removed - using precommit_type instead
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -986,7 +986,7 @@ if __name__ == '__main__':
                     "issues_found": [],  # No issues found
                     # Assessment field removed - using precommit_type instead
                     # Confidence field removed - using precommit_type instead
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -1021,7 +1021,7 @@ if __name__ == '__main__':
                     "issues_found": [],
                     # Assessment field removed - using precommit_type instead
                     # Confidence field removed - using precommit_type instead
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 

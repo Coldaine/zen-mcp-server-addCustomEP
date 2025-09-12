@@ -2,7 +2,7 @@
   "_README": {
     "description": "Unified model configuration for multiple AI providers and endpoints, including OpenRouter",
     "providers_supported": [
-      "OpenRouter - Access to GPT-4, Claude, Mistral, etc. via unified API",
+      "OpenRouter - Access to GPT-4, Mistral, etc. via unified API",
       "Custom API endpoints - Local models (Ollama, vLLM, LM Studio, etc.)",
       "Self-hosted APIs - Any OpenAI-compatible endpoint"
     ],
@@ -50,42 +50,6 @@
     }
   },
   "models": [
-    {
-      "model_name": "anthropic/claude-opus-4.1",
-      "aliases": ["opus", "claude-opus", "claude-opus-4.1", "claude-4.1-opus"],
-      "context_window": 200000,
-      "max_output_tokens": 64000,
-      "supports_extended_thinking": false,
-      "supports_json_mode": false,
-      "supports_function_calling": false,
-      "supports_images": true,
-      "max_image_size_mb": 5.0,
-      "description": "Claude Opus 4.1 - Our most capable and intelligent model yet"
-    },
-    {
-      "model_name": "anthropic/claude-sonnet-4.1",
-      "aliases": ["sonnet", "claude-sonnet", "claude-sonnet-4.1", "claude-4.1-sonnet", "claude"],
-      "context_window": 200000,
-      "max_output_tokens": 64000,
-      "supports_extended_thinking": false,
-      "supports_json_mode": false,
-      "supports_function_calling": false,
-      "supports_images": true,
-      "max_image_size_mb": 5.0,
-      "description": "Claude Sonnet 4.1 - High-performance model with exceptional reasoning and efficiency"
-    },
-    {
-      "model_name": "anthropic/claude-3.5-haiku",
-      "aliases": ["haiku", "claude-haiku", "claude3-haiku", "claude-3-haiku"],
-      "context_window": 200000,
-      "max_output_tokens": 64000,
-      "supports_extended_thinking": false,
-      "supports_json_mode": false,
-      "supports_function_calling": false,
-      "supports_images": true,
-      "max_image_size_mb": 5.0,
-      "description": "Claude 3 Haiku - Fast and efficient with vision"
-    },
     {
       "model_name": "google/gemini-2.5-pro",
       "aliases": ["pro","gemini-pro", "gemini", "pro-openrouter"],
@@ -240,6 +204,58 @@
       "max_image_size_mb": 0.0,
       "is_custom": true,
       "description": "Local Qwen3 0.6B model via Ollama - lightweight and fast for development testing"
+    },
+    {
+      "model_name": "moondream:latest",
+      "aliases": ["moondream", "vision", "vision-local", "ollama-vision"],
+      "context_window": 32000,
+      "max_output_tokens": 16000,
+      "supports_extended_thinking": false,
+      "supports_json_mode": false,
+      "supports_function_calling": false,
+      "supports_images": true,
+      "max_image_size_mb": 10.0,
+      "is_custom": true,
+      "description": "Local Moondream vision model via Ollama - lightweight vision-capable model for image analysis"
+    },
+    {
+      "model_name": "qwen2.5vl:7b",
+      "aliases": ["qwen-vision", "qwen2.5vl", "vision-qwen", "ollama-vision-qwen"],
+      "context_window": 32000,
+      "max_output_tokens": 16000,
+      "supports_extended_thinking": false,
+      "supports_json_mode": false,
+      "supports_function_calling": false,
+      "supports_images": true,
+      "max_image_size_mb": 10.0,
+      "is_custom": true,
+      "description": "Local Qwen2.5VL 7B vision model via Ollama - powerful vision-capable model for image analysis"
+    },
+    {
+      "model_name": "llava:latest",
+      "aliases": ["llava", "llava-vision", "vision-llava", "ollama-llava"],
+      "context_window": 32000,
+      "max_output_tokens": 16000,
+      "supports_extended_thinking": false,
+      "supports_json_mode": false,
+      "supports_function_calling": false,
+      "supports_images": true,
+      "max_image_size_mb": 10.0,
+      "is_custom": true,
+      "description": "Local LLaVA vision model via Ollama - vision-capable model for image analysis"
+    },
+    {
+      "model_name": "llama3.2-vision:11b",
+      "aliases": ["llama-vision", "llama3.2-vision", "vision-llama", "ollama-llama-vision"],
+      "context_window": 128000,
+      "max_output_tokens": 4096,
+      "supports_extended_thinking": false,
+      "supports_json_mode": false,
+      "supports_function_calling": false,
+      "supports_images": true,
+      "max_image_size_mb": 10.0,
+      "is_custom": true,
+      "description": "Local Llama 3.2 Vision 11B model via Ollama - powerful vision-capable model for image analysis"
     }
   ]
 }

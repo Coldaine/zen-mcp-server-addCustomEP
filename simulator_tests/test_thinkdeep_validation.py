@@ -375,7 +375,7 @@ class ThinkDeepWorkflowValidationTest(ConversationBaseTest):
                     ],
                     "confidence": "high",
                     "continuation_id": continuation_id,
-                    "model": "flash",  # Use flash for expert analysis
+                    "model": "qwen3:0.6b",  # Use flash for expert analysis
                 },
             )
 
@@ -468,7 +468,7 @@ class ThinkDeepWorkflowValidationTest(ConversationBaseTest):
                     "relevant_files": [self.architecture_file, self.requirements_file],
                     "relevant_context": ["migration_complete_strategy", "implementation_plan"],
                     "confidence": "certain",  # This should skip expert analysis
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -651,7 +651,7 @@ class ThinkDeepWorkflowValidationTest(ConversationBaseTest):
                     "relevant_files": [strategy_file],  # This should be referenced, not embedded
                     "relevant_context": ["implementation_timeline", "technology_selection"],
                     "confidence": "low",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -690,7 +690,7 @@ class ThinkDeepWorkflowValidationTest(ConversationBaseTest):
                     "relevant_files": [strategy_file, tech_stack_file],  # Should be fully embedded
                     "relevant_context": ["implementation_plan", "technology_decisions", "risk_management"],
                     "confidence": "high",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -798,7 +798,7 @@ class ThinkDeepWorkflowValidationTest(ConversationBaseTest):
                     "relevant_files": [risk_file],
                     "relevant_context": ["risk_assessment", "migration_planning"],
                     "confidence": "low",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -831,7 +831,7 @@ class ThinkDeepWorkflowValidationTest(ConversationBaseTest):
                     "relevant_files": [risk_file, metrics_file],
                     "relevant_context": ["risk_metric_correlation", "priority_matrix"],
                     "confidence": "medium",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -864,7 +864,7 @@ class ThinkDeepWorkflowValidationTest(ConversationBaseTest):
                     "relevant_files": [risk_file, metrics_file, self.requirements_file],
                     "relevant_context": ["phase_gate_approach", "milestone_criteria", "early_wins"],
                     "confidence": "high",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -897,7 +897,7 @@ class ThinkDeepWorkflowValidationTest(ConversationBaseTest):
                     "relevant_files": [risk_file, metrics_file, self.requirements_file, self.architecture_file],
                     "relevant_context": ["strategic_framework", "governance_model", "success_measurement"],
                     "confidence": "high",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 

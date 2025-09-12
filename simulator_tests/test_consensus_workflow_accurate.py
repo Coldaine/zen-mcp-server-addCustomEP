@@ -33,7 +33,9 @@ class TestConsensusWorkflowAccurate(ConversationBaseTest):
 
         try:
             self.logger.info("Testing concurrent consensus workflow in single step")
-            self.logger.info("Expected flow: Single step - Claude analysis + both models consulted concurrently + synthesis")
+            self.logger.info(
+                "Expected flow: Single step - Claude analysis + both models consulted concurrently + synthesis"
+            )
 
             # ============================================================================
             # SINGLE CONCURRENT STEP: Claude analysis + both models + synthesis
@@ -50,17 +52,17 @@ class TestConsensusWorkflowAccurate(ConversationBaseTest):
                     "findings": "Initial assessment of AI search feature proposal considering user needs, technical constraints, and business value.",
                     "models": [
                         {
-                            "model": "flash",
+                            "model": "qwen3:0.6b",
                             "stance": "for",
                             "stance_prompt": "Focus on innovation benefits and competitive advantages.",
                         },
                         {
-                            "model": "flash",
+                            "model": "qwen3:0.6b",
                             "stance": "against",
                             "stance_prompt": "Focus on implementation complexity and resource requirements.",
                         },
                     ],
-                    "model": "flash",  # Claude's execution model
+                    "model": "qwen3:0.6b",  # Claude's execution model
                 },
             )
 
@@ -162,7 +164,7 @@ class TestConsensusWorkflowAccurate(ConversationBaseTest):
             self.logger.info(f"Model name in metadata: {metadata.get('model_name')}")
 
             self.logger.info("✓ Concurrent consensus step completed successfully")
-            self.logger.info(f"✓ Both models (flash:for, flash:against) consulted concurrently")
+            self.logger.info("✓ Both models (flash:for, flash:against) consulted concurrently")
             self.logger.info("✓ All responses accumulated and validated")
             self.logger.info("✓ Claude analysis and synthesis included")
             self.logger.info("✓ Efficient workflow: 2 models = 1 concurrent step")

@@ -34,12 +34,12 @@ class TestConsensusThreeModels(BaseSimulatorTest):
                     "findings": "Initial analysis needed on sync manager class architecture decision for CoolTodos app",
                     "models": [
                         {
-                            "model": "flash",
+                            "model": "qwen3:0.6b",
                             "stance": "against",
                             "stance_prompt": "You are a software architecture critic. Focus on the potential downsides of adding a sync manager class: complexity overhead, maintenance burden, potential for over-engineering, and whether simpler alternatives exist. Consider if this adds unnecessary abstraction layers.",
                         },
                         {
-                            "model": "flash",
+                            "model": "qwen3:0.6b",
                             "stance": "for",
                             "stance_prompt": "You are a software architecture advocate. Focus on the benefits of a sync manager class: separation of concerns, testability, maintainability, and how it can improve the overall architecture. Consider scalability and code organization advantages.",
                         },
@@ -49,7 +49,7 @@ class TestConsensusThreeModels(BaseSimulatorTest):
                             "stance_prompt": "You are a pragmatic software engineer. Provide a balanced analysis considering both the benefits and drawbacks. Focus on the specific context of a CoolTodos app and what factors would determine if this is the right choice.",
                         },
                     ],
-                    "model": "flash",  # Default model for Claude's execution
+                    "model": "qwen3:0.6b",  # Default model for Claude's execution
                 },
             )
 
@@ -92,16 +92,16 @@ class TestConsensusThreeModels(BaseSimulatorTest):
                 return False
 
             # Validate concurrent response structure with 3 accumulated responses
-            accumulated_responses = consensus_data.get("accumulated_responses") or consensus_data.get("all_model_responses")
+            accumulated_responses = consensus_data.get("accumulated_responses") or consensus_data.get(
+                "all_model_responses"
+            )
             if not accumulated_responses or len(accumulated_responses) != 3:
-                self.logger.error(f"Expected 3 accumulated responses, got {len(accumulated_responses) if accumulated_responses else 0}")
+                self.logger.error(
+                    f"Expected 3 accumulated responses, got {len(accumulated_responses) if accumulated_responses else 0}"
+                )
                 return False
 
-            expected_models_stances = [
-                ("flash", "against"),
-                ("flash", "for"),
-                ("qwen3:0.6b", "neutral")
-            ]
+            expected_models_stances = [("flash", "against"), ("flash", "for"), ("qwen3:0.6b", "neutral")]
 
             for i, (expected_model, expected_stance) in enumerate(expected_models_stances):
                 if i >= len(accumulated_responses):
@@ -110,7 +110,9 @@ class TestConsensusThreeModels(BaseSimulatorTest):
 
                 response = accumulated_responses[i]
                 if response.get("model") != expected_model or response.get("stance") != expected_stance:
-                    self.logger.error(f"Response {i+1} expected {expected_model}:{expected_stance}, got {response.get('model')}:{response.get('stance')}")
+                    self.logger.error(
+                        f"Response {i+1} expected {expected_model}:{expected_stance}, got {response.get('model')}:{response.get('stance')}"
+                    )
                     return False
 
                 if response.get("status") != "success":
@@ -158,8 +160,8 @@ class TestConsensusThreeModels(BaseSimulatorTest):
                 return False
 
             self.logger.info("✓ Three-model concurrent consensus tool test completed successfully")
-            self.logger.info(f"✓ Concurrent step completed with 3 models consulted")
-            self.logger.info(f"✓ All responses validated: flash:against, flash:for, qwen3:0.6b:neutral")
+            self.logger.info("✓ Concurrent step completed with 3 models consulted")
+            self.logger.info("✓ All responses validated: flash:against, flash:for, qwen3:0.6b:neutral")
             self.logger.info(f"✓ Analysis provided: {len(analysis_text)} characters")
             self.logger.info(f"✓ Model metadata properly included: {metadata.get('model_name')}")
             self.logger.info("✓ Consensus complete in single step")

@@ -86,7 +86,7 @@ def hash_pwd(pwd):
                 "prompt": "List security issues in auth.py",
                 "files": [auth_file],
                 "thinking_mode": "low",
-                "model": "flash",
+                "model": "qwen3:0.6b",
             }
 
             response1, continuation_id1 = self.call_mcp_tool("chat", chat_params)
@@ -108,7 +108,7 @@ def hash_pwd(pwd):
                 "findings": "Initial analysis will focus on security vulnerabilities in authentication code",
                 "relevant_files": [auth_file],
                 "thinking_mode": "low",
-                "model": "flash",
+                "model": "qwen3:0.6b",
             }
 
             response2, continuation_id2 = self.call_mcp_tool("analyze", analyze_params)
@@ -128,7 +128,7 @@ def hash_pwd(pwd):
                 "prompt": "Check config.json too",
                 "files": [auth_file, config_file_path],  # Old + new file
                 "thinking_mode": "low",
-                "model": "flash",
+                "model": "qwen3:0.6b",
             }
 
             response3, _ = self.call_mcp_tool("chat", chat_continue_params)
@@ -149,7 +149,7 @@ def hash_pwd(pwd):
                 "findings": "Investigating authentication vulnerabilities found in previous analysis",
                 "relevant_files": [auth_file, config_file_path],
                 "thinking_mode": "low",
-                "model": "flash",
+                "model": "qwen3:0.6b",
             }
 
             response4, continuation_id4 = self.call_mcp_tool("debug", debug_params)
@@ -174,7 +174,7 @@ def hash_pwd(pwd):
                     "continuation_id": continuation_id4,
                     "relevant_files": [auth_file, config_file_path],
                     "thinking_mode": "low",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 }
 
                 response5, _ = self.call_mcp_tool("debug", debug_continue_params)
@@ -192,7 +192,7 @@ def hash_pwd(pwd):
                 "findings": "Performing thorough security review of authentication code and configuration",
                 "relevant_files": [auth_file, config_file_path],
                 "thinking_mode": "low",
-                "model": "flash",
+                "model": "qwen3:0.6b",
             }
 
             response6, continuation_id6 = self.call_mcp_tool("codereview", codereview_params)
@@ -230,7 +230,7 @@ def secure_login(user, pwd):
                 "path": self.test_dir,
                 "relevant_files": [auth_file, config_file_path, improved_file],
                 "thinking_mode": "low",
-                "model": "flash",
+                "model": "qwen3:0.6b",
             }
 
             response7, continuation_id7 = self.call_mcp_tool("precommit", precommit_params)

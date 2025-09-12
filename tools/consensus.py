@@ -18,7 +18,6 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import os
 import time
 from typing import TYPE_CHECKING, Any
 
@@ -109,6 +108,7 @@ def _normalize_model_result(model_spec: dict, result) -> dict:
             "error_message": f"Unexpected result type: {type(result)}",
             "latency_ms": 0,
         }
+
 
 # Tool-specific field descriptions for consensus workflow
 CONSENSUS_WORKFLOW_FIELD_DESCRIPTIONS = {
@@ -465,9 +465,7 @@ of the evidence, even when it strongly points in one direction.""",
         if request.step_number == 1:
             # After concurrent execution, workflow is complete
             response_data["status"] = "consensus_complete"
-            response_data["next_steps"] = (
-                "All models have been consulted concurrently. Ready for final synthesis."
-            )
+            response_data["next_steps"] = "All models have been consulted concurrently. Ready for final synthesis."
         else:
             # This shouldn't happen in the new concurrent flow, but handle gracefully
             response_data["status"] = "unexpected_step"
@@ -499,14 +497,14 @@ of the evidence, even when it strongly points in one direction.""",
 
                 # Run all model consultations concurrently
                 concurrent_results = await run_models_concurrently(
-                    self.models_to_consult,
-                    lambda spec: self._consult_model_with_timing(spec, request)
+                    self.models_to_consult, lambda spec: self._consult_model_with_timing(spec, request)
                 )
 
                 # Store results and log completion
                 self.accumulated_responses = concurrent_results
                 end_time = time.time()
                 total_time = (end_time - start_time) * 1000  # Convert to milliseconds
+                logger.debug(f"consensus concurrent_total_time_ms={total_time:.2f}")
 
                 # Log individual model completions
                 for result in concurrent_results:
@@ -516,7 +514,7 @@ of the evidence, even when it strongly points in one direction.""",
                     )
 
                 # Log aggregation summary
-                success_count = sum(1 for r in concurrent_results if r['status'] == 'success')
+                success_count = sum(1 for r in concurrent_results if r["status"] == "success")
                 error_count = len(concurrent_results) - success_count
                 logger.debug(f"consensus aggregation success={success_count} error={error_count}")
 
@@ -571,6 +569,7 @@ of the evidence, even when it strongly points in one direction.""",
             # Save to markdown (always enabled)
             try:
                 from utils.consensus_output import save_consensus_response_to_markdown
+
                 markdown_path = save_consensus_response_to_markdown(response_data)
                 logger.info(f"Consensus response saved to markdown: {markdown_path}")
             except Exception as e:

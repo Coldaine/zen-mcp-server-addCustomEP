@@ -4,8 +4,7 @@ Tests for the Consensus tool using WorkflowTool architecture.
 
 import asyncio
 import json
-from typing import cast
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import Mock
 
 import pytest
 
@@ -186,7 +185,10 @@ class TestConsensusTool:
 
         # Step 1: Claude's initial analysis + concurrent model consultations + synthesis
         actions = tool.get_required_actions(1, "exploring", "Initial findings", 4)
-        assert any("initial analysis is complete and all models have been consulted concurrently" in action for action in actions)
+        assert any(
+            "initial analysis is complete and all models have been consulted concurrently" in action
+            for action in actions
+        )
         assert any("Review all model responses provided in this step" in action for action in actions)
         assert any("Synthesize all perspectives" in action for action in actions)
 
@@ -377,15 +379,15 @@ class TestConsensusTool:
                 "content": "O3 analysis",
                 "error_message": None,
                 "latency_ms": 800,
-            }
+            },
         ]
-        
+
         # Mock the run_models_concurrently function
-        mock_run_concurrent = mocker.patch('tools.consensus.run_models_concurrently')
+        mock_run_concurrent = mocker.patch("tools.consensus.run_models_concurrently")
         mock_run_concurrent.return_value = mock_model_responses
-        
-        # Mock the _consult_model_with_timing method
-        mock_consult = mocker.patch.object(ConsensusTool, '_consult_model_with_timing')
+
+        # Mock the _consult_model_with_timing method (return value not needed explicitly)
+        mocker.patch.object(ConsensusTool, "_consult_model_with_timing")
 
         # Create step 1 request
         request = ConsensusRequest(
@@ -394,10 +396,7 @@ class TestConsensusTool:
             total_steps=1,  # Will be overridden to 1
             next_step_required=False,
             findings="Initial findings",
-            models=[
-                {"model": "flash", "stance": "neutral"},
-                {"model": "haiku", "stance": "for"}
-            ],
+            models=[{"model": "flash", "stance": "neutral"}, {"model": "haiku", "stance": "for"}],
             model="auto",
             continuation_id=None,
             hypothesis=None,
@@ -407,14 +406,18 @@ class TestConsensusTool:
         )
 
         # Execute workflow
-        result = asyncio.run(tool.execute_workflow({
-            "step": request.step,
-            "step_number": request.step_number,
-            "total_steps": request.total_steps,
-            "next_step_required": request.next_step_required,
-            "findings": request.findings,
-            "models": request.models
-        }))
+        result = asyncio.run(
+            tool.execute_workflow(
+                {
+                    "step": request.step,
+                    "step_number": request.step_number,
+                    "total_steps": request.total_steps,
+                    "next_step_required": request.next_step_required,
+                    "findings": request.findings,
+                    "models": request.models,
+                }
+            )
+        )
 
         # Verify concurrent execution was called
         mock_run_concurrent.assert_called_once()
@@ -439,10 +442,7 @@ class TestConsensusTool:
         tool = ConsensusTool()
 
         # Simulate mixed results
-        tool.models_to_consult = [
-            {"model": "flash", "stance": "neutral"},
-            {"model": "haiku", "stance": "for"}
-        ]
+        tool.models_to_consult = [{"model": "flash", "stance": "neutral"}, {"model": "haiku", "stance": "for"}]
         tool.accumulated_responses = [
             {
                 "model": "flash",
@@ -459,7 +459,7 @@ class TestConsensusTool:
                 "content": None,
                 "error_message": "Model timeout",
                 "latency_ms": 30000,
-            }
+            },
         ]
 
         # Test metadata customization

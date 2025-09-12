@@ -69,7 +69,7 @@ DATABASE_CONFIG = {
                 {
                     "prompt": "Analyze this configuration file briefly",
                     "files": [validation_file],
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -89,7 +89,7 @@ DATABASE_CONFIG = {
                         "prompt": "Continue analyzing this configuration file",
                         "files": [validation_file],  # Same file should be deduplicated
                         "continuation_id": thread_id,
-                        "model": "flash",
+                        "model": "qwen3:0.6b",
                     },
                 )
 
@@ -110,7 +110,7 @@ DATABASE_CONFIG = {
                     "next_step_required": False,
                     "findings": "Starting code review of configuration file",
                     "relevant_files": [validation_file],
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 

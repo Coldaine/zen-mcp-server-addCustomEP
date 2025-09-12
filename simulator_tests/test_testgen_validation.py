@@ -315,7 +315,7 @@ class TestCalculatorBasic:
                     "relevant_context": ["add", "subtract", "multiply", "divide", "calculate_percentage", "power"],
                     "confidence": "high",
                     "continuation_id": continuation_id,
-                    "model": "flash",  # Use flash for expert analysis
+                    "model": "qwen3:0.6b",  # Use flash for expert analysis
                 },
             )
 
@@ -395,7 +395,7 @@ class TestCalculatorBasic:
                     "relevant_files": [self.calculator_file],
                     "relevant_context": ["add", "subtract", "multiply", "divide", "calculate_percentage", "power"],
                     "confidence": "certain",  # This should skip expert analysis
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -568,7 +568,7 @@ def is_prime(n):
                     "relevant_files": [utils_file],  # This should be referenced, not embedded
                     "relevant_context": ["validate_number", "format_result"],
                     "confidence": "low",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -603,7 +603,7 @@ def is_prime(n):
                     "relevant_files": [utils_file, math_file],  # Should be fully embedded
                     "relevant_context": ["validate_number", "format_result", "factorial", "is_prime"],
                     "confidence": "high",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -724,7 +724,7 @@ class DataProcessor:
                     "relevant_files": [processor_file],
                     "relevant_context": ["DataProcessor", "process_batch", "_process_single_item", "get_stats"],
                     "confidence": "low",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -757,7 +757,7 @@ class DataProcessor:
                     "relevant_files": [processor_file],
                     "relevant_context": ["process_batch", "_process_single_item"],
                     "confidence": "medium",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -781,7 +781,7 @@ class DataProcessor:
                     "files_checked": [processor_file],
                     "relevant_files": [processor_file],
                     "confidence": "high",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -805,7 +805,7 @@ class DataProcessor:
                     "files_checked": [processor_file],
                     "relevant_files": [processor_file],
                     "confidence": "high",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 

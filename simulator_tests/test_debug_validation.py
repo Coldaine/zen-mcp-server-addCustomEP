@@ -354,7 +354,7 @@ RuntimeError: dictionary changed size during iteration
                     "hypothesis": "Dictionary modification during iteration causes RuntimeError in cleanup_expired_sessions",
                     "confidence": "high",
                     "continuation_id": continuation_id,
-                    "model": "flash",  # Use flash for expert analysis
+                    "model": "qwen3:0.6b",  # Use flash for expert analysis
                 },
             )
 
@@ -439,7 +439,7 @@ RuntimeError: dictionary changed size during iteration
                     "relevant_context": ["SessionManager.cleanup_expired_sessions"],
                     "hypothesis": "Dictionary modification during iteration causes RuntimeError - fix is straightforward",
                     "confidence": "certain",  # This should skip expert analysis
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -607,7 +607,7 @@ def validate_input(data):
                     "relevant_context": ["process_data"],
                     "hypothesis": "Investigating data flow",
                     "confidence": "low",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -647,7 +647,7 @@ def validate_input(data):
                     "relevant_context": ["process_data", "validate_input"],
                     "hypothesis": "Validation might be too strict",
                     "confidence": "medium",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -693,7 +693,7 @@ def validate_input(data):
                     "relevant_context": ["process_data", "validate_input"],
                     "hypothesis": "Validation logic is too restrictive for valid edge cases",
                     "confidence": "high",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -800,7 +800,7 @@ class DatabaseServer:
                     "relevant_context": [],
                     "hypothesis": "Configuration issue causing startup failure",
                     "confidence": "low",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -834,7 +834,7 @@ class DatabaseServer:
                     "relevant_context": ["DatabaseServer.__init__"],
                     "hypothesis": "Invalid environment variable causing integer conversion error",
                     "confidence": "medium",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -874,7 +874,7 @@ class DatabaseServer:
                     "relevant_context": ["DatabaseServer.__init__"],
                     "hypothesis": "Need proper error handling and validation for environment variables",
                     "confidence": "high",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -908,7 +908,7 @@ class DatabaseServer:
                     "relevant_context": ["DatabaseServer.__init__"],
                     "hypothesis": "Environment variable validation needed with proper error handling",
                     "confidence": "high",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 

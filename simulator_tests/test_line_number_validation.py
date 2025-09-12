@@ -65,7 +65,7 @@ def validate_data(data):
                 {
                     "prompt": "Where is tax_rate defined in this file? Please tell me the exact line number.",
                     "files": [test_file_path],
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -86,7 +86,7 @@ def validate_data(data):
                 {
                     "prompt": "What happens between lines 7-11 in this code? Focus on the loop logic.",
                     "files": [test_file_path],
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 
@@ -108,7 +108,7 @@ def validate_data(data):
                     "prompt": "Analyze this code for refactoring opportunities",
                     "files": [test_file_path],
                     "refactor_type": "codesmells",
-                    "model": "flash",
+                    "model": "qwen3:0.6b",
                 },
             )
 

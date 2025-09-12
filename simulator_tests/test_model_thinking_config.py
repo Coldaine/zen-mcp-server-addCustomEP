@@ -30,7 +30,7 @@ class TestModelThinkingConfig(BaseSimulatorTest):
                 "chat",
                 {
                     "prompt": "What is 2 + 2? Please think carefully and explain.",
-                    "model": "pro",  # Should resolve to gemini-2.5-pro
+                    "model": "qwen3:0.6b",  # Should resolve to gemini-2.5-pro
                     "thinking_mode": "high",  # Should use thinking_config
                 },
             )
@@ -55,7 +55,7 @@ class TestModelThinkingConfig(BaseSimulatorTest):
                 "chat",
                 {
                     "prompt": "What is 3 + 3? Give a quick answer.",
-                    "model": "flash",  # Should resolve to gemini-2.5-flash
+                    "model": "qwen3:0.6b",  # Should resolve to gemini-2.5-flash
                     "thinking_mode": "high",  # Should be ignored for Flash model
                 },
             )
