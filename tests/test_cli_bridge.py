@@ -54,6 +54,9 @@ class TestCLIBridgeProvider:
         assert response.provider.name == "CLI"
         mock_run.assert_called_once()
         args, kwargs = mock_run.call_args
+        # Ensure we invoke non-interactive subcommand and pass stdin
+        cmd = args[0]
+        assert cmd[1] == "exec"
         assert kwargs["input"] == "test prompt"
         assert kwargs["timeout"] == 30
 
@@ -166,6 +169,7 @@ class TestCLIBridgeProvider:
             provider.generate_content("test", "codex")
 
             mock_run.assert_called_once()
-            args, kwargs = mock_run.call_args
-            cmd = args[0]
-            assert cmd[0] == "custom-codex"
+        args, kwargs = mock_run.call_args
+        cmd = args[0]
+        assert cmd[0] == "custom-codex"
+        assert cmd[1] == "exec"

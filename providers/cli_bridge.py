@@ -23,7 +23,9 @@ class CLIBridgeProvider(ModelProvider):
             "context_window": 400_000,
             "max_output_tokens": 128_000,
             "binary": "codex",
-            "args": [],  # Codex CLI uses GPT-5 by default; no args needed
+            # Use non-interactive execution path; read prompt from stdin
+            # --color=never avoids ANSI codes in output; --skip-git-repo-check for portability
+            "args": ["exec", "--color", "never", "--skip-git-repo-check"],
         },
     }
 
