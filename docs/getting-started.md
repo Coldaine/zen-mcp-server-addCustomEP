@@ -147,6 +147,8 @@ PATH = "/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin:$HOME/.local/bin:$HOME/.c
 GEMINI_API_KEY = "your_api_key_here"
 ```
 
+See `docs/cli-codex-integration.md` for details on running the live CLI test and troubleshooting.
+
 **Benefits of uvx method:**
 - ✅ Zero manual setup required
 - ✅ Always pulls latest version

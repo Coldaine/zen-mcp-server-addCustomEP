@@ -73,10 +73,6 @@ class ModelProviderRegistry:
         # Get API key from environment
         api_key = cls._get_api_key_for_provider(provider_type)
 
-        # Special case: CLI providers don't require an API key
-        if provider_type == ProviderType.CLI:
-            api_key = ""  # Use empty string for CLI providers
-
         # Get provider class or factory function
         provider_class = instance._providers[provider_type]
 
@@ -98,6 +94,9 @@ class ModelProviderRegistry:
                 api_key = api_key or ""
                 # Initialize custom provider with both API key and base URL
                 provider = provider_class(api_key=api_key, base_url=custom_url)
+        elif provider_type == ProviderType.CLI:
+            # CLI providers don't require API keys - initialize without credentials
+            provider = provider_class(api_key="")
         else:
             if not api_key:
                 return None
