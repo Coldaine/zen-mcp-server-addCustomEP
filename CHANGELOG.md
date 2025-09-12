@@ -2,6 +2,38 @@
 
 <!-- version list -->
 
+## v5.12.0 (2025-09-12)
+
+### Features
+
+- Concurrent single-step consensus workflow (parallel model consultation, aggregated timing log)
+- Local-only default model strategy (replaced external aliases with Ollama-hosted models)
+
+### Refactoring
+
+- Removed legacy multi-step consensus progression in favor of immediate aggregation
+- Standardized consensus response structure and added markdown export utilities
+
+### Documentation
+
+- Added async consensus refactor rationale, model library snapshot, planning notes, GLM tips
+- Added environment verification script usage notes and help overview
+
+### Chores
+
+- Sanitized `.env` (no committed secrets) and added `scripts/verify_env.py`
+- Added `uv.lock` for deterministic dependency resolution
+
+### Known Issues
+
+- Local vision models currently fail image interpretation (tests xfail pending image payload pipeline fix)
+
+### Migration Notes
+
+- External model aliases (`flash`, `pro`, `gemini-*`, `haiku`, `o3`) removed; update automation to new local identifiers
+- Consensus tool now returns full model set in step 1 with `consensus_workflow_complete` status
+
+
 ## v5.11.0 (2025-08-26)
 
 ### Chores

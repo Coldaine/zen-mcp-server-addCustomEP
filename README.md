@@ -131,6 +131,19 @@ cd zen-mcp-server
 
 👉 **[Complete Setup Guide](docs/getting-started.md)** with detailed installation, configuration for Gemini / Codex, and troubleshooting
 
+### Local-Only Model Strategy (v5.12.0+)
+
+As of v5.12.0 the default configuration favors **local Ollama-hosted models** over external paid APIs. External aliases like `flash`, `pro`, `haiku`, `o3`, and `gemini-*` were removed from the default test harness to reduce cost and enable fully offline workflows.
+
+If you want to re-enable remote models:
+
+1. Export the relevant API keys (e.g. `export OPENROUTER_API_KEY=...`).
+2. Reintroduce or override model entries in `conf/custom_models.json` (see `docs/custom_models.md`).
+3. Restart the server so the provider registry picks up newly enabled providers.
+
+Vision Note: Local vision models are registered (`llava`, `moondream`, `qwen2.5vl`, `llama3.2-vision`) but image interpretation is currently under investigation. Vision simulator test is temporarily marked `xfail` (see `docs/issues/local_model_migration_followups.md`).
+
+
 ## Core Tools
 
 > **Note:** Each tool comes with its own multi-step workflow, parameters, and descriptions that consume valuable context window space even when not in use. To optimize performance, some tools are disabled by default. See [Tool Configuration](#tool-configuration) below to enable them.

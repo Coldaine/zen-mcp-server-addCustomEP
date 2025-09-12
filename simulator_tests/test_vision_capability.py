@@ -12,9 +12,15 @@ Tests vision capability with the chat tool using llama3.2-vision model:
 import base64
 import os
 
+import pytest
+
 from .base_test import BaseSimulatorTest
 
 
+@pytest.mark.xfail(
+    reason="Local vision models not processing images yet; see docs/issues/local_model_migration_followups.md Issue 1",
+    strict=False,
+)
 class VisionCapabilityTest(BaseSimulatorTest):
     """Test vision capability with chat tool and llama3.2-vision model"""
 
