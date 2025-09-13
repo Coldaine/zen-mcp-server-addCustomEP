@@ -192,11 +192,10 @@ cd zen-mcp-server
 
 ## Step 3: Configure API Keys
 
- 
-\n### For uvx installation
+### For uvx installation
 Add your API keys directly to the MCP configuration shown above.
 
-\n### For clone installation
+### For clone installation
 Edit the `.env` file:
  
 
@@ -204,9 +203,8 @@ Edit the `.env` file:
 nano .env
 ```
 
- 
 Add your API keys (at least one required):
-\n```env
+```env
 # Choose your providers (at least one required)
 GEMINI_API_KEY=your-gemini-api-key-here      # For Gemini models
 OPENAI_API_KEY=your-openai-api-key-here      # For O3, GPT-5
@@ -231,52 +229,41 @@ CUSTOM_MODEL_NAME=llama3.2                   # Default model name
 - ⭐ If multiple APIs configured, native APIs take priority over OpenRouter
 - ⭐ Configure model aliases in [`conf/custom_models.json`](../conf/custom_models.json)
 
-```
+## Step 4: Test the Installation
 ## Step 4: Test the Installation
 
-### For Claude Desktop:
-```env
+### For Claude Desktop
 1. Restart Claude Desktop
 2. Open a new conversation
-3. Try: `"Use zen to list available models"`
+3. Try: "Use zen to list available models"
 
-### For Claude Code CLI:
-```
+### For Claude Code CLI
 1. Exit any existing Claude session
-2. Run `claude` from your project directory  
+2. Run `claude` from your project directory
+3. Try: "Use zen to chat about Python best practices"
 
-3. Try: `"Use zen to chat about Python best practices"`
+### For Gemini CLI
+Note: While Zen MCP connects to Gemini CLI, tool invocation isn't working correctly yet. See [Gemini CLI Setup](gemini-setup.md) for updates.
 
-\n### For Gemini CLI
-**Note**: While Zen MCP connects to Gemini CLI, tool invocation isn't working correctly yet. See [Gemini CLI Setup](gemini-setup.md) for updates.
-
-\n### For Codex CLI
+### For Codex CLI
 1. Restart Codex CLI if running
 2. Open a new conversation
-3. Try: `"Use zen to list available models"`
+3. Try: "Use zen to list available models"
 
 ### Test Commands
 
 ```text
-"Use zen to list available models"
-"Chat with zen about the best approach for API design"
-"Use zen thinkdeep with gemini pro about scaling strategies"  
-"Debug this error with o3: [paste error]"
+Use zen to list available models
+Chat with zen about the best approach for API design
+Use zen thinkdeep with gemini pro about scaling strategies
+Debug this error with o3: [paste error]
+```
 
-## Hybrid CLI Routing (How CLI models are handled)
+## CLI Routing Notes
 
-To preserve the lightweight design of local CLI bridges (Codex, Ollama CLI, etc.), Zen MCP uses a hybrid routing strategy:
-
-- **Direct CLI routing:** If a requested model matches a known CLI model (configured via `CODEX_CLI_ENABLED` and `CODEX_CLI_BINARY`), the server will route the request directly to the `CLIBridgeProvider`. This avoids forcing CLI tools through API-style validation and authentication logic.
-- **Registry discovery for everything else:** The provider registry is still used for discovery and for all native or networked providers (Gemini, OpenAI, X.AI, DIAL, Custom, OpenRouter).
-
-Why this matters:
-- Keeps CLI execution simple and reliable (subprocess calls, no API key checks).
-- Prevents registry-level auth checks from blocking local CLI providers.
-- Maintains unified `listmodels` discovery while ensuring execution uses the best path.
+Zen MCP registers CLI providers (e.g., Codex) when enabled via environment and the binary exists on PATH. Resolution and discovery go through the provider registry.
 
 If you rely on CLI tools, ensure `CODEX_CLI_ENABLED=1` and `CODEX_CLI_BINARY` point to the CLI binary in your `PATH`.
-```
 
 **Note**: Codex CLI provides excellent MCP integration with automatic environment variable configuration when using the setup script.
 
