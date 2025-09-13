@@ -22,6 +22,7 @@ import asyncio
 import atexit
 import logging
 import os
+import shutil
 import sys
 import time
 from logging.handlers import RotatingFileHandler
@@ -385,6 +386,7 @@ def configure_providers():
         logger.debug(f"  {key}: {'[PRESENT]' if value else '[MISSING]'}")
     from providers import ModelProviderRegistry
     from providers.base import ProviderType
+    from providers.cli_bridge import CLIBridgeProvider
     from providers.custom import CustomProvider
     from providers.dial import DIALModelProvider
     from providers.gemini import GeminiModelProvider
@@ -462,6 +464,15 @@ def configure_providers():
         else:
             logger.debug("No custom API key provided (using unauthenticated access)")
 
+    # Check for CLI tools (Codex, etc.)
+    cli_enabled = os.getenv("CODEX_CLI_ENABLED", "").lower() in ("1", "true", "yes")
+    cli_binary = os.getenv("CODEX_CLI_BINARY", "codex")
+    has_cli = False
+    if cli_enabled and shutil.which(cli_binary):
+        valid_providers.append(f"CLI ({cli_binary})")
+        has_cli = True
+        logger.info(f"CLI tool found: {cli_binary} - CLI models available")
+
     # Register providers in priority order:
     # 1. Native APIs first (most direct and efficient)
     if has_native_apis:
@@ -484,6 +495,10 @@ def configure_providers():
 
         ModelProviderRegistry.register_provider(ProviderType.CUSTOM, custom_provider_factory)
 
+    # 2.5. CLI provider (local CLI tools)
+    if has_cli:
+        ModelProviderRegistry.register_provider(ProviderType.CLI, CLIBridgeProvider)
+
     # 3. OpenRouter last (catch-all for everything else)
     if has_openrouter:
         ModelProviderRegistry.register_provider(ProviderType.OPENROUTER, OpenRouterProvider)
@@ -497,7 +512,8 @@ def configure_providers():
             "- XAI_API_KEY for X.AI GROK models\n"
             "- DIAL_API_KEY for DIAL models\n"
             "- OPENROUTER_API_KEY for OpenRouter (multiple models)\n"
-            "- CUSTOM_API_URL for local models (Ollama, vLLM, etc.)"
+            "- CUSTOM_API_URL for local models (Ollama, vLLM, etc.)\n"
+            "- CODEX_CLI_ENABLED=1 and CODEX_CLI_BINARY for local CLI tools"
         )
 
     logger.info(f"Available providers: {', '.join(valid_providers)}")
@@ -506,6 +522,8 @@ def configure_providers():
     priority_info = []
     if has_native_apis:
         priority_info.append("Native APIs (Gemini, OpenAI)")
+    if has_cli:
+        priority_info.append("CLI tools")
     if has_custom:
         priority_info.append("Custom endpoints")
     if has_openrouter:
@@ -766,7 +784,25 @@ async def handle_call_tool(name: str, arguments: dict[str, Any]) -> list[TextCon
             arguments["model"] = model_name
 
         # Validate model availability at MCP boundary
-        provider = ModelProviderRegistry.get_provider_for_model(model_name)
+        # Hybrid routing: prefer direct CLI routing for known CLI models to
+        # preserve the lightweight subprocess design and avoid forcing CLI
+        # providers through API-shaped registry validation.
+        provider = None
+        try:
+            from providers.cli_bridge import CLIBridgeProvider
+
+            # If model is supported by the CLI bridge, route directly to it
+            if model_name in getattr(CLIBridgeProvider, "CLI_MODEL_SPECS", {}):
+                logger.debug(f"Direct CLI routing for model '{model_name}'")
+                # Initialize a fresh CLI bridge provider instance (stateless)
+                provider = CLIBridgeProvider(api_key="")
+        except Exception:
+            # If CLI bridge is not available or fails import, fall back to registry
+            provider = None
+
+        # Fall back to registry-based provider lookup if not a direct CLI model
+        if not provider:
+            provider = ModelProviderRegistry.get_provider_for_model(model_name)
         if not provider:
             # Get list of available models for error message
             available_models = list(ModelProviderRegistry.get_available_models(respect_restrictions=True).keys())

@@ -248,6 +248,14 @@ class CustomProvider(OpenAICompatibleProvider):
         """
         # logging.debug(f"Custom provider validating model: '{model_name}'")
 
+        # IMPORTANT: Reject known CLI models to avoid conflicts with CLI provider
+        # CLI models should be handled by CLIBridgeProvider, not CustomProvider
+        from .cli_bridge import CLIBridgeProvider
+
+        if hasattr(CLIBridgeProvider, "CLI_MODEL_SPECS") and model_name in CLIBridgeProvider.CLI_MODEL_SPECS:
+            logging.debug(f"Model '{model_name}' rejected by custom provider (known CLI model)")
+            return False
+
         # Try to resolve through registry first
         config = self._registry.resolve(model_name)
         if config:

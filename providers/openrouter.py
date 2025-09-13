@@ -136,6 +136,13 @@ class OpenRouterProvider(OpenAICompatibleProvider):
         Returns:
             True if model is allowed, False if restricted
         """
+        # IMPORTANT: Reject known CLI models to avoid conflicts with CLI provider
+        # CLI models should be handled by CLIBridgeProvider, not OpenRouter
+        from .cli_bridge import CLIBridgeProvider
+
+        if hasattr(CLIBridgeProvider, "CLI_MODEL_SPECS") and model_name in CLIBridgeProvider.CLI_MODEL_SPECS:
+            return False
+
         # Check model restrictions if configured
         from utils.model_restrictions import get_restriction_service
 

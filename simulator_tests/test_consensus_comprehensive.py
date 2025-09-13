@@ -164,6 +164,7 @@ class TestConsensusComprehensive(ConversationBaseTest):
         except Exception as e:
             self.logger.error(f"Comprehensive consensus test failed: {str(e)}")
             import traceback
+
             self.logger.error(f"Traceback: {traceback.format_exc()}")
             return False
 

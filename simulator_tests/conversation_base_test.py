@@ -133,6 +133,7 @@ class ConversationBaseTest(BaseSimulatorTest):
             if "model" not in params:
                 # Prefer local small models (Ollama) for deterministic, cost-free testing
                 from providers.registry import ModelProviderRegistry as _Registry
+
                 try:
                     available = list(_Registry.get_available_models(respect_restrictions=True).keys())
                 except Exception:
