@@ -7,6 +7,7 @@ import pytest
 
 from providers import ModelProviderRegistry, ModelResponse
 from providers.base import ProviderType
+from providers.registry import get_primary_provider_class
 from providers.gemini import GeminiModelProvider
 from providers.openai_provider import OpenAIModelProvider
 
@@ -36,7 +37,8 @@ class TestModelProviderRegistry:
 
         registry = ModelProviderRegistry()
         assert ProviderType.GOOGLE in registry._providers
-        assert registry._providers[ProviderType.GOOGLE] == GeminiModelProvider
+        assert get_primary_provider_class(ProviderType.GOOGLE) is GeminiModelProvider
+        assert len(registry._providers[ProviderType.GOOGLE]) == 1
 
     @patch.dict(os.environ, {"GEMINI_API_KEY": "test-key"})
     def test_get_provider(self):

@@ -41,21 +41,26 @@ class ModelProviderRegistry:
         return cls._instance
 
     @classmethod
-    def register_provider(cls, provider_type: ProviderType, provider_class: type[ModelProvider]) -> None:
-        """Register a new provider class.
+    def register_provider(cls, provider_type: ProviderType, provider_cls: type[ModelProvider], *, append: bool = False) -> None:
+        """
+        Register a provider class for a given provider type.
 
         Args:
-            provider_type: Type of the provider (e.g., ProviderType.GOOGLE)
-            provider_class: Class that implements ModelProvider interface
+            provider_type: The type of the provider to register.
+            provider_cls: The class of the provider.
+            append: If True, appends the provider to the list for this type.
+                    If False (default), overwrites any existing providers for the type.
+                    This preserves backward compatibility for single-provider types.
         """
         instance = cls()
-        provider_list = instance._providers.setdefault(provider_type, [])
-        provider_list.append(provider_class)
-        # Keep initialized list aligned in size with provider classes list
-        init_list = instance._initialized_providers.setdefault(provider_type, [])
-        # Fill with None placeholders to match length
-        while len(init_list) < len(provider_list):
-            init_list.append(None)
+        if provider_type not in instance._providers or not append:
+            # Overwrite behavior (default and original contract)
+            instance._providers[provider_type] = [provider_cls]
+            instance._initialized_providers[provider_type] = [None]
+        else:
+            # Append behavior for multi-provider types like CLI
+            instance._providers[provider_type].append(provider_cls)
+            instance._initialized_providers[provider_type].append(None)
 
     @classmethod
     def get_provider(cls, provider_type: ProviderType, force_new: bool = False) -> Optional[ModelProvider]:
@@ -374,13 +379,12 @@ class ModelProviderRegistry:
 
     @classmethod
     def reset_for_testing(cls) -> None:
-        """Reset the registry to a clean state for testing.
-
-        This provides a safe, public API for tests to clean up registry state
-        without directly manipulating private attributes.
-        """
-        cls._instance = None
-        # Fresh instance will recreate internal structures
+        """Clear all registrations and initialized instances for a clean test slate."""
+        instance = cls()
+        if hasattr(instance, "_providers"):
+            instance._providers.clear()
+        if hasattr(instance, "_initialized_providers"):
+            instance._initialized_providers.clear()
 
     @classmethod
     def unregister_provider(
@@ -405,3 +409,24 @@ class ModelProviderRegistry:
         init_list = instance._initialized_providers.get(provider_type, [])
         if idx < len(init_list):
             init_list.pop(idx)
+
+
+def register_additional_provider(
+    provider_type: ProviderType, provider_cls: type[ModelProvider]
+) -> None:
+    """Semantic helper to explicitly append a provider to a type."""
+    ModelProviderRegistry.register_provider(provider_type, provider_cls, append=True)
+
+
+def get_primary_provider_class(
+    provider_type: ProviderType,
+) -> Optional[type[ModelProvider]]:
+    """
+    Compatibility accessor for tests/code expecting a single provider class per type.
+
+    Returns the first registered provider for the type.
+    """
+    instance = ModelProviderRegistry()
+    # Accessing internal _providers list for test compatibility
+    provider_list = instance._providers.get(provider_type)
+    return provider_list[0] if provider_list else None
