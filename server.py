@@ -507,7 +507,10 @@ def configure_providers():
     if has_cli:
         ModelProviderRegistry.register_provider(ProviderType.CLI, CLIBridgeProvider)
     if has_gemini_cli:
-        ModelProviderRegistry.register_provider(ProviderType.CLI, GeminiCLIBridgeProvider)
+        # Use append=True for the second CLI provider to enable multi-CLI support
+        ModelProviderRegistry.register_provider(
+            ProviderType.CLI, GeminiCLIBridgeProvider, append=True
+        )
 
     # 3. OpenRouter last (catch-all for everything else)
     if has_openrouter:

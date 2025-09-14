@@ -2,7 +2,7 @@
 
 import logging
 import os
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional, Type
 
 from .base import ModelProvider, ProviderType
 
@@ -34,28 +34,36 @@ class ModelProviderRegistry:
             cls._instance = super().__new__(cls)
             # Initialize instance dictionaries on first creation
             # Map ProviderType -> list of provider classes (or factories)
-            cls._instance._providers: dict[ProviderType, list] = {}
+            cls._instance._providers: Dict[ProviderType, List[type[ModelProvider]]] = {}
             # Map ProviderType -> list of initialized provider instances (aligned by index)
-            cls._instance._initialized_providers: dict[ProviderType, list] = {}
+            cls._instance._initialized_providers: Dict[ProviderType, List[Optional[ModelProvider]]] = {}
             logging.debug(f"REGISTRY: Created instance {cls._instance}")
         return cls._instance
 
     @classmethod
-    def register_provider(cls, provider_type: ProviderType, provider_class: type[ModelProvider]) -> None:
+    def register_provider(
+        cls,
+        provider_type: ProviderType,
+        provider_class: type[ModelProvider],
+        *,
+        append: bool = False,
+    ) -> None:
         """Register a new provider class.
 
         Args:
             provider_type: Type of the provider (e.g., ProviderType.GOOGLE)
             provider_class: Class that implements ModelProvider interface
+            append: If True, appends the provider to the list for this type.
+                If False (default), overwrites any existing providers for the type.
+                This preserves backward compatibility for single-provider types.
         """
         instance = cls()
-        provider_list = instance._providers.setdefault(provider_type, [])
-        provider_list.append(provider_class)
-        # Keep initialized list aligned in size with provider classes list
-        init_list = instance._initialized_providers.setdefault(provider_type, [])
-        # Fill with None placeholders to match length
-        while len(init_list) < len(provider_list):
-            init_list.append(None)
+        if provider_type not in instance._providers or not append:
+            instance._providers[provider_type] = [provider_class]
+            instance._initialized_providers[provider_type] = [None]
+        else:
+            instance._providers[provider_type].append(provider_class)
+            instance._initialized_providers[provider_type].append(None)
 
     @classmethod
     def get_provider(cls, provider_type: ProviderType, force_new: bool = False) -> Optional[ModelProvider]:
@@ -374,13 +382,10 @@ class ModelProviderRegistry:
 
     @classmethod
     def reset_for_testing(cls) -> None:
-        """Reset the registry to a clean state for testing.
-
-        This provides a safe, public API for tests to clean up registry state
-        without directly manipulating private attributes.
-        """
-        cls._instance = None
-        # Fresh instance will recreate internal structures
+        """Clear all registrations and initialized instances for a clean test slate."""
+        instance = cls()
+        instance._providers.clear()
+        instance._initialized_providers.clear()
 
     @classmethod
     def unregister_provider(
@@ -405,3 +410,19 @@ class ModelProviderRegistry:
         init_list = instance._initialized_providers.get(provider_type, [])
         if idx < len(init_list):
             init_list.pop(idx)
+
+
+def register_additional_provider(
+    provider_type: ProviderType, provider_class: type[ModelProvider]
+) -> None:
+    """Semantic helper to explicitly append a provider to a type."""
+    ModelProviderRegistry.register_provider(provider_type, provider_class, append=True)
+
+
+def get_primary_provider_class(
+    provider_type: ProviderType,
+) -> Optional[type[ModelProvider]]:
+    """Compatibility accessor for tests/code expecting a single provider class per type."""
+    instance = ModelProviderRegistry()
+    provider_list = instance._providers.get(provider_type)
+    return provider_list[0] if provider_list else None
