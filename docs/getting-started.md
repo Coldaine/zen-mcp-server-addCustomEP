@@ -243,7 +243,20 @@ CUSTOM_MODEL_NAME=llama3.2                   # Default model name
 3. Try: "Use zen to chat about Python best practices"
 
 ### For Gemini CLI
-Note: While Zen MCP connects to Gemini CLI, tool invocation isn't working correctly yet. See [Gemini CLI Setup](gemini-setup.md) for updates.
+The server auto-detects the local `gemini` binary (no enable flag required). If it is on your PATH you automatically get the logical model `gemini-cli`.
+
+Optional environment overrides (set in your MCP launch config or shell):
+
+```env
+# Override binary name/path
+GEMINI_CLI_BINARY=gemini
+# Force a specific cloud model used by the CLI (adds --model <value>)
+GEMINI_CLI_MODEL=gemini-2.5-flash
+# Adjust timeout (seconds)
+GEMINI_CLI_TIMEOUT=45
+```
+
+Invocation pattern used internally: `gemini --yolo -p "<prompt>"` plus `--model <value>` when `GEMINI_CLI_MODEL` is set. A system prompt (if provided) is prepended to your user prompt separated by a blank line.
 
 ### For Codex CLI
 1. Restart Codex CLI if running

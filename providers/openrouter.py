@@ -140,7 +140,19 @@ class OpenRouterProvider(OpenAICompatibleProvider):
         # CLI models should be handled by CLIBridgeProvider, not OpenRouter
         from .cli_bridge import CLIBridgeProvider
 
+        # Also import Gemini CLI provider lazily to avoid hard dependency if file missing in older versions
+        try:  # noqa: SIM105 keep simple
+            from .gemini_cli_bridge import GeminiCLIBridgeProvider  # type: ignore
+        except Exception:  # pragma: no cover - optional
+            GeminiCLIBridgeProvider = None  # type: ignore
+
         if hasattr(CLIBridgeProvider, "CLI_MODEL_NAME") and model_name == CLIBridgeProvider.CLI_MODEL_NAME:
+            return False
+        if (
+            GeminiCLIBridgeProvider is not None
+            and hasattr(GeminiCLIBridgeProvider, "CLI_MODEL_NAME")
+            and model_name == GeminiCLIBridgeProvider.CLI_MODEL_NAME
+        ):
             return False
 
         # Check model restrictions if configured

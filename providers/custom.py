@@ -252,8 +252,21 @@ class CustomProvider(OpenAICompatibleProvider):
         # CLI models should be handled by CLIBridgeProvider, not CustomProvider
         from .cli_bridge import CLIBridgeProvider
 
+        # Optional Gemini CLI import
+        try:  # noqa: SIM105 keep simple
+            from .gemini_cli_bridge import GeminiCLIBridgeProvider  # type: ignore
+        except Exception:  # pragma: no cover
+            GeminiCLIBridgeProvider = None  # type: ignore
+
         if hasattr(CLIBridgeProvider, "CLI_MODEL_NAME") and model_name == CLIBridgeProvider.CLI_MODEL_NAME:
             logging.debug(f"Model '{model_name}' rejected by custom provider (known CLI model)")
+            return False
+        if (
+            GeminiCLIBridgeProvider is not None
+            and hasattr(GeminiCLIBridgeProvider, "CLI_MODEL_NAME")
+            and model_name == GeminiCLIBridgeProvider.CLI_MODEL_NAME
+        ):
+            logging.debug(f"Model '{model_name}' rejected by custom provider (known Gemini CLI model)")
             return False
 
         # Try to resolve through registry first

@@ -4,6 +4,7 @@ Pytest configuration for Zen MCP Server tests
 
 import asyncio
 import importlib
+import logging
 import os
 import sys
 from pathlib import Path
@@ -84,6 +85,30 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "no_mock_provider: disable automatic provider mocking")
     # Assume we need dummy keys until we learn otherwise
     config._needs_dummy_keys = True
+
+    # Ensure logs directory exists for pytest log_file
+    log_dir = Path(__file__).resolve().parent.parent / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+
+    # Optionally attach a file handler for tests that don't import server.py
+    # Pytest will write to logs/pytest.log via pytest.ini, but we can also capture
+    # module-level logging here if needed.
+    try:
+        test_log_path = log_dir / "test_run.log"
+        fh = logging.FileHandler(test_log_path, encoding="utf-8")
+        fh.setLevel(logging.INFO)
+        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s")
+        fh.setFormatter(formatter)
+        root = logging.getLogger()
+        # Avoid adding duplicate handlers across reloads
+        if not any(
+            isinstance(h, logging.FileHandler) and getattr(h, "baseFilename", "") == str(test_log_path)
+            for h in root.handlers
+        ):
+            root.addHandler(fh)
+    except Exception:
+        # Non-fatal: pytest will still log to logs/pytest.log from pytest.ini
+        pass
 
 
 def pytest_collection_modifyitems(session, config, items):
