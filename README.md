@@ -83,6 +83,7 @@ For best results, use Claude Code with:
 
 **1. Get API Keys** (choose one or more):
 - **[OpenRouter](https://openrouter.ai/)** - Access multiple models with one API
+- **Kilo (Direct)** - Use `KILO_API_KEY` for direct access to Kilo-hosted models (enables `kilo:` aliases)
 - **[Gemini](https://makersuite.google.com/app/apikey)** - Google's latest models
 - **[OpenAI](https://platform.openai.com/api-keys)** - O3, GPT-5 series
 - **[X.AI](https://console.x.ai/)** - Grok models
@@ -141,6 +142,41 @@ If you want to re-enable remote models:
 1. Export the relevant API keys (e.g. `export OPENROUTER_API_KEY=...`).
 2. Reintroduce or override model entries in `conf/custom_models.json` (see `docs/custom_models.md`).
 3. Restart the server so the provider registry picks up newly enabled providers.
+
+### OpenRouter vs Direct Kilo Usage
+
+Zen supports both the OpenRouter proxy endpoint and the direct Kilo API for models that appear with `kilo:` aliases in the model library. This is controlled via environment variables and a lightweight selection heuristic inside `OpenRouterProvider`.
+
+Selection order:
+
+1. `KILO_PREFERRED=true` and `KILO_API_KEY` set → direct Kilo (`https://api.kilocodex.com/v1`)
+2. Else if `OPENROUTER_API_KEY` set → OpenRouter proxy (`https://api.kilocode.ai/api/openrouter/`)
+3. Else if `KILO_API_KEY` set → direct Kilo fallback
+4. Else → falls back to the api_key argument (legacy behavior)
+
+Implications:
+- `kilo:*` and `openrouter:*` model prefixes both resolve to the canonical model id
+- Proxy-specific headers only applied when using the OpenRouter proxy endpoint
+- Backward compatible: existing setups with only `OPENROUTER_API_KEY` are unchanged
+
+Example configuration:
+```bash
+export OPENROUTER_API_KEY=your-openrouter-key    # Optional if using only Kilo
+export KILO_API_KEY=your-kilo-key                # Enables direct Kilo access
+export KILO_PREFERRED=true                      # Force direct Kilo when both keys present
+```
+
+Temporarily prefer OpenRouter in a shell:
+```bash
+unset KILO_PREFERRED
+```
+
+Or disable Kilo entirely for a session:
+```bash
+unset KILO_API_KEY
+```
+
+You can safely mix prefixes in prompts; both `kilo:qwen/qwen3-max` and `openrouter:qwen/qwen3-max` will route correctly.
 
 Vision Note: Local vision models are registered (`llava`, `moondream`, `qwen2.5vl`, `llama3.2-vision`) but image interpretation is currently under investigation. Vision simulator test is temporarily marked `xfail` (see `docs/issues/local_model_migration_followups.md`).
 
