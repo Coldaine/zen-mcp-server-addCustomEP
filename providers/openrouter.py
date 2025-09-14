@@ -40,12 +40,53 @@ class OpenRouterProvider(OpenAICompatibleProvider):
         """Initialize OpenRouter provider.
 
         Args:
-            api_key: OpenRouter API key
+            api_key: OpenRouter API key (may be overridden by KILO_API_KEY logic)
             **kwargs: Additional configuration
         """
-        # Use Kilo's OpenRouter proxy endpoint (the extension/server exposes an OpenRouter-compatible proxy)
-        base_url = "https://api.kilocode.ai/api/openrouter/"
+        # Determine which API key and endpoint to use
+        kilo_preferred = os.getenv("KILO_PREFERRED", "").lower() in ("true", "1", "yes")
+        kilo_key = os.getenv("KILO_API_KEY")
+        openrouter_key = os.getenv("OPENROUTER_API_KEY")
+
+        # API key selection logic:
+        # 1. If KILO_PREFERRED=true and KILO_API_KEY available, use KILO_API_KEY
+        # 2. Else if OPENROUTER_API_KEY available, use OPENROUTER_API_KEY
+        # 3. Else if KILO_API_KEY available, use KILO_API_KEY
+        # 4. Otherwise, use the provided api_key (for backward compatibility)
+
+        if kilo_preferred and kilo_key:
+            # KILO_PREFERRED takes precedence
+            selected_key = kilo_key
+            base_url = "https://api.kilocodex.com/v1"
+            self._using_kilo_api = True
+        elif openrouter_key:
+            # Use OpenRouter proxy endpoint
+            selected_key = openrouter_key
+            base_url = "https://api.kilocode.ai/api/openrouter/"
+            self._using_kilo_api = False
+        elif kilo_key:
+            # Fallback to KILO_API_KEY with direct endpoint
+            selected_key = kilo_key
+            base_url = "https://api.kilocodex.com/v1"
+            self._using_kilo_api = True
+        else:
+            # Backward compatibility: use provided api_key
+            selected_key = api_key
+            base_url = "https://api.kilocode.ai/api/openrouter/"
+            self._using_kilo_api = False
+
+        # Override the api_key if we selected a different one
+        if selected_key != api_key:
+            api_key = selected_key
+
         super().__init__(api_key, base_url=base_url, **kwargs)
+
+        # Set headers based on which API we're using
+        # For direct Kilo API, we don't need the proxy headers
+        if self._using_kilo_api:
+            # Clear the proxy headers for direct Kilo API calls
+            self.DEFAULT_HEADERS = {}
+        # For OpenRouter proxy, keep the existing headers
 
         # Initialize model registry
         if OpenRouterProvider._registry is None:
@@ -64,6 +105,20 @@ class OpenRouterProvider(OpenAICompatibleProvider):
         Returns:
             Resolved OpenRouter model name
         """
+        # Handle kilo: prefix specially
+        if model_name.startswith("kilo:"):
+            # Strip the kilo: prefix to get the actual model name
+            actual_model = model_name[5:]  # Remove "kilo:" prefix
+            logging.info(f"Resolved kilo: alias '{model_name}' to '{actual_model}'")
+            return actual_model
+
+        # Handle openrouter: prefix (for consistency)
+        if model_name.startswith("openrouter:"):
+            # Strip the openrouter: prefix to get the actual model name
+            actual_model = model_name[11:]  # Remove "openrouter:" prefix
+            logging.info(f"Resolved openrouter: alias '{model_name}' to '{actual_model}'")
+            return actual_model
+
         # Try to resolve through registry
         config = self._registry.resolve(model_name)
 

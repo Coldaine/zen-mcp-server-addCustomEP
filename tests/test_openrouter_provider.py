@@ -13,6 +13,7 @@ from providers.registry import ModelProviderRegistry
 class TestOpenRouterProvider:
     """Test cases for OpenRouter provider."""
 
+    @patch.dict(os.environ, {}, clear=True)
     def test_provider_initialization(self):
         """Test OpenRouter provider initialization."""
         provider = OpenRouterProvider(api_key="test-key")
@@ -20,6 +21,46 @@ class TestOpenRouterProvider:
         # Now using KiloCode's OpenRouter proxy endpoint
         assert provider.base_url == "https://api.kilocode.ai/api/openrouter/"
         assert provider.FRIENDLY_NAME == "OpenRouter"
+
+    @patch.dict(os.environ, {"KILO_API_KEY": "kilo-test-key"}, clear=True)
+    def test_kilo_api_key_fallback(self):
+        """Test KILO_API_KEY fallback when OPENROUTER_API_KEY is not set."""
+        provider = OpenRouterProvider(api_key="fallback-key")
+        assert provider.api_key == "kilo-test-key"
+        assert provider.base_url == "https://api.kilocodex.com/v1"
+        assert provider._using_kilo_api is True
+        # Should not have proxy headers for direct Kilo API
+        assert provider.DEFAULT_HEADERS == {}
+
+    @patch.dict(os.environ, {"OPENROUTER_API_KEY": "openrouter-test-key"}, clear=True)
+    def test_openrouter_api_key_precedence(self):
+        """Test OPENROUTER_API_KEY takes precedence when both are set."""
+        provider = OpenRouterProvider(api_key="fallback-key")
+        assert provider.api_key == "openrouter-test-key"
+        assert provider.base_url == "https://api.kilocode.ai/api/openrouter/"
+        assert provider._using_kilo_api is False
+        # Should have proxy headers for OpenRouter
+        assert "HTTP-Referer" in provider.DEFAULT_HEADERS
+
+    @patch.dict(os.environ, {"KILO_API_KEY": "kilo-test-key", "KILO_PREFERRED": "true"}, clear=True)
+    def test_kilo_preferred_flag(self):
+        """Test KILO_PREFERRED flag forces KILO_API_KEY usage."""
+        provider = OpenRouterProvider(api_key="fallback-key")
+        assert provider.api_key == "kilo-test-key"
+        assert provider.base_url == "https://api.kilocodex.com/v1"
+        assert provider._using_kilo_api is True
+
+    @patch.dict(
+        os.environ,
+        {"OPENROUTER_API_KEY": "openrouter-test-key", "KILO_API_KEY": "kilo-test-key", "KILO_PREFERRED": "true"},
+        clear=True,
+    )
+    def test_kilo_preferred_overrides_openrouter(self):
+        """Test KILO_PREFERRED overrides OPENROUTER_API_KEY when both are set."""
+        provider = OpenRouterProvider(api_key="fallback-key")
+        assert provider.api_key == "kilo-test-key"
+        assert provider.base_url == "https://api.kilocodex.com/v1"
+        assert provider._using_kilo_api is True
 
     def test_custom_headers(self):
         """Test OpenRouter custom headers."""

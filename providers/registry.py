@@ -259,6 +259,21 @@ class ModelProviderRegistry:
             ProviderType.CLI: None,  # CLI providers don't use API keys
         }
 
+        # Special handling for OpenRouter: check for both OPENROUTER_API_KEY and KILO_API_KEY
+        if provider_type == ProviderType.OPENROUTER:
+            kilo_preferred = os.getenv("KILO_PREFERRED", "").lower() in ("true", "1", "yes")
+            kilo_key = os.getenv("KILO_API_KEY")
+            openrouter_key = os.getenv("OPENROUTER_API_KEY")
+
+            if kilo_preferred and kilo_key:
+                return kilo_key
+            elif openrouter_key:
+                return openrouter_key
+            elif kilo_key:
+                return kilo_key
+            else:
+                return None
+
         env_var = key_mapping.get(provider_type)
         if not env_var:
             return None
