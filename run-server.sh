@@ -80,116 +80,11 @@ clear_python_cache() {
 
 # Get cross-platform Python executable path from venv
 get_venv_python_path() {
-    local venv_path="$1"
-    
-    # Convert to absolute path for consistent behavior across shell environments
-    local abs_venv_path
-    abs_venv_path=$(cd "$(dirname "$venv_path")" && pwd)/$(basename "$venv_path")
-
-    # Check for both Unix and Windows Python executable paths
-    if [[ -f "$abs_venv_path/bin/python" ]]; then
-        echo "$abs_venv_path/bin/python"
-    elif [[ -f "$abs_venv_path/Scripts/python.exe" ]]; then
-        echo "$abs_venv_path/Scripts/python.exe"
-    else
-        return 1  # No Python executable found
-    fi
-}
-
-# Detect the operating system
-detect_os() {
-    case "$OSTYPE" in
-        darwin*)  echo "macos" ;;
-        linux*)
-            if grep -qi microsoft /proc/version 2>/dev/null; then
-                echo "wsl"
-            else
-                echo "linux"
-            fi
-            ;;
-        msys*|cygwin*|win32) echo "windows" ;;
-        *)        echo "unknown" ;;
-    esac
-}
-
-# Get Claude config path based on platform
-get_claude_config_path() {
-    local os_type=$(detect_os)
-
-    case "$os_type" in
-        macos)
-            echo "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
-            ;;
-        linux)
-            echo "$HOME/.config/Claude/claude_desktop_config.json"
-            ;;
-        wsl)
-            local win_appdata
-            if command -v wslvar &> /dev/null; then
-                win_appdata=$(wslvar APPDATA 2>/dev/null)
-            fi
-
-            if [[ -n "${win_appdata:-}" ]]; then
-                echo "$(wslpath "$win_appdata")/Claude/claude_desktop_config.json"
-            else
-                print_warning "Could not determine Windows user path automatically. Please ensure APPDATA is set correctly or provide the full path manually."
-                echo "/mnt/c/Users/$USER/AppData/Roaming/Claude/claude_desktop_config.json"
-            fi
-            ;;
-        windows)
-            echo "$APPDATA/Claude/claude_desktop_config.json"
-            ;;
-        *)
-            echo ""
-            ;;
-    esac
-}
-
-# ----------------------------------------------------------------------------
-# Docker Cleanup Functions
-# ----------------------------------------------------------------------------
-
-# Clean up old Docker artifacts
-cleanup_docker() {
-    # Skip if already cleaned or Docker not available
-    [[ -f "$DOCKER_CLEANED_FLAG" ]] && return 0
-
-    if ! command -v docker &> /dev/null || ! docker info &> /dev/null 2>&1; then
-        return 0
-    fi
-
-    local found_artifacts=false
-
-    # Define containers to remove
-    local containers=(
-        "gemini-mcp-server"
-        "gemini-mcp-redis"
-        "zen-mcp-server"
-        "zen-mcp-redis"
-        "zen-mcp-log-monitor"
-    )
-
-    # Remove containers
-    for container in "${containers[@]}"; do
-        if docker ps -a --format "{{.Names}}" | grep -q "^${container}$" 2>/dev/null; then
-            if [[ "$found_artifacts" == false ]]; then
-                echo "One-time Docker cleanup..."
-                found_artifacts=true
-            fi
-            echo "  Removing container: $container"
-            docker stop "$container" >/dev/null 2>&1 || true
-            docker rm "$container" >/dev/null 2>&1 || true
-        fi
-    done
-
-    # Remove images
-    local images=("gemini-mcp-server:latest" "zen-mcp-server:latest")
-    for image in "${images[@]}"; do
-        if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "^${image}$" 2>/dev/null; then
-            if [[ "$found_artifacts" == false ]]; then
-                echo "One-time Docker cleanup..."
-                found_artifacts=true
-            fi
+    check_codex_cli_integration() {
+        # Non-interactive Codex CLI integration. Controlled by ZEN_AUTO_CONFIGURE_CODEX=1.
+        # If variable is unset or zero, skip silently. No prompts.
+        if [[ "${ZEN_AUTO_CONFIGURE_CODEX:-0}" != "1" ]]; then
+            check_codex_cli_integration() { :; }
             echo "  Removing image: $image"
             docker rmi "$image" >/dev/null 2>&1 || true
         fi
@@ -266,11 +161,9 @@ find_python() {
             if ! pyenv versions 2>/dev/null | grep -E "3\.(1[2-9]|[2-9][0-9])" >/dev/null; then
                 echo ""
                 echo "Python 3.10+ is required. Pyenv can install Python 3.12 locally for this project."
-                read -p "Install Python 3.12 using pyenv? (Y/n): " -n 1 -r
-                echo ""
-                if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+                # Non-interactive: controlled by ZEN_AUTO_INSTALL_PYENV=1
+                if [[ "${ZEN_AUTO_INSTALL_PYENV:-0}" == "1" ]]; then
                     if install_python_with_pyenv; then
-                        # Try finding Python again
                         if python_cmd=$(find_python); then
                             echo "$python_cmd"
                             return 0
@@ -283,18 +176,13 @@ find_python() {
                 if [[ ! -f ".python-version" ]] || ! grep -qE "3\.(1[2-9]|[2-9][0-9])" .python-version 2>/dev/null; then
                     echo ""
                     print_info "Python 3.12 is installed via pyenv but not set for this project."
-                    read -p "Set Python 3.12.0 for this project? (Y/n): " -n 1 -r
-                    echo ""
-                    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-                        # Find the first suitable Python version
+                    if [[ "${ZEN_AUTO_SET_PYENV:-0}" == "1" ]]; then
                         local py_version=$(pyenv versions --bare | grep -E "^3\.(1[2-9]|[2-9][0-9])" | head -1)
                         if [[ -n "$py_version" ]]; then
                             pyenv local "$py_version"
                             print_success "Set Python $py_version for this project"
-                            # Re-initialize pyenv to pick up the change
                             eval "$(pyenv init --path)" 2>/dev/null || true
                             eval "$(pyenv init -)" 2>/dev/null || true
-                            # Try finding Python again
                             if python_cmd=$(find_python); then
                                 echo "$python_cmd"
                                 return 0
@@ -1239,22 +1127,12 @@ check_claude_cli_integration() {
     local server_path="$2"
 
     if ! command -v claude &> /dev/null; then
-        echo ""
         print_warning "Claude CLI not found"
-        echo ""
-        read -p "Would you like to add Zen to Claude Code? (Y/n): " -n 1 -r
-        echo ""
-        if [[ $REPLY =~ ^[Nn]$ ]]; then
-            print_info "Skipping Claude Code integration"
-            return 0
+        # Only emit instructions if auto config is explicitly requested
+        if [[ "${ZEN_AUTO_CONFIGURE_CLAUDE_CLI:-0}" == "1" ]]; then
+            echo "Please install Claude Code: https://docs.anthropic.com/en/docs/claude-code/cli-usage" >&2
         fi
-
-        echo ""
-        echo "Please install Claude Code first:"
-        echo "  Visit: https://docs.anthropic.com/en/docs/claude-code/cli-usage"
-        echo ""
-        echo "Then run this script again to register MCP."
-        return 1
+        return 0
     fi
 
     # Check if zen is registered
@@ -1282,26 +1160,10 @@ check_claude_cli_integration() {
             if eval "$claude_cmd" 2>/dev/null; then
                 print_success "Updated Zen to become a standalone script with environment variables"
                 return 0
-            else
-                echo ""
-                echo "Failed to update MCP registration. Please run manually:"
-                echo "  claude mcp remove zen -s user"
-                echo "  $claude_cmd"
-                return 1
-            fi
-        else
-            # Verify the registered path matches current setup
-            local expected_cmd="$python_cmd $server_path"
-            if echo "$mcp_list" | grep -F "$server_path" &>/dev/null; then
+            if [[ "${ZEN_AUTO_CONFIGURE_CLAUDE_CLI:-0}" != "1" ]]; then
                 return 0
-            else
-                print_warning "Zen registered with different path, updating..."
-                claude mcp remove zen -s user 2>/dev/null || true
-
-                # Re-add with current path and environment variables
-                local env_vars=$(parse_env_variables)
-                local env_args=""
-                
+            fi
+            print_info "Auto-registering Zen with Claude Code (ZEN_AUTO_CONFIGURE_CLAUDE_CLI=1)..."
                 # Convert environment variables to -e arguments
                 if [[ -n "$env_vars" ]]; then
                     while IFS= read -r line; do
@@ -1376,31 +1238,10 @@ check_claude_cli_integration() {
 }
 
 # Check and update Claude Desktop configuration
-check_claude_desktop_integration() {
-    local python_cmd="$1"
-    local server_path="$2"
-
-    # Skip if already configured (check flag)
-    if [[ -f "$DESKTOP_CONFIG_FLAG" ]]; then
-        return 0
-    fi
-
-    local config_path=$(get_claude_config_path)
-    if [[ -z "$config_path" ]]; then
-        print_warning "Unable to determine Claude Desktop config path for this platform"
-        return 0
-    fi
-
-    echo ""
-    read -p "Configure Zen for Claude Desktop? (Y/n): " -n 1 -r
-    echo ""
-    if [[ $REPLY =~ ^[Nn]$ ]]; then
-        print_info "Skipping Claude Desktop integration"
-        touch "$DESKTOP_CONFIG_FLAG"  # Don't ask again
-        return 0
-    fi
-
-    # Create config directory if it doesn't exist
+check_claude_cli_integration() { :; }
+check_claude_desktop_integration() { :; }
+check_gemini_cli_integration() { :; }
+check_codex_cli_integration() { :; }
     local config_dir=$(dirname "$config_path")
     mkdir -p "$config_dir" 2>/dev/null || true
 
@@ -1606,14 +1447,10 @@ check_gemini_cli_integration() {
         return 0
     fi
 
-    # Ask user if they want to add Zen to Gemini CLI
-    echo ""
-    read -p "Configure Zen for Gemini CLI? (Y/n): " -n 1 -r
-    echo ""
-    if [[ $REPLY =~ ^[Nn]$ ]]; then
-        print_info "Skipping Gemini CLI integration"
+    if [[ "${ZEN_AUTO_CONFIGURE_GEMINI:-0}" != "1" ]]; then
         return 0
     fi
+    print_info "Auto-configuring Gemini CLI (ZEN_AUTO_CONFIGURE_GEMINI=1)..."
 
     # Ensure wrapper script exists
     if [[ ! -f "$zen_wrapper" ]]; then
@@ -2121,17 +1958,7 @@ main() {
     # Step 8: Display setup instructions
     display_setup_instructions "$python_cmd" "$server_path"
 
-    # Step 9: Check Claude integrations
-    check_claude_cli_integration "$python_cmd" "$server_path"
-    check_claude_desktop_integration "$python_cmd" "$server_path"
-
-    # Step 10: Check Gemini CLI integration
-    check_gemini_cli_integration "$script_dir"
-
-    # Step 11: Check Codex CLI integration
-    check_codex_cli_integration
-
-    # Step 12: Display log information
+    # Step 9: Display log information
     echo ""
     echo "Logs will be written to: $script_dir/$LOG_DIR/$LOG_FILE"
     echo ""

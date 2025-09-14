@@ -96,10 +96,11 @@ For best results, use Claude Code with:
 git clone https://github.com/BeehiveInnovations/zen-mcp-server.git
 cd zen-mcp-server
 
-# Handles everything: setup, config, API keys from system environment. 
-# Auto-configures Claude Desktop, Claude Code, Gemini CLI, Codex CLI
-# Enable / disable additional settings in .env
-./run-server.sh  
+# Sets up environment and starts server only (no external tool config)
+./run-server.sh
+
+# (Optional) Register Zen with supported tools (idempotent, no prompts)
+./scripts/configure-integrations.sh
 ```
 
 **Option B: Instant Setup with [uvx](https://docs.astral.sh/uv/getting-started/installation/)**
