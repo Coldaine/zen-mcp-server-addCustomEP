@@ -13,57 +13,48 @@ logger = logging.getLogger(__name__)
 
 
 class CLIBridgeProvider(ModelProvider):
-    """Provider for local CLI tools that expose model inference via command line."""
+    """Provider for a single local CLI tool (codex). Speculative multi-model support removed."""
 
-    # Model specifications - extensible for multiple CLI tools
-    CLI_MODEL_SPECS = {
-        "codex": {
-            "friendly_name": "Codex (GPT-5)",
-            # Align with GPT-5 capabilities for consistency
-            "context_window": 400_000,
-            "max_output_tokens": 128_000,
-            "binary": "codex",
-            # CLI arguments for non-interactive operation:
-            #   "exec"                  : Run the CLI in execution mode (non-interactive)
-            #   "--color", "never"      : Disable ANSI color codes in output for easier parsing
-            #   "--skip-git-repo-check" : Avoid checking for a git repository, improving portability in CI and scripts
-            "args": ["exec", "--color", "never", "--skip-git-repo-check"],
-        },
-    }
+    CLI_MODEL_NAME = "codex-cli"  # single logical model name exposed to the server
+    DEFAULT_BINARY = "codex"  # actual binary expected on PATH (override via CODEX_CLI_BINARY)
+    DEFAULT_ARGS = [
+        "exec",
+        "--color",
+        "never",
+        "--skip-git-repo-check",
+    ]
 
     def __init__(self, api_key: str = "", **kwargs):
         """Initialize CLI bridge provider."""
         super().__init__(api_key, **kwargs)
         self.timeout = int(os.getenv("CODEX_CLI_TIMEOUT", "30"))  # Default 30 seconds
 
-        # Build SUPPORTED_MODELS from specs
-        self.SUPPORTED_MODELS = {}
-        for model_name, spec in self.CLI_MODEL_SPECS.items():
-            self.SUPPORTED_MODELS[model_name] = ModelCapabilities(
-                provider=ProviderType.CLI,
-                model_name=model_name,
-                friendly_name=spec["friendly_name"],
-                context_window=spec["context_window"],
-                max_output_tokens=spec["max_output_tokens"],
-                supports_extended_thinking=False,
-                supports_system_prompts=True,  # We concatenate internally
-                supports_streaming=False,
-                supports_function_calling=False,
-                supports_images=False,
-                max_image_size_mb=0.0,
-                supports_temperature=False,  # CLI may not support temperature
-                description=f"Local CLI model via {spec['binary']}",
-                aliases=[],  # Can add short aliases later if needed
-                supports_json_mode=False,
-                max_thinking_tokens=0,
-                is_custom=False,
-            )
+        # Single capabilities object (minimal, no speculative features)
+        self.capabilities = ModelCapabilities(
+            provider=ProviderType.CLI,
+            model_name=self.CLI_MODEL_NAME,
+            friendly_name="Codex CLI",
+            context_window=400_000,  # generous upper bound; real limit enforced by underlying API/binary
+            max_output_tokens=128_000,
+            supports_extended_thinking=False,
+            supports_system_prompts=True,
+            supports_streaming=False,
+            supports_function_calling=False,
+            supports_images=False,
+            max_image_size_mb=0.0,
+            supports_temperature=False,
+            description="Local codex CLI wrapper",
+            aliases=[],
+            supports_json_mode=False,
+            max_thinking_tokens=0,
+            is_custom=False,
+        )
 
     def get_capabilities(self, model_name: str) -> ModelCapabilities:
         """Get capabilities for a specific model."""
-        if model_name not in self.SUPPORTED_MODELS:
+        if model_name != self.CLI_MODEL_NAME:
             raise ValueError(f"Model {model_name} not supported by CLI bridge")
-        return self.SUPPORTED_MODELS[model_name]
+        return self.capabilities
 
     def generate_content(
         self,
@@ -75,11 +66,10 @@ class CLIBridgeProvider(ModelProvider):
         **kwargs,
     ) -> ModelResponse:
         """Generate content using CLI tool."""
-        if model_name not in self.CLI_MODEL_SPECS:
+        if model_name != self.CLI_MODEL_NAME:
             raise ValueError(f"Unknown model: {model_name}")
 
-        spec = self.CLI_MODEL_SPECS[model_name]
-        binary = os.getenv("CODEX_CLI_BINARY", spec["binary"])
+        binary = os.getenv("CODEX_CLI_BINARY", self.DEFAULT_BINARY)
 
         # Verify binary exists
         if not shutil.which(binary):
@@ -91,7 +81,7 @@ class CLIBridgeProvider(ModelProvider):
             full_prompt = f"{system_prompt}\n\n{prompt}"
 
         # Build command
-        cmd = [binary] + spec["args"]
+        cmd = [binary] + self.DEFAULT_ARGS
 
         logger.debug(f"Running CLI command: {' '.join(cmd)} with timeout {self.timeout}s")
 
@@ -111,7 +101,7 @@ class CLIBridgeProvider(ModelProvider):
                 content="",
                 usage={"input_tokens": 0, "output_tokens": 0, "total_tokens": 0},
                 model_name=model_name,
-                friendly_name=spec["friendly_name"],
+                friendly_name=self.capabilities.friendly_name,
                 provider=ProviderType.CLI,
                 metadata={"error": "timeout", "timeout_seconds": self.timeout},
             )
@@ -126,7 +116,7 @@ class CLIBridgeProvider(ModelProvider):
                 content="",
                 usage={"input_tokens": 0, "output_tokens": 0, "total_tokens": 0},
                 model_name=model_name,
-                friendly_name=spec["friendly_name"],
+                friendly_name=self.capabilities.friendly_name,
                 provider=ProviderType.CLI,
                 metadata={"error": "command_failed", "stderr": error_msg, "exit_code": result.returncode},
             )
@@ -137,7 +127,7 @@ class CLIBridgeProvider(ModelProvider):
             content=content,
             usage={"input_tokens": 0, "output_tokens": 0, "total_tokens": 0},  # Stub for now
             model_name=model_name,
-            friendly_name=spec["friendly_name"],
+            friendly_name=self.capabilities.friendly_name,
             provider=ProviderType.CLI,
             metadata={"execution_time": elapsed},
         )
@@ -145,8 +135,17 @@ class CLIBridgeProvider(ModelProvider):
     def count_tokens(self, text: str, model_name: str) -> int:
         """Count tokens - stub implementation."""
         # For MVP, return 0 and log that this is approximate
-        logger.debug(f"Token counting not implemented for CLI model {model_name}, returning 0")
-        return 0
+        if model_name != self.CLI_MODEL_NAME:
+            raise ValueError("Unsupported model for token counting")
+        logger.debug("Token counting not implemented for CLI CLI model; returning -1 sentinel")
+        return -1
+
+    def list_models(self, respect_restrictions: bool = True) -> list[str]:  # noqa: ARG002 parity
+        """Return the single logical CLI model name.
+
+        restrictions are applied at registry layer; nothing to filter here.
+        """
+        return [self.CLI_MODEL_NAME]
 
     def get_provider_type(self) -> ProviderType:
         """Get provider type."""
@@ -154,7 +153,7 @@ class CLIBridgeProvider(ModelProvider):
 
     def validate_model_name(self, model_name: str) -> bool:
         """Validate model name."""
-        return model_name in self.CLI_MODEL_SPECS
+        return model_name == self.CLI_MODEL_NAME
 
     def supports_thinking_mode(self, model_name: str) -> bool:
         """CLI models don't support thinking mode."""

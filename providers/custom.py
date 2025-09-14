@@ -252,7 +252,7 @@ class CustomProvider(OpenAICompatibleProvider):
         # CLI models should be handled by CLIBridgeProvider, not CustomProvider
         from .cli_bridge import CLIBridgeProvider
 
-        if hasattr(CLIBridgeProvider, "CLI_MODEL_SPECS") and model_name in CLIBridgeProvider.CLI_MODEL_SPECS:
+        if hasattr(CLIBridgeProvider, "CLI_MODEL_NAME") and model_name == CLIBridgeProvider.CLI_MODEL_NAME:
             logging.debug(f"Model '{model_name}' rejected by custom provider (known CLI model)")
             return False
 

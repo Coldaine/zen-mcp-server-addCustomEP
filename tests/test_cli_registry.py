@@ -14,14 +14,14 @@ def test_cli_provider_registration_and_listing():
 
     available = ModelProviderRegistry.get_available_model_names()
     assert isinstance(available, list)
-    # CLIBridgeProvider exposes 'codex' in its CLI_MODEL_SPECS
-    assert any(name.lower() == "codex" for name in available)
+    # CLIBridgeProvider exposes single 'codex-cli' logical model
+    assert any(name.lower() == "codex-cli" for name in available)
 
 
 def test_get_provider_for_cli_model():
     ModelProviderRegistry.register_provider(ProviderType.CLI, CLIBridgeProvider)
 
-    provider = ModelProviderRegistry.get_provider_for_model("codex")
+    provider = ModelProviderRegistry.get_provider_for_model("codex-cli")
     assert provider is not None
     assert provider.get_provider_type() == ProviderType.CLI
 

@@ -140,7 +140,7 @@ class OpenRouterProvider(OpenAICompatibleProvider):
         # CLI models should be handled by CLIBridgeProvider, not OpenRouter
         from .cli_bridge import CLIBridgeProvider
 
-        if hasattr(CLIBridgeProvider, "CLI_MODEL_SPECS") and model_name in CLIBridgeProvider.CLI_MODEL_SPECS:
+        if hasattr(CLIBridgeProvider, "CLI_MODEL_NAME") and model_name == CLIBridgeProvider.CLI_MODEL_NAME:
             return False
 
         # Check model restrictions if configured

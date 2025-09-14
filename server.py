@@ -792,7 +792,7 @@ async def handle_call_tool(name: str, arguments: dict[str, Any]) -> list[TextCon
             from providers.cli_bridge import CLIBridgeProvider
 
             # If model is supported by the CLI bridge, route directly to it
-            if model_name in getattr(CLIBridgeProvider, "CLI_MODEL_SPECS", {}):
+            if model_name == getattr(CLIBridgeProvider, "CLI_MODEL_NAME", "__none__"):
                 logger.debug(f"Direct CLI routing for model '{model_name}'")
                 # Initialize a fresh CLI bridge provider instance (stateless)
                 provider = CLIBridgeProvider(api_key="")
