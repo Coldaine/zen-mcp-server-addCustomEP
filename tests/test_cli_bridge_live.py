@@ -6,6 +6,9 @@ the CLI's response plausibly satisfies the instruction, instead of comparing to
 any hard-coded expected output.
 """
 
+import pytest
+pytest.skip("Requires codex CLI binary and a live local model endpoint", allow_module_level=True)
+
 import os
 import shutil
 
