@@ -18,7 +18,7 @@ __version__ = "1.0.0"
 # Last update date in ISO format
 __updated__ = "2025-09-16"
 # Primary maintainer
-__author__ = "Fahad Gilani"
+__author__ = "Coldaine"
 
 # Model configuration
 # DEFAULT_MODEL: The default model used for all AI operations
