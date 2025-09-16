@@ -1,5 +1,6 @@
 """Model provider registry for managing available providers."""
 
+import json
 import logging
 import os
 from typing import TYPE_CHECKING, Optional
@@ -368,3 +369,46 @@ class ModelProviderRegistry:
         instance = cls()
         instance._providers.pop(provider_type, None)
         instance._initialized_providers.pop(provider_type, None)
+
+
+# Load _ModelLibrary.json for upstream_provider checks
+
+
+def load_model_library():
+    try:
+        with open("docs/_ModelLibrary.json") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+
+
+MODEL_LIBRARY = load_model_library()
+
+
+def get_provider_for_model(model_name: str) -> Optional[ModelProvider]:
+    """Get provider for a specific model name."""
+    # Load model config from library
+    model_config = MODEL_LIBRARY.get("models", {}).get(model_name)
+    if not model_config:
+        # Fallback to custom_models.json lookup
+        from .custom import get_custom_model_config
+
+        model_config = get_custom_model_config(model_name)
+
+    if model_config:
+        upstream = model_config.get("upstream_provider", "unknown")
+        if upstream == "openrouter" and os.getenv("KILO_PREFERRED", "true").lower() == "true":
+            # Route OpenRouter models to Kilo first
+            if os.getenv("KILO_API_KEY"):
+                return ModelProviderRegistry.get_provider(ProviderType.KILO)
+        # Route to specific provider based on upstream
+        provider_type = getattr(ProviderType, upstream.upper(), None)
+        if provider_type:
+            return ModelProviderRegistry.get_provider(provider_type)
+
+    # Original priority fallback
+    for provider_type in ModelProviderRegistry.PROVIDER_PRIORITY_ORDER:
+        provider = ModelProviderRegistry.get_provider(provider_type)
+        if provider.validate_model_name(model_name):
+            return provider
+    return None

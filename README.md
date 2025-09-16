@@ -98,3 +98,10 @@ License: Apache 2.0
 - _ModelLibrary.json recovered and committed.
 - Agent prompts updated to include status reporting.
 
+
+## Current Project Status
+
+- **Phase 1: Foundational Setup** – Complete (GLM default set, registry updated, models merged, Kilo routing configured).
+- **Phase 2: Core Tool Refactor (Consensus)** – Pending.
+- **Phase 3: Testing Overhaul (Live Qwen)** – Pending.
+- **Phase 4: Advanced Integration (Headless CLI)** – Pending.
