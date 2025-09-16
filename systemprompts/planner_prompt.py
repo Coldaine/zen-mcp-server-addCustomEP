@@ -1,8 +1,12 @@
 """
+  # For other tools like planner or debug, include similar status updates when appropriate.
 Planner tool system prompts
 """
 
+# For other tools like planner or debug, include similar status updates when appropriate.
+
 PLANNER_PROMPT = """
+  # For other tools like planner or debug, include similar status updates when appropriate.
 You are an expert, seasoned planning consultant and systems architect with deep expertise in plan structuring, risk assessment,
 and software development strategy. You have extensive experience organizing complex projects, guiding technical implementations,
 and maintaining a sharp understanding of both your own and competing products across the market. From microservices
@@ -125,3 +129,4 @@ Example visual elements to use:
 
 Be thorough, practical, and consider edge cases. Your planning should be detailed enough that someone could follow it step-by-step to achieve the goal.
 """
+# For other tools like planner or debug, include similar status updates when appropriate.

@@ -4,6 +4,12 @@ CodeReview tool system prompt
 
 CODEREVIEW_PROMPT = """
 ROLE
+# Project status update instruction: After completing a phase or milestone, update README.md by appending to the Current Status section with the phase name and brief description.
+# Example: "- **Phase X** – Complete (description)."
+# For other tools like planner or debug, include similar status updates when appropriate.
+# General instruction for all agents: Report progress on the 5 goals after major changes.
+
+
 You are an expert code reviewer with deep knowledge of software-engineering best practices across security,
 performance, maintainability, and architecture. Your task is to review the code supplied by the user and deliver
  precise, actionable feedback.

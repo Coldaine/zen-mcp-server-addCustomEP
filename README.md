@@ -23,3 +23,73 @@ Zen MCP Server is a refactored Model Context Protocol (MCP) server for AI develo
 For details, see docs/ (getting-started.md, configuration.md).
 
 License: Apache 2.0
+
+## Current Project Status
+- **Prep Phase: Documentation Reorganization** – Complete (README refactored, CLI instructions organized in docs/refactor/, _ModelLibrary.json recovered, index.md added).
+- **Phase 1: Foundational Setup (Registry, Models, Defaults)** – Pending (Kilo substitution, model merge, GLM default).
+- **Phase 2: Core Tool Refactor (Consensus)** – Pending (parallel calls, randomized stances).
+- **Phase 3: Testing Overhaul (Live Qwen)** – Pending.
+- **Phase 4: Advanced Integration (Headless CLI)** – Pending.
+
+**Milestone Updates:**
+- README refactored and pushed.
+- CLI instructions organized in docs/refactor/.
+- _ModelLibrary.json recovered and committed.
+- Agent prompts updated to include status reporting.
+
+
+## Current Project Status
+- **Prep Phase: Documentation Reorganization** – Complete (README refactored, CLI instructions organized in docs/refactor/, _ModelLibrary.json recovered, index.md added).
+- **Phase 1: Foundational Setup (Registry, Models, Defaults)** – Complete (GLM default set, registry updated, models merged, Kilo routing configured).
+- **Phase 2: Core Tool Refactor (Consensus)** – Pending (parallel calls, randomized stances).
+- **Phase 3: Testing Overhaul (Live Qwen)** – Pending.
+- **Phase 4: Advanced Integration (Headless CLI)** – Pending.
+
+**Milestone Updates:**
+- README refactored and pushed.
+- CLI instructions organized in docs/refactor/.
+- _ModelLibrary.json recovered and committed.
+- Agent prompts updated to include status reporting.
+
+
+## Current Project Status
+- **Prep Phase: Documentation Reorganization** – Complete (README refactored, CLI instructions organized in docs/refactor/, _ModelLibrary.json recovered, index.md added).
+- **Phase 1: Foundational Setup (Registry, Models, Defaults)** – Pending (Kilo substitution, model merge, GLM default).
+- **Phase 2: Core Tool Refactor (Consensus)** – Pending (parallel calls, randomized stances).
+- **Phase 3: Testing Overhaul (Live Qwen)** – Pending.
+- **Phase 4: Advanced Integration (Headless CLI)** – Pending.
+
+**Milestone Updates:**
+- README refactored and pushed.
+- CLI instructions organized in docs/refactor/.
+- _ModelLibrary.json recovered and committed.
+- Agent prompts updated to include status reporting.
+
+
+## Current Project Status
+- **Prep Phase: Documentation Reorganization** – Complete (README refactored, CLI instructions organized in docs/refactor/, _ModelLibrary.json recovered, index.md added).
+- **Phase 1: Foundational Setup (Registry, Models, Defaults)** – Pending (Kilo substitution, model merge, GLM default).
+- **Phase 2: Core Tool Refactor (Consensus)** – Pending (parallel calls, randomized stances).
+- **Phase 3: Testing Overhaul (Live Qwen)** – Pending.
+- **Phase 4: Advanced Integration (Headless CLI)** – Pending.
+
+**Milestone Updates:**
+- README refactored and pushed.
+- CLI instructions organized in docs/refactor/.
+- _ModelLibrary.json recovered and committed.
+- Agent prompts updated to include status reporting.
+
+
+## Current Project Status
+- **Prep Phase: Documentation Reorganization** – Complete (README refactored, CLI instructions organized in docs/refactor/, _ModelLibrary.json recovered, index.md added).
+- **Phase 1: Foundational Setup (Registry, Models, Defaults)** – Pending (Kilo substitution, model merge, GLM default).
+- **Phase 2: Core Tool Refactor (Consensus)** – Pending (parallel calls, randomized stances).
+- **Phase 3: Testing Overhaul (Live Qwen)** – Pending.
+- **Phase 4: Advanced Integration (Headless CLI)** – Pending.
+
+**Milestone Updates:**
+- README refactored and pushed.
+- CLI instructions organized in docs/refactor/.
+- _ModelLibrary.json recovered and committed.
+- Agent prompts updated to include status reporting.
+
