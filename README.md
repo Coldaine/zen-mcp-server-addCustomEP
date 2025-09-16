@@ -24,6 +24,7 @@ For details, see docs/ (getting-started.md, configuration.md).
 
 License: Apache 2.0
 
+- **Phase 1: Foundational Setup (Registry, Models, Defaults)** – Complete (GLM default set).
 ## Current Project Status
 - **Prep Phase: Documentation Reorganization** – Complete (README refactored, CLI instructions organized in docs/refactor/, _ModelLibrary.json recovered, index.md added).
 - **Phase 1: Foundational Setup (Registry, Models, Defaults)** – Pending (Kilo substitution, model merge, GLM default).
@@ -38,6 +39,7 @@ License: Apache 2.0
 - Agent prompts updated to include status reporting.
 
 
+- **Phase 1: Foundational Setup (Registry, Models, Defaults)** – Complete (GLM default set).
 ## Current Project Status
 - **Prep Phase: Documentation Reorganization** – Complete (README refactored, CLI instructions organized in docs/refactor/, _ModelLibrary.json recovered, index.md added).
 - **Phase 1: Foundational Setup (Registry, Models, Defaults)** – Complete (GLM default set, registry updated, models merged, Kilo routing configured).
@@ -52,6 +54,7 @@ License: Apache 2.0
 - Agent prompts updated to include status reporting.
 
 
+- **Phase 1: Foundational Setup (Registry, Models, Defaults)** – Complete (GLM default set).
 ## Current Project Status
 - **Prep Phase: Documentation Reorganization** – Complete (README refactored, CLI instructions organized in docs/refactor/, _ModelLibrary.json recovered, index.md added).
 - **Phase 1: Foundational Setup (Registry, Models, Defaults)** – Pending (Kilo substitution, model merge, GLM default).
@@ -66,6 +69,7 @@ License: Apache 2.0
 - Agent prompts updated to include status reporting.
 
 
+- **Phase 1: Foundational Setup (Registry, Models, Defaults)** – Complete (GLM default set).
 ## Current Project Status
 - **Prep Phase: Documentation Reorganization** – Complete (README refactored, CLI instructions organized in docs/refactor/, _ModelLibrary.json recovered, index.md added).
 - **Phase 1: Foundational Setup (Registry, Models, Defaults)** – Pending (Kilo substitution, model merge, GLM default).
@@ -80,6 +84,7 @@ License: Apache 2.0
 - Agent prompts updated to include status reporting.
 
 
+- **Phase 1: Foundational Setup (Registry, Models, Defaults)** – Complete (GLM default set).
 ## Current Project Status
 - **Prep Phase: Documentation Reorganization** – Complete (README refactored, CLI instructions organized in docs/refactor/, _ModelLibrary.json recovered, index.md added).
 - **Phase 1: Foundational Setup (Registry, Models, Defaults)** – Pending (Kilo substitution, model merge, GLM default).
