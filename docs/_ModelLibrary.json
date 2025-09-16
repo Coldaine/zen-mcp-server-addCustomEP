@@ -1,0 +1,2778 @@
+```json
+{
+  "providers": {
+    "openai": {
+      "upstream_provider": "openai",
+      "models": {
+        "gpt-5": {
+          "model_id": "gpt-5",
+          "aliases": [
+            "openai:gpt-5",
+            "openrouter:openai/gpt-5"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "vision",
+            "tool_use"
+          ],
+          "context_window_tokens": 400000,
+          "max_output_tokens": 128000,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [
+                "low",
+                "medium",
+                "high",
+                "minimal"
+              ],
+              "budget_tokens_range": [
+                0,
+                128000
+              ],
+              "dynamic_budget_supported": true,
+              "include_thoughts_supported": true,
+              "default_mode": "auto"
+            },
+            "provider_params": {
+              "openai": {
+                "reasoning_effort": [
+                  "low",
+                  "medium",
+                  "high",
+                  "minimal"
+                ]
+              },
+              "openrouter": {
+                "reasoning": {
+                  "effort": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "max_tokens": "int"
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": false,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 1.25,
+            "output_per_million": 10.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 480
+          },
+          "endpoints": {
+            "base": "https://api.openai.com/v1",
+            "path": "/chat/completions",
+            "notes": "Supports reasoning_effort and verbosity parameters"
+          },
+          "notes": "Released August 2025, 3x larger context than GPT-4o, includes reasoning capabilities"
+        },
+        "gpt-5-mini": {
+          "model_id": "gpt-5-mini",
+          "aliases": [
+            "openai:gpt-5-mini",
+            "openrouter:openai/gpt-5-mini"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "vision",
+            "tool_use"
+          ],
+          "context_window_tokens": 400000,
+          "max_output_tokens": 128000,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [
+                "low",
+                "medium",
+                "high",
+                "minimal"
+              ],
+              "budget_tokens_range": [
+                0,
+                128000
+              ],
+              "dynamic_budget_supported": true,
+              "include_thoughts_supported": true,
+              "default_mode": "auto"
+            },
+            "provider_params": {
+              "openai": {
+                "reasoning_effort": [
+                  "low",
+                  "medium",
+                  "high",
+                  "minimal"
+                ]
+              },
+              "openrouter": {
+                "reasoning": {
+                  "effort": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "max_tokens": "int"
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": false,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 0.25,
+            "output_per_million": 2.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 480
+          },
+          "endpoints": {
+            "base": "https://api.openai.com/v1",
+            "path": "/chat/completions",
+            "notes": "Faster, cheaper version of GPT-5"
+          },
+          "notes": "Cost-effective version with reasoning support"
+        },
+        "gpt-5-nano": {
+          "model_id": "gpt-5-nano",
+          "aliases": [
+            "openai:gpt-5-nano"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 128000,
+          "max_output_tokens": 128000,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [
+                "minimal",
+                "low",
+                "high"
+              ],
+              "budget_tokens_range": [
+                0,
+                128000
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": true,
+              "default_mode": "minimal"
+            },
+            "provider_params": {
+              "openai": {
+                "reasoning_effort": [
+                  "minimal",
+                  "low",
+                  "high"
+                ]
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 0.05,
+            "output_per_million": 0.4,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": null,
+            "requests_per_minute": null
+          },
+          "endpoints": {
+            "base": "https://api.openai.com",
+            "path": "/v1/chat/completions",
+            "notes": "Smallest GPT-5 variant, minimal reasoning default"
+          },
+          "notes": "Ultra-lightweight version, mostly text modality"
+        },
+        "o3-pro": {
+          "model_id": "o3-pro",
+          "aliases": [
+            "openrouter:openai/o3-pro"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 400000,
+          "max_output_tokens": 128000,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "budget_tokens_range": [
+                0,
+                128000
+              ],
+              "dynamic_budget_supported": true,
+              "include_thoughts_supported": true,
+              "default_mode": "medium"
+            },
+            "provider_params": {
+              "openai": {
+                "reasoning_effort": [
+                  "low",
+                  "medium",
+                  "high"
+                ]
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": false,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 1.25,
+            "output_per_million": 10.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 240
+          },
+          "endpoints": {
+            "base": "https://api.openai.com/v1",
+            "path": "/chat/completions",
+            "notes": "Extended reasoning model with visible thinking"
+          },
+          "notes": "Premium reasoning model from April 2025"
+        }
+      }
+    },
+    "anthropic": {
+      "upstream_provider": "anthropic",
+      "models": {
+        "claude-4.1-opus-20250804": {
+          "model_id": "claude-4.1-opus-20250804",
+          "aliases": [
+            "anthropic:claude-4.1-opus",
+            "openrouter:anthropic/claude-4.1-opus"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "vision",
+            "tool_use"
+          ],
+          "context_window_tokens": 200000,
+          "max_output_tokens": 32000,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                32000
+              ],
+              "dynamic_budget_supported": true,
+              "include_thoughts_supported": true,
+              "default_mode": "enabled"
+            },
+            "provider_params": {
+              "anthropic": {
+                "thinking": {
+                  "type": [
+                    "enabled",
+                    "disabled"
+                  ],
+                  "budget_tokens": "int"
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": false,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 15.0,
+            "output_per_million": 75.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 100
+          },
+          "endpoints": {
+            "base": "https://api.anthropic.com",
+            "path": "/v1/messages",
+            "notes": "Supports thinking parameter and tool use"
+          },
+          "notes": "Released August 2025, 74.5% on SWE-bench, world's best coding model"
+        },
+        "claude-4-sonnet-20250522": {
+          "model_id": "claude-4-sonnet-20250522",
+          "aliases": [
+            "anthropic:claude-4-sonnet",
+            "openrouter:anthropic/claude-4-sonnet"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "vision",
+            "tool_use"
+          ],
+          "context_window_tokens": 1000000,
+          "max_output_tokens": 32000,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                32000
+              ],
+              "dynamic_budget_supported": true,
+              "include_thoughts_supported": true,
+              "default_mode": "enabled"
+            },
+            "provider_params": {
+              "anthropic": {
+                "thinking": {
+                  "type": [
+                    "enabled",
+                    "disabled"
+                  ],
+                  "budget_tokens": "int"
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": false,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 3.0,
+            "output_per_million": 15.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 150
+          },
+          "endpoints": {
+            "base": "https://api.anthropic.com",
+            "path": "/v1/messages",
+            "notes": "1M context for prompts >200K tokens incurs higher pricing"
+          },
+          "notes": "1M token context window, long context pricing >200K tokens"
+        }
+      }
+    },
+    "google": {
+      "upstream_provider": "google",
+      "models": {
+        "gemini-2.5-pro": {
+          "model_id": "gemini-2.5-pro",
+          "aliases": [
+            "google:gemini-2.5-pro",
+            "openrouter:google/gemini-2.5-pro"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "vision",
+            "audio",
+            "tool_use"
+          ],
+          "context_window_tokens": 2000000,
+          "max_output_tokens": 65535,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                65535
+              ],
+              "dynamic_budget_supported": true,
+              "include_thoughts_supported": true,
+              "default_mode": "auto"
+            },
+            "provider_params": {
+              "google": {
+                "thinkingConfig": {
+                  "thinkingBudget": "int",
+                  "includeThoughts": "bool"
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": false,
+            "cot_visible_to_user_by_default": false
+          },
+          "pricing": {
+            "input_per_million": 1.25,
+            "output_per_million": 10.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 360
+          },
+          "endpoints": {
+            "base": "https://generativelanguage.googleapis.com/v1beta",
+            "path": "/models/gemini-2.5-pro:generateContent",
+            "notes": "Pricing increases for prompts >200K tokens"
+          },
+          "notes": "Thinking tokens included in output pricing, March 2025 release"
+        },
+        "gemini-2.5-flash": {
+          "model_id": "gemini-2.5-flash",
+          "aliases": [
+            "google:gemini-2.5-flash",
+            "openrouter:google/gemini-2.5-flash"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "vision",
+            "audio",
+            "tool_use"
+          ],
+          "context_window_tokens": 1048576,
+          "max_output_tokens": 65535,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                8192
+              ],
+              "dynamic_budget_supported": true,
+              "include_thoughts_supported": true,
+              "default_mode": "auto"
+            },
+            "provider_params": {
+              "google": {
+                "thinkingConfig": {
+                  "thinkingBudget": "int",
+                  "includeThoughts": "bool"
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": false,
+            "cot_visible_to_user_by_default": false
+          },
+          "pricing": {
+            "input_per_million": 0.1,
+            "output_per_million": 0.4,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 1000
+          },
+          "endpoints": {
+            "base": "https://generativelanguage.googleapis.com/v1beta",
+            "path": "/models/gemini-2.5-flash:generateContent",
+            "notes": "Fast inference, cost-optimized"
+          },
+          "notes": "High-speed model for cost-sensitive workloads"
+        }
+      }
+    },
+    "moonshot": {
+      "upstream_provider": "moonshot",
+      "models": {
+        "kimi-k2-instruct-0905": {
+          "model_id": "kimi-k2-instruct-0905",
+          "aliases": [
+            "moonshot:kimi-k2",
+            "openrouter:moonshotai/kimi-k2-instruct"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 256000,
+          "max_output_tokens": 16384,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                16384
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": false,
+              "default_mode": "auto"
+            },
+            "provider_params": {
+              "moonshot": {
+                "variant_model": "kimi-thinking-preview"
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": false
+          },
+          "pricing": {
+            "input_per_million": 1.0,
+            "output_per_million": 3.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 200
+          },
+          "endpoints": {
+            "base": "https://api.moonshot.cn/v1",
+            "path": "/chat/completions",
+            "notes": "MoE with 1T total params, 32B active"
+          },
+          "notes": "September 2025, open-source with modified MIT license, 1T parameters"
+        },
+        "kimi-thinking-preview": {
+          "model_id": "kimi-thinking-preview",
+          "aliases": [
+            "moonshot:kimi-thinking-preview"
+          ],
+          "status": "preview",
+          "modalities": [
+            "text",
+            "vision",
+            "tool_use"
+          ],
+          "context_window_tokens": 128000,
+          "max_output_tokens": null,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                128000
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": true,
+              "default_mode": "auto"
+            },
+            "provider_params": {
+              "moonshot": {
+                "variant_model": "kimi-thinking-preview"
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": null,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 0.15,
+            "output_per_million": 2.5,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": null,
+            "requests_per_minute": null
+          },
+          "endpoints": {
+            "base": "https://api.moonshot.cn",
+            "path": "/v1/chat/completions",
+            "notes": "Thinking inherent to model, step-by-step reasoning"
+          },
+          "notes": "16B total, 2.8B active via MoE, multimodal reasoning"
+        }
+      }
+    },
+    "z_ai": {
+      "upstream_provider": "z_ai",
+      "models": {
+        "glm-4.5": {
+          "model_id": "glm-4.5",
+          "aliases": [
+            "z.ai:glm-4.5"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "vision",
+            "tool_use"
+          ],
+          "context_window_tokens": 128000,
+          "max_output_tokens": 4096,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                0
+              ],
+              "dynamic_budget_supported": true,
+              "include_thoughts_supported": true,
+              "default_mode": "auto"
+            },
+            "provider_params": {
+              "z_ai": {
+                "thinking": {
+                  "type": [
+                    "enabled",
+                    "disabled"
+                  ]
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": null,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 0.6,
+            "output_per_million": 2.2,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": null,
+            "requests_per_minute": null
+          },
+          "endpoints": {
+            "base": "https://api.z.ai",
+            "path": "/api/paas/v4/chat/completions",
+            "notes": "Dynamic thinking enabled by default"
+          },
+          "notes": "355B params, 32B active via MoE, thinking dynamic"
+        },
+        "glm-4.5-air": {
+          "model_id": "glm-4.5-air",
+          "aliases": [
+            "z.ai:glm-4.5-air"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "vision",
+            "tool_use"
+          ],
+          "context_window_tokens": 128000,
+          "max_output_tokens": 4096,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                0
+              ],
+              "dynamic_budget_supported": true,
+              "include_thoughts_supported": true,
+              "default_mode": "auto"
+            },
+            "provider_params": {
+              "z_ai": {
+                "thinking": {
+                  "type": [
+                    "enabled",
+                    "disabled"
+                  ]
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": null,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 0.2,
+            "output_per_million": 1.1,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": null,
+            "requests_per_minute": null
+          },
+          "endpoints": {
+            "base": "https://api.z.ai",
+            "path": "/api/paas/v4/chat/completions",
+            "notes": "Lightweight version with dynamic thinking"
+          },
+          "notes": "106B total, 12B active via MoE, optimized for speed"
+        }
+      }
+    },
+    "other": {
+      "upstream_provider": "other",
+      "models": {
+        "grok-4-0709": {
+          "model_id": "grok-4-0709",
+          "aliases": [
+            "xai:grok-4",
+            "openrouter:xai/grok-4"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "vision",
+            "tool_use"
+          ],
+          "context_window_tokens": 256000,
+          "max_output_tokens": 128000,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                128000
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": true,
+              "default_mode": "enabled"
+            },
+            "provider_params": {
+              "x_ai": {
+                "reasoning_mode": "always_on"
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": null,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 3.0,
+            "output_per_million": 15.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 480
+          },
+          "endpoints": {
+            "base": "https://api.x.ai/v1",
+            "path": "/chat/completions",
+            "notes": "Reasoning always enabled, no effort parameter"
+          },
+          "notes": "Released July 2025, reasoning-only model, no non-reasoning mode"
+        },
+        "grok-3": {
+          "model_id": "grok-3",
+          "aliases": [
+            "xai:grok-3",
+            "openrouter:xai/grok-3"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "vision",
+            "tool_use"
+          ],
+          "context_window_tokens": 131072,
+          "max_output_tokens": 65536,
+          "thinking": {
+            "supported": false,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                0
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": false,
+              "default_mode": "off"
+            },
+            "provider_params": {}
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": null,
+            "cot_visible_to_user_by_default": false
+          },
+          "pricing": {
+            "input_per_million": 1.0,
+            "output_per_million": 5.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 600
+          },
+          "endpoints": {
+            "base": "https://api.x.ai/v1",
+            "path": "/chat/completions",
+            "notes": "Standard model, supports presence/frequency penalties"
+          },
+          "notes": "February 2025 release, 10x more compute than Grok-2"
+        },
+        "qwen3-max-preview": {
+          "model_id": "qwen3-max-preview",
+          "aliases": [
+            "alibaba:qwen3-max",
+            "openrouter:qwen/qwen3-max"
+          ],
+          "status": "preview",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 262144,
+          "max_output_tokens": 65535,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                65535
+              ],
+              "dynamic_budget_supported": true,
+              "include_thoughts_supported": true,
+              "default_mode": "auto"
+            },
+            "provider_params": {}
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": false
+          },
+          "pricing": {
+            "input_per_million": 1.2,
+            "output_per_million": 6.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 100
+          },
+          "endpoints": {
+            "base": "https://dashscope.aliyuncs.com/api/v1",
+            "path": "/services/aigc/text-generation/generation",
+            "notes": "Tiered pricing based on input length"
+          },
+          "notes": "September 2025, trillion-parameter flagship model, preview access only"
+        },
+        "llama-4-scout": {
+          "model_id": "llama-4-scout",
+          "aliases": [
+            "meta:llama-4-scout",
+            "openrouter:meta-llama/llama-4-scout"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "vision",
+            "tool_use"
+          ],
+          "context_window_tokens": 10000000,
+          "max_output_tokens": 128000,
+          "thinking": {
+            "supported": false,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                0
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": false,
+              "default_mode": "off"
+            },
+            "provider_params": {}
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": false,
+            "cot_visible_to_user_by_default": false
+          },
+          "pricing": {
+            "input_per_million": 0.5,
+            "output_per_million": 2.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 300
+          },
+          "endpoints": {
+            "base": "https://api.llama.com/v1",
+            "path": "/chat/completions",
+            "notes": "17B active params, 16 experts, 10M context"
+          },
+          "notes": "April 2025, complete architectural overhaul, 10M context window"
+        },
+        "deepseek-r1-0528": {
+          "model_id": "deepseek-r1-0528",
+          "aliases": [
+            "deepseek:deepseek-r1",
+            "openrouter:deepseek/deepseek-r1"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 128000,
+          "max_output_tokens": 32000,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                32000
+              ],
+              "dynamic_budget_supported": true,
+              "include_thoughts_supported": true,
+              "default_mode": "auto"
+            },
+            "provider_params": {}
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 0.3,
+            "output_per_million": 1.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 200
+          },
+          "endpoints": {
+            "base": "https://api.deepseek.com/v1",
+            "path": "/chat/completions",
+            "notes": "Hybrid reasoning architecture"
+          },
+          "notes": "May 2025, enhanced reasoning with thinking/non-thinking modes"
+        },
+        "mistral-medium-3": {
+          "model_id": "mistral-medium-3",
+          "aliases": [
+            "mistral:mistral-medium-3",
+            "openrouter:mistralai/mistral-medium-3"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 128000,
+          "max_output_tokens": 32000,
+          "thinking": {
+            "supported": false,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                0
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": false,
+              "default_mode": "off"
+            },
+            "provider_params": {}
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": false,
+            "cot_visible_to_user_by_default": false
+          },
+          "pricing": {
+            "input_per_million": 2.0,
+            "output_per_million": 8.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 150
+          },
+          "endpoints": {
+            "base": "https://api.mistral.ai/v1",
+            "path": "/chat/completions",
+            "notes": "8x lower cost than previous generation"
+          },
+          "notes": "January 2025, 'Medium is the new large', significant cost reduction"
+        },
+        "command-a-03-2025": {
+          "model_id": "command-a-03-2025",
+          "aliases": [
+            "cohere:command-a",
+            "openrouter:cohere/command-a"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 256000,
+          "max_output_tokens": 32000,
+          "thinking": {
+            "supported": false,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                0
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": false,
+              "default_mode": "off"
+            },
+            "provider_params": {}
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": false,
+            "cot_visible_to_user_by_default": false
+          },
+          "pricing": {
+            "input_per_million": 3.0,
+            "output_per_million": 12.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 100
+          },
+          "endpoints": {
+            "base": "https://api.cohere.ai/v1",
+            "path": "/chat",
+            "notes": "Most performant Cohere model"
+          },
+          "notes": "March 2025, 256K context window, most capable Cohere model"
+        },
+        "qwen3-max": {
+          "model_id": "qwen/qwen3-max",
+          "aliases": [
+            "openrouter:qwen/qwen3-max",
+            "kilo:qwen/qwen3-max"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 256000,
+          "max_output_tokens": 32768,
+          "thinking": {
+            "supported": false,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                0
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": false,
+              "default_mode": "off"
+            },
+            "provider_params": {}
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": false
+          },
+          "pricing": {
+            "input_per_million": 1.2,
+            "output_per_million": 6.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 50
+          },
+          "endpoints": {
+            "base": "https://api.kilocodex.com/v1",
+            "path": "/chat/completions",
+            "notes": "Kilo Code forwards to OpenRouter. Use model slug 'qwen/qwen3-max'. Do not include reasoning object — it will be ignored or cause error."
+          },
+          "notes": "Highest-performing non-thinking Qwen3 variant. Dense/MoE hybrid architecture. No thinking mode support. Context window matches other Qwen3-Next models. Pricing as of Sep 12, 2025."
+        },
+        "qwen3-235b-a22b-thinking-2507": {
+          "model_id": "qwen/qwen3-235b-a22b-thinking-2507",
+          "aliases": [
+            "openrouter:qwen/qwen3-235b-a22b-thinking-2507",
+            "kilo:qwen/qwen3-235b-a22b-thinking-2507"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 262144,
+          "max_output_tokens": 32768,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "budget_tokens_range": [
+                1024,
+                32000
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": true,
+              "default_mode": "high"
+            },
+            "provider_params": {
+              "openrouter": {
+                "reasoning": {
+                  "effort": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "max_tokens": "int",
+                  "exclude": "boolean"
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 2.5,
+            "output_per_million": 12.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 50
+          },
+          "endpoints": {
+            "base": "https://api.kilocodex.com/v1",
+            "path": "/chat/completions",
+            "notes": "Kilo Code forwards to OpenRouter. Thinking-only model. Use 'exclude':true in reasoning to hide trace. Higher cost than standard Qwen3 variants."
+          },
+          "notes": "MoE model activating ~22B parameters of 235B total. Released Sep 11, 2025. Explicit reasoning, step-by-step trace vs final answers."
+        },
+        "qwen3-30b-a3b-thinking-2507": {
+          "model_id": "qwen/qwen3-30b-a3b-thinking-2507",
+          "aliases": [
+            "openrouter:qwen/qwen3-30b-a3b-thinking-2507",
+            "kilo:qwen/qwen3-30b-a3b-thinking-2507"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 262144,
+          "max_output_tokens": 32768,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "budget_tokens_range": [
+                1024,
+                32000
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": true,
+              "default_mode": "high"
+            },
+            "provider_params": {
+              "openrouter": {
+                "reasoning": {
+                  "effort": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "max_tokens": "int",
+                  "exclude": "boolean"
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 1.8,
+            "output_per_million": 9.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 50
+          },
+          "endpoints": {
+            "base": "https://api.kilocodex.com/v1",
+            "path": "/chat/completions",
+            "notes": "Kilo Code forwards to OpenRouter. Thinking-only model. Use 'exclude':true in reasoning to hide trace. 30B parameters, MoE activating 3B approx."
+          },
+          "notes": "Released Sep 11, 2025. Thinking mode only. Explicit reasoning, step-by-step trace vs final answers."
+        },
+        "qwen3-30b-a3b:free": {
+          "model_id": "qwen/qwen3-30b-a3b:free",
+          "aliases": [
+            "openrouter:qwen/qwen3-30b-a3b:free",
+            "kilo:qwen/qwen3-30b-a3b:free"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 40960,
+          "max_output_tokens": 32768,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "budget_tokens_range": [
+                1024,
+                32000
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": true,
+              "default_mode": "high"
+            },
+            "provider_params": {
+              "openrouter": {
+                "reasoning": {
+                  "effort": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "max_tokens": "int",
+                  "exclude": "boolean"
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 0,
+            "output_per_million": 0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "free",
+            "requests_per_minute": 100
+          },
+          "endpoints": {
+            "base": "https://api.kilocodex.com/v1",
+            "path": "/chat/completions",
+            "notes": "Kilo Code forwards to OpenRouter. Dual-mode model. Free variant has smaller context window (40,960 tokens)."
+          },
+          "notes": "30B parameters, MoE activating 3B approx. Free tier with dual-mode support for thinking and non-thinking."
+        },
+        "qwen3-8b:free": {
+          "model_id": "qwen/qwen3-8b:free",
+          "aliases": [
+            "openrouter:qwen/qwen3-8b:free",
+            "kilo:qwen/qwen3-8b:free"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 40960,
+          "max_output_tokens": 32768,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "budget_tokens_range": [
+                1024,
+                32000
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": true,
+              "default_mode": "high"
+            },
+            "provider_params": {
+              "openrouter": {
+                "reasoning": {
+                  "effort": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "max_tokens": "int",
+                  "exclude": "boolean"
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 0,
+            "output_per_million": 0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "free",
+            "requests_per_minute": 100
+          },
+          "endpoints": {
+            "base": "https://api.kilocodex.com/v1",
+            "path": "/chat/completions",
+            "notes": "Kilo Code forwards to OpenRouter. Dual-mode model. Free variant has smaller context window (40,960 tokens)."
+          },
+          "notes": "Dense 8.2B parameters. Free tier with dual-mode support for thinking and non-thinking."
+        },
+        "qwen3-32b": {
+          "model_id": "qwen/qwen3-32b",
+          "aliases": [
+            "openrouter:qwen/qwen3-32b",
+            "kilo:qwen/qwen3-32b"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 131072,
+          "max_output_tokens": 32768,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "budget_tokens_range": [
+                1024,
+                32000
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": true,
+              "default_mode": "high"
+            },
+            "provider_params": {
+              "openrouter": {
+                "reasoning": {
+                  "effort": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "max_tokens": "int",
+                  "exclude": "boolean"
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 1.5,
+            "output_per_million": 7.5,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 50
+          },
+          "endpoints": {
+            "base": "https://api.kilocodex.com/v1",
+            "path": "/chat/completions",
+            "notes": "Kilo Code forwards to OpenRouter. Dual-mode model. Likely paid beyond free tier."
+          },
+          "notes": "Dense 32.8B parameters. Context window ~131,072 tokens. Free status may be limited."
+        },
+        "qwen3-next-80b-a3b-thinking": {
+          "model_id": "qwen/qwen3-next-80b-a3b-thinking",
+          "aliases": [
+            "openrouter:qwen/qwen3-next-80b-a3b-thinking",
+            "kilo:qwen/qwen3-next-80b-a3b-thinking"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 262144,
+          "max_output_tokens": 32768,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "budget_tokens_range": [
+                1024,
+                32000
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": true,
+              "default_mode": "high"
+            },
+            "provider_params": {
+              "openrouter": {
+                "reasoning": {
+                  "effort": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "max_tokens": "int",
+                  "exclude": "boolean"
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 1.8,
+            "output_per_million": 9.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 50
+          },
+          "endpoints": {
+            "base": "https://api.kilocodex.com/v1",
+            "path": "/chat/completions",
+            "notes": "Kilo Code forwards to OpenRouter. Thinking-only model. Use 'exclude':true in reasoning to hide trace."
+          },
+          "notes": "Released Sep 11, 2025. Qwen3-Next-80B-A3B thinking variant. Context window matches other Qwen3-Next models."
+        },
+        "qwen3-next-80b-a3b-instruct": {
+          "model_id": "qwen/qwen3-next-80b-a3b-instruct",
+          "aliases": [
+            "openrouter:qwen/qwen3-next-80b-a3b-instruct",
+            "kilo:qwen/qwen3-next-80b-a3b-instruct"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 262144,
+          "max_output_tokens": 32768,
+          "thinking": {
+            "supported": false,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                0
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": false,
+              "default_mode": "off"
+            },
+            "provider_params": {}
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": false
+          },
+          "pricing": {
+            "input_per_million": 1.5,
+            "output_per_million": 7.5,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 50
+          },
+          "endpoints": {
+            "base": "https://api.kilocodex.com/v1",
+            "path": "/chat/completions",
+            "notes": "Kilo Code forwards to OpenRouter. Non-thinking variant. Do not include reasoning object — it will be ignored or cause error."
+          },
+          "notes": "Released Sep 11, 2025. Qwen3-Next-80B-A3B instruct variant. Context window matches other Qwen3-Next models."
+        },
+        "qwen3-235b-a22b-instruct-2507": {
+          "model_id": "qwen/qwen3-235b-a22b-instruct-2507",
+          "aliases": [
+            "openrouter:qwen/qwen3-235b-a22b-instruct-2507",
+            "kilo:qwen/qwen3-235b-a22b-instruct-2507"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 262144,
+          "max_output_tokens": 32768,
+          "thinking": {
+            "supported": false,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                0
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": false,
+              "default_mode": "off"
+            },
+            "provider_params": {}
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": false
+          },
+          "pricing": {
+            "input_per_million": 2.2,
+            "output_per_million": 11.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 50
+          },
+          "endpoints": {
+            "base": "https://api.kilocodex.com/v1",
+            "path": "/chat/completions",
+            "notes": "Kilo Code forwards to OpenRouter. Non-thinking variant. Do not include reasoning object — it will be ignored or cause error."
+          },
+          "notes": "MoE model activating ~22B parameters of 235B total. Non-thinking variant of the 235B model."
+        },
+        "qwen3-30b-a3b-instruct-2507": {
+          "model_id": "qwen/qwen3-30b-a3b-instruct-2507",
+          "aliases": [
+            "openrouter:qwen/qwen3-30b-a3b-instruct-2507",
+            "kilo:qwen/qwen3-30b-a3b-instruct-2507"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 262144,
+          "max_output_tokens": 32768,
+          "thinking": {
+            "supported": false,
+            "controls": {
+              "effort_levels": [],
+              "budget_tokens_range": [
+                0,
+                0
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": false,
+              "default_mode": "off"
+            },
+            "provider_params": {}
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": false
+          },
+          "pricing": {
+            "input_per_million": 1.5,
+            "output_per_million": 7.5,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 50
+          },
+          "endpoints": {
+            "base": "https://api.kilocodex.com/v1",
+            "path": "/chat/completions",
+            "notes": "Kilo Code forwards to OpenRouter. Non-thinking variant. Do not include reasoning object — it will be ignored or cause error."
+          },
+          "notes": "30B parameters, MoE activating 3B approx. Non-thinking variant of the 30B model."
+        },
+        "qwen3-1.7b": {
+          "model_id": "qwen/qwen3-1.7b",
+          "aliases": [
+            "openrouter:qwen/qwen3-1.7b",
+            "kilo:qwen/qwen3-1.7b"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 32768,
+          "max_output_tokens": 32768,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "budget_tokens_range": [
+                512,
+                16000
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": true,
+              "default_mode": "high"
+            },
+            "provider_params": {
+              "openrouter": {
+                "reasoning": {
+                  "effort": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "max_tokens": "int",
+                  "exclude": "boolean"
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 0.5,
+            "output_per_million": 2.5,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 100
+          },
+          "endpoints": {
+            "base": "https://api.kilocodex.com/v1",
+            "path": "/chat/completions",
+            "notes": "Kilo Code forwards to OpenRouter. Small model. Dual-mode support for thinking and non-thinking."
+          },
+          "notes": "1.7B parameter model. Lower cost option with dual-mode capabilities."
+        },
+        "qwen3-0.6b-04-28:free": {
+          "model_id": "qwen/qwen3-0.6b-04-28:free",
+          "aliases": [
+            "openrouter:qwen/qwen3-0.6b-04-28:free",
+            "kilo:qwen/qwen3-0.6b-04-28:free"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 16384,
+          "max_output_tokens": 32768,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "budget_tokens_range": [
+                256,
+                8000
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": true,
+              "default_mode": "high"
+            },
+            "provider_params": {
+              "openrouter": {
+                "reasoning": {
+                  "effort": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "max_tokens": "int",
+                  "exclude": "boolean"
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 0,
+            "output_per_million": 0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "free",
+            "requests_per_minute": 100
+          },
+          "endpoints": {
+            "base": "https://api.kilocodex.com/v1",
+            "path": "/chat/completions",
+            "notes": "Kilo Code forwards to OpenRouter. Very small model. Free variant with dual-mode support."
+          },
+          "notes": "0.6B parameter model. Free tier with dual-mode capabilities. Smallest context window among Qwen3 variants."
+        },
+        "qwen3-coder": {
+          "model_id": "qwen/qwen3-coder",
+          "aliases": [
+            "openrouter:qwen/qwen3-coder",
+            "kilo:qwen/qwen3-coder"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 131072,
+          "max_output_tokens": 32768,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "budget_tokens_range": [
+                1024,
+                32000
+              ],
+              "dynamic_budget_supported": false,
+              "include_thoughts_supported": true,
+              "default_mode": "high"
+            },
+            "provider_params": {
+              "openrouter": {
+                "reasoning": {
+                  "effort": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "max_tokens": "int",
+                  "exclude": "boolean"
+                }
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": true,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 1.7,
+            "output_per_million": 8.5,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "paid",
+            "requests_per_minute": 50
+          },
+          "endpoints": {
+            "base": "https://api.kilocodex.com/v1",
+            "path": "/chat/completions",
+            "notes": "Kilo Code forwards to OpenRouter. Coder-specific variant. Dual-mode support for thinking and non-thinking."
+          },
+          "notes": "Also known as 480B-A35B Instruct. Optimized for code generation tasks with dual-mode capabilities."
+        },
+        "grok-code-fast-1": {
+          "model_id": "x-ai/grok-code-fast-1",
+          "aliases": [
+            "openrouter:x-ai/grok-code-fast-1",
+            "grok-code-fast-1"
+          ],
+          "status": "available",
+          "modalities": [
+            "text",
+            "tool_use"
+          ],
+          "context_window_tokens": 128000,
+          "max_output_tokens": 32000,
+          "thinking": {
+            "supported": true,
+            "controls": {
+              "effort_levels": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "budget_tokens_range": [
+                1000,
+                64000
+              ],
+              "dynamic_budget_supported": true,
+              "include_thoughts_supported": true,
+              "default_mode": "medium"
+            },
+            "provider_params": {
+              "openrouter": {
+                "reasoning": {
+                  "effort": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "max_tokens": 32000
+                }
+              },
+              "other": {
+                "reasoning_effort": [
+                  "low",
+                  "medium",
+                  "high"
+                ]
+              }
+            }
+          },
+          "tool_calling": {
+            "supported": true,
+            "json_schema_outputs": true
+          },
+          "safety": {
+            "stores_inputs_by_default": false,
+            "cot_visible_to_user_by_default": true
+          },
+          "pricing": {
+            "input_per_million": 3.0,
+            "output_per_million": 15.0,
+            "currency": "USD"
+          },
+          "rate_limits": {
+            "tier": "premium",
+            "requests_per_minute": 480
+          },
+          "endpoints": {
+            "base": "https://openrouter.ai/api/v1",
+            "path": "/chat/completions",
+            "notes": "supports reasoning parameter, cached inputs at $0.75/1M"
+          },
+          "notes": "Fast agentic coding model with visible reasoning traces, leads OpenRouter usage for coding tasks"
+        }
+      }
+    }
+  }
+}
+```
+
+
+[
+  {
+    "provider": "other",
+    "upstream_provider": "other",
+    "model_id": "sonoma-sky-alpha",
+    "aliases": [
+      "openrouter:sonoma-sky-alpha"
+    ],
+    "status": "available",
+    "modalities": [
+      "text",
+      "vision",
+      "tool_use"
+    ],
+    "context_window_tokens": 2000000,
+    "max_output_tokens": 2000000,
+    "thinking": {
+      "supported": true,
+      "controls": {
+        "effort_levels": [],
+        "budget_tokens_range": [
+          0,
+          2000000
+        ],
+        "dynamic_budget_supported": false,
+        "include_thoughts_supported": true,
+        "default_mode": "enabled"
+      },
+      "provider_params": {}
+    },
+    "tool_calling": {
+      "supported": true,
+      "json_schema_outputs": true
+    },
+    "safety": {
+      "stores_inputs_by_default": true,
+      "cot_visible_to_user_by_default": true
+    },
+    "pricing": {
+      "input_per_million": 0,
+      "output_per_million": 0,
+      "currency": "USD"
+    },
+    "rate_limits": {
+      "tier": "free",
+      "requests_per_minute": null
+    },
+    "endpoints": {
+      "base": "https://openrouter.ai/api/v1",
+      "path": "/chat/completions",
+      "notes": "Free during alpha period, prompts and completions logged"
+    },
+    "notes": "Maximally intelligent general-purpose frontier model, likely Grok 4.2 based on community analysis"
+  },
+  {
+    "provider": "other",
+    "upstream_provider": "other",
+    "model_id": "sonoma-dusk-alpha",
+    "aliases": [
+      "openrouter:sonoma-dusk-alpha"
+    ],
+    "status": "available",
+    "modalities": [
+      "text",
+      "vision",
+      "tool_use"
+    ],
+    "context_window_tokens": 2000000,
+    "max_output_tokens": 2000000,
+    "thinking": {
+      "supported": true,
+      "controls": {
+        "effort_levels": [],
+        "budget_tokens_range": [
+          0,
+          2000000
+        ],
+        "dynamic_budget_supported": false,
+        "include_thoughts_supported": true,
+        "default_mode": "enabled"
+      },
+      "provider_params": {}
+    },
+    "tool_calling": {
+      "supported": true,
+      "json_schema_outputs": true
+    },
+    "safety": {
+      "stores_inputs_by_default": true,
+      "cot_visible_to_user_by_default": true
+    },
+    "pricing": {
+      "input_per_million": 0,
+      "output_per_million": 0,
+      "currency": "USD"
+    },
+    "rate_limits": {
+      "tier": "free",
+      "requests_per_minute": null
+    },
+    "endpoints": {
+      "base": "https://openrouter.ai/api/v1",
+      "path": "/chat/completions",
+      "notes": "Free during alpha period, prompts and completions logged"
+    },
+    "notes": "Fast and intelligent general-purpose frontier model, likely Grok 4.2 mini variant"
+  },
+  {
+    "provider": "other",
+    "upstream_provider": "alibaba",
+    "model_id": "qwen3-235b-a22b-thinking-2507",
+    "aliases": [
+      "qwen:qwen3-235b-a22b-thinking-2507",
+      "openrouter:qwen/qwen3-235b-a22b-thinking-2507"
+    ],
+    "status": "available",
+    "modalities": [
+      "text",
+      "tool_use"
+    ],
+    "context_window_tokens": 262144,
+    "max_output_tokens": 262144,
+    "thinking": {
+      "supported": true,
+      "controls": {
+        "effort_levels": [],
+        "budget_tokens_range": [
+          0,
+          262144
+        ],
+        "dynamic_budget_supported": false,
+        "include_thoughts_supported": true,
+        "default_mode": "enabled"
+      },
+      "provider_params": {
+        "qwen": {
+          "thinking": {
+            "type": "enabled"
+          }
+        }
+      }
+    },
+    "tool_calling": {
+      "supported": true,
+      "json_schema_outputs": true
+    },
+    "safety": {
+      "stores_inputs_by_default": true,
+      "cot_visible_to_user_by_default": true
+    },
+    "pricing": {
+      "input_per_million": 0.098,
+      "output_per_million": 0.39,
+      "currency": "USD"
+    },
+    "rate_limits": {
+      "tier": "paid",
+      "requests_per_minute": null
+    },
+    "endpoints": {
+      "base": "https://openrouter.ai/api/v1",
+      "path": "/chat/completions",
+      "notes": "Thinking-only mode, cannot disable thinking"
+    },
+    "notes": "High-performance MoE model with 235B total parameters, 22B active, optimized for complex reasoning"
+  },
+  {
+    "provider": "other",
+    "upstream_provider": "alibaba",
+    "model_id": "qwen3-next-80b-a3b-thinking",
+    "aliases": [
+      "qwen:qwen3-next-80b-a3b-thinking",
+      "openrouter:qwen/qwen3-next-80b-a3b-thinking"
+    ],
+    "status": "available",
+    "modalities": [
+      "text",
+      "tool_use"
+    ],
+    "context_window_tokens": 262144,
+    "max_output_tokens": 262144,
+    "thinking": {
+      "supported": true,
+      "controls": {
+        "effort_levels": [],
+        "budget_tokens_range": [
+          0,
+          262144
+        ],
+        "dynamic_budget_supported": false,
+        "include_thoughts_supported": true,
+        "default_mode": "enabled"
+      },
+      "provider_params": {
+        "qwen": {
+          "thinking": {
+            "type": "enabled"
+          }
+        }
+      }
+    },
+    "tool_calling": {
+      "supported": true,
+      "json_schema_outputs": true
+    },
+    "safety": {
+      "stores_inputs_by_default": true,
+      "cot_visible_to_user_by_default": true
+    },
+    "pricing": {
+      "input_per_million": 0.14,
+      "output_per_million": 1.4,
+      "currency": "USD"
+    },
+    "rate_limits": {
+      "tier": "paid",
+      "requests_per_minute": null
+    },
+    "endpoints": {
+      "base": "https://openrouter.ai/api/v1",
+      "path": "/chat/completions",
+      "notes": "Thinking-only mode, designed for hard multi-step problems"
+    },
+    "notes": "Designed for math proofs, code synthesis/debugging, logic, and agentic planning"
+  },
+  {
+    "provider": "other",
+    "upstream_provider": "alibaba",
+    "model_id": "qwen3-next-80b-a3b-instruct",
+    "aliases": [
+      "qwen:qwen3-next-80b-a3b-instruct",
+      "openrouter:qwen/qwen3-next-80b-a3b-instruct"
+    ],
+    "status": "available",
+    "modalities": [
+      "text",
+      "tool_use"
+    ],
+    "context_window_tokens": 262144,
+    "max_output_tokens": 262144,
+    "thinking": {
+      "supported": false,
+      "controls": {
+        "effort_levels": [],
+        "budget_tokens_range": [
+          0,
+          0
+        ],
+        "dynamic_budget_supported": false,
+        "include_thoughts_supported": false,
+        "default_mode": "off"
+      },
+      "provider_params": {}
+    },
+    "tool_calling": {
+      "supported": true,
+      "json_schema_outputs": true
+    },
+    "safety": {
+      "stores_inputs_by_default": true,
+      "cot_visible_to_user_by_default": false
+    },
+    "pricing": {
+      "input_per_million": 0.14,
+      "output_per_million": 1.4,
+      "currency": "USD"
+    },
+    "rate_limits": {
+      "tier": "paid",
+      "requests_per_minute": null
+    },
+    "endpoints": {
+      "base": "https://openrouter.ai/api/v1",
+      "path": "/chat/completions",
+      "notes": "Non-thinking mode only, optimized for fast stable responses"
+    },
+    "notes": "Optimized for fast, stable responses without thinking traces"
+  },
+  {
+    "provider": "other",
+    "upstream_provider": "alibaba",
+    "model_id": "qwen3-30b-a3b-instruct-2507",
+    "aliases": [
+      "qwen:qwen3-30b-a3b-instruct-2507",
+      "openrouter:qwen/qwen3-30b-a3b-instruct-2507"
+    ],
+    "status": "available",
+    "modalities": [
+      "text",
+      "tool_use"
+    ],
+    "context_window_tokens": 262144,
+    "max_output_tokens": 262144,
+    "thinking": {
+      "supported": false,
+      "controls": {
+        "effort_levels": [],
+        "budget_tokens_range": [
+          0,
+          0
+        ],
+        "dynamic_budget_supported": false,
+        "include_thoughts_supported": false,
+        "default_mode": "off"
+      },
+      "provider_params": {}
+    },
+    "tool_calling": {
+      "supported": true,
+      "json_schema_outputs": true
+    },
+    "safety": {
+      "stores_inputs_by_default": true,
+      "cot_visible_to_user_by_default": false
+    },
+    "pricing": {
+      "input_per_million": 0.071,
+      "output_per_million": 0.283,
+      "currency": "USD"
+    },
+    "rate_limits": {
+      "tier": "paid",
+      "requests_per_minute": null
+    },
+    "endpoints": {
+      "base": "https://openrouter.ai/api/v1",
+      "path": "/chat/completions",
+      "notes": "Non-thinking mode only, 30.5B total parameters, 3.3B active"
+    },
+    "notes": "30.5B-parameter MoE model with 3.3B active parameters, non-thinking mode only"
+  },
+  {
+    "provider": "other",
+    "upstream_provider": "alibaba",
+    "model_id": "qwen3-30b-a3b",
+    "aliases": [
+      "qwen:qwen3-30b-a3b",
+      "openrouter:qwen/qwen3-30b-a3b"
+    ],
+    "status": "available",
+    "modalities": [
+      "text",
+      "tool_use"
+    ],
+    "context_window_tokens": 131072,
+    "max_output_tokens": 131072,
+    "thinking": {
+      "supported": true,
+      "controls": {
+        "effort_levels": [],
+        "budget_tokens_range": [
+          0,
+          131072
+        ],
+        "dynamic_budget_supported": true,
+        "include_thoughts_supported": true,
+        "default_mode": "auto"
+      },
+      "provider_params": {
+        "qwen": {
+          "thinking": {
+            "type": [
+              "enabled",
+              "disabled"
+            ]
+          }
+        }
+      }
+    },
+    "tool_calling": {
+      "supported": true,
+      "json_schema_outputs": true
+    },
+    "safety": {
+      "stores_inputs_by_default": true,
+      "cot_visible_to_user_by_default": true
+    },
+    "pricing": {
+      "input_per_million": 0.036,
+      "output_per_million": 0.144,
+      "currency": "USD"
+    },
+    "rate_limits": {
+      "tier": "paid",
+      "requests_per_minute": null
+    },
+    "endpoints": {
+      "base": "https://openrouter.ai/api/v1",
+      "path": "/chat/completions",
+      "notes": "Hybrid model supporting both thinking and non-thinking modes"
+    },
+    "notes": "30.5B total parameters, 3.3B active, can switch between thinking and non-thinking modes"
+  },
+  {
+    "provider": "other",
+    "upstream_provider": "alibaba",
+    "model_id": "qwen3-8b",
+    "aliases": [
+      "qwen:qwen3-8b",
+      "openrouter:qwen/qwen3-8b"
+    ],
+    "status": "available",
+    "modalities": [
+      "text",
+      "tool_use"
+    ],
+    "context_window_tokens": 128000,
+    "max_output_tokens": 20000,
+    "thinking": {
+      "supported": true,
+      "controls": {
+        "effort_levels": [],
+        "budget_tokens_range": [
+          0,
+          20000
+        ],
+        "dynamic_budget_supported": true,
+        "include_thoughts_supported": true,
+        "default_mode": "auto"
+      },
+      "provider_params": {
+        "qwen": {
+          "thinking": {
+            "type": [
+              "enabled",
+              "disabled"
+            ]
+          }
+        }
+      }
+    },
+    "tool_calling": {
+      "supported": true,
+      "json_schema_outputs": true
+    },
+    "safety": {
+      "stores_inputs_by_default": true,
+      "cot_visible_to_user_by_default": true
+    },
+    "pricing": {
+      "input_per_million": 0.035,
+      "output_per_million": 0.138,
+      "currency": "USD"
+    },
+    "rate_limits": {
+      "tier": "paid",
+      "requests_per_minute": null
+    },
+    "endpoints": {
+      "base": "https://openrouter.ai/api/v1",
+      "path": "/chat/completions",
+      "notes": "Dense 8.2B parameter model with hybrid thinking capabilities"
+    },
+    "notes": "8.2B dense parameters, 32K native context extendable to 131K with YaRN"
+  },
+  {
+    "provider": "other",
+    "upstream_provider": "alibaba",
+    "model_id": "qwen3-4b",
+    "aliases": [
+      "qwen:qwen3-4b",
+      "openrouter:qwen/qwen3-4b:free"
+    ],
+    "status": "available",
+    "modalities": [
+      "text",
+      "tool_use"
+    ],
+    "context_window_tokens": 40960,
+    "max_output_tokens": 40960,
+    "thinking": {
+      "supported": true,
+      "controls": {
+        "effort_levels": [],
+        "budget_tokens_range": [
+          0,
+          40960
+        ],
+        "dynamic_budget_supported": true,
+        "include_thoughts_supported": true,
+        "default_mode": "auto"
+      },
+      "provider_params": {
+        "qwen": {
+          "thinking": {
+            "type": [
+              "enabled",
+              "disabled"
+            ]
+          }
+        }
+      }
+    },
+    "tool_calling": {
+      "supported": true,
+      "json_schema_outputs": true
+    },
+    "safety": {
+      "stores_inputs_by_default": false,
+      "cot_visible_to_user_by_default": true
+    },
+    "pricing": {
+      "input_per_million": 0,
+      "output_per_million": 0,
+      "currency": "USD"
+    },
+    "rate_limits": {
+      "tier": "free",
+      "requests_per_minute": null
+    },
+    "endpoints": {
+      "base": "https://openrouter.ai/api/v1",
+      "path": "/chat/completions",
+      "notes": "Free version available, dual-mode architecture"
+    },
+    "notes": "4B dense parameters with dual-mode architecture for thinking and non-thinking"
+  },
+  {
+    "provider": "other",
+    "upstream_provider": "alibaba",
+    "model_id": "qwen3-coder-480b-a35b-instruct",
+    "aliases": [
+      "qwen:qwen3-coder-480b-a35b-instruct",
+      "openrouter:qwen/qwen3-coder"
+    ],
+    "status": "available",
+    "modalities": [
+      "text",
+      "tool_use"
+    ],
+    "context_window_tokens": 262144,
+    "max_output_tokens": 262144,
+    "thinking": {
+      "supported": false,
+      "controls": {
+        "effort_levels": [],
+        "budget_tokens_range": [
+          0,
+          0
+        ],
+        "dynamic_budget_supported": false,
+        "include_thoughts_supported": false,
+        "default_mode": "off"
+      },
+      "provider_params": {}
+    },
+    "tool_calling": {
+      "supported": true,
+      "json_schema_outputs": true
+    },
+    "safety": {
+      "stores_inputs_by_default": true,
+      "cot_visible_to_user_by_default": false
+    },
+    "pricing": {
+      "input_per_million": 0.25,
+      "output_per_million": 1.0,
+      "currency": "USD"
+    },
+    "rate_limits": {
+      "tier": "paid",
+      "requests_per_minute": null
+    },
+    "endpoints": {
+      "base": "https://openrouter.ai/api/v1",
+      "path": "/chat/completions",
+      "notes": "Optimized for agentic coding tasks, pricing varies by context length"
+    },
+    "notes": "480B total parameters, 35B active, optimized for agentic coding tasks"
+  },
+  {
+    "provider": "other",
+    "upstream_provider": "alibaba",
+    "model_id": "qwen3-coder-30b-a3b-instruct",
+    "aliases": [
+      "qwen:qwen3-coder-30b-a3b-instruct",
+      "openrouter:qwen/qwen3-coder-30b-a3b-instruct"
+    ],
+    "status": "available",
+    "modalities": [
+      "text",
+      "tool_use"
+    ],
+    "context_window_tokens": 262144,
+    "max_output_tokens": 262144,
+    "thinking": {
+      "supported": false,
+      "controls": {
+        "effort_levels": [],
+        "budget_tokens_range": [
+          0,
+          0
+        ],
+        "dynamic_budget_supported": false,
+        "include_thoughts_supported": false,
+        "default_mode": "off"
+      },
+      "provider_params": {}
+    },
+    "tool_calling": {
+      "supported": true,
+      "json_schema_outputs": true
+    },
+    "safety": {
+      "stores_inputs_by_default": true,
+      "cot_visible_to_user_by_default": false
+    },
+    "pricing": {
+      "input_per_million": 0.071,
+      "output_per_million": 0.283,
+      "currency": "USD"
+    },
+    "rate_limits": {
+      "tier": "paid",
+      "requests_per_minute": null
+    },
+    "endpoints": {
+      "base": "https://openrouter.ai/api/v1",
+      "path": "/chat/completions",
+      "notes": "256K native context extendable to 1M with Yarn"
+    },
+    "notes": "30.5B parameter MoE with 128 experts (8 active), optimized for coding"
+  },
+  {
+    "provider": "other",
+    "upstream_provider": "z.ai",
+    "model_id": "glm-4.5",
+    "aliases": [
+      "glm-4.5"
+    ],
+    "status": "available",
+    "modalities": [
+      "text",
+      "tool_use"
+    ],
+    "context_window_tokens": 128000,
+    "max_output_tokens": 128000,
+    "thinking": {
+      "supported": true,
+      "controls": {
+        "effort_levels": [],
+        "budget_tokens_range": [
+          0,
+          128000
+        ],
+        "dynamic_budget_supported": true,
+        "include_thoughts_supported": true,
+        "default_mode": "auto"
+      },
+      "provider_params": {
+        "z.ai": {
+          "thinking": {
+            "type": [
+              "enabled",
+              "disabled"
+            ]
+          }
+        }
+      }
+    },
+    "tool_calling": {
+      "supported": true,
+      "json_schema_outputs": true
+    },
+    "safety": {
+      "stores_inputs_by_default": false,
+      "cot_visible_to_user_by_default": true
+    },
+    "pricing": {
+      "input_per_million": 0.6,
+      "output_per_million": 2.2,
+      "currency": "USD"
+    },
+    "rate_limits": {
+      "tier": "paid",
+      "requests_per_minute": null
+    },
+    "endpoints": {
+      "base": "https://api.z.ai/api/paas/v4/",
+      "path": "/chat/completions",
+      "notes": "Hybrid reasoning model with thinking and non-thinking modes"
+    },
+    "notes": "355B total parameters, 32B active, purpose-built for agent-oriented applications"
+  },
+  {
+    "provider": "other",
+    "upstream_provider": "z.ai",
+    "model_id": "glm-4.5-air",
+    "aliases": [
+      "glm-4.5-air"
+    ],
+    "status": "available",
+    "modalities": [
+      "text",
+      "tool_use"
+    ],
+    "context_window_tokens": 128000,
+    "max_output_tokens": 128000,
+    "thinking": {
+      "supported": true,
+      "controls": {
+        "effort_levels": [],
+        "budget_tokens_range": [
+          0,
+          128000
+        ],
+        "dynamic_budget_supported": true,
+        "include_thoughts_supported": true,
+        "default_mode": "auto"
+      },
+      "provider_params": {
+        "z.ai": {
+          "thinking": {
+            "type": [
+              "enabled",
+              "disabled"
+            ]
+          }
+        }
+      }
+    },
+    "tool_calling": {
+      "supported": true,
+      "json_schema_outputs": true
+    },
+    "safety": {
+      "stores_inputs_by_default": false,
+      "cot_visible_to_user_by_default": true
+    },
+    "pricing": {
+      "input_per_million": 0.2,
+      "output_per_million": 1.1,
+      "currency": "USD"
+    },
+    "rate_limits": {
+      "tier": "paid",
+      "requests_per_minute": null
+    },
+    "endpoints": {
+      "base": "https://api.z.ai/api/paas/v4/",
+      "path": "/chat/completions",
+      "notes": "Lightweight variant with same dual-mode capabilities"
+    },
+    "notes": "106B total parameters, 12B active, more compact design with same capabilities"
+  }
+]
