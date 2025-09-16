@@ -105,3 +105,10 @@ License: Apache 2.0
 - **Phase 2: Core Tool Refactor (Consensus)** – Pending.
 - **Phase 3: Testing Overhaul (Live Qwen)** – Pending.
 - **Phase 4: Advanced Integration (Headless CLI)** – Pending.
+
+## Current Project Status
+
+- **Phase 1: Foundational Setup** – Complete (GLM default set).
+- **Phase 2: Core Tool Refactor (Consensus)** – Pending.
+- **Phase 3: Testing Overhaul (Live Qwen)** – Pending.
+- **Phase 4: Advanced Integration (Headless CLI)** – Pending.
