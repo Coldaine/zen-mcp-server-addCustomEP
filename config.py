@@ -25,7 +25,7 @@ __author__ = "Coldaine"
 # This should be a stable, high-performance model suitable for code analysis
 # Can be overridden by setting DEFAULT_MODEL environment variable
 # Special value "auto" means Claude should pick the best model for each task
-DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "auto")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", "glm-4.5")
 
 # Auto mode detection - when DEFAULT_MODEL is "auto", Claude picks the model
 IS_AUTO_MODE = DEFAULT_MODEL.lower() == "auto"
