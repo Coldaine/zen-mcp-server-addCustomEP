@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "zen": {
+      "command": "C:\\zen-mcp\\zen-mcp-server\\.zen_venv\\Scripts\\python.exe",
+      "args": [
+        "C:/zen-mcp/zen-mcp-server/server.py"
+      ],
+      "env": {
+        "ZAI_API_KEY": "your-zai-api-key-here",
+        "DEFAULT_MODEL": "glm-4.6",
+        "PYTHONPATH": "C:/zen-mcp/zen-mcp-server"
+      }
+    }
+  },
+  "security": {
+    "auth": {
+      "selectedType": "oauth-personal"
+    }
+  }
+}

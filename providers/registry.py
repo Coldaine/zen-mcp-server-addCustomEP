@@ -138,7 +138,7 @@ class ModelProviderRegistry:
         elif provider_type == ProviderType.ZAI:
             if not api_key:
                 return None
-            zai_base_url = get_env("ZAI_BASE_URL") or "https://api.z.ai/api/paas/v4/"
+            zai_base_url = get_env("ZAI_BASE_URL") or "https://api.z.ai/api/paas/v4"
             provider_kwargs = {"api_key": api_key}
             if zai_base_url:
                 provider_kwargs["base_url"] = zai_base_url
