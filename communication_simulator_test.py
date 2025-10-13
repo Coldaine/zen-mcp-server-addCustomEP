@@ -134,25 +134,29 @@ class CommunicationSimulator:
     def _get_python_path(self) -> str:
         """Get the Python path for the virtual environment"""
         current_dir = os.getcwd()
+        print(f"Current working directory: {current_dir}")
 
         # Try .venv first (modern convention)
-        venv_python = os.path.join(current_dir, ".venv", "bin", "python")
+        venv_python = os.path.join(current_dir, ".venv", "Scripts", "python.exe")
+        print(f"Checking for {venv_python}")
         if os.path.exists(venv_python):
             return venv_python
 
         # Try venv as fallback
-        venv_python = os.path.join(current_dir, "venv", "bin", "python")
+        venv_python = os.path.join(current_dir, "venv", "Scripts", "python.exe")
+        print(f"Checking for {venv_python}")
         if os.path.exists(venv_python):
             return venv_python
 
         # Try .zen_venv as fallback
-        zen_venv_python = os.path.join(current_dir, ".zen_venv", "bin", "python")
+        zen_venv_python = os.path.join(current_dir, ".zen_venv", "Scripts", "python.exe")
+        print(f"Checking for {zen_venv_python}")
         if os.path.exists(zen_venv_python):
             return zen_venv_python
 
         # Fallback to system python if venv doesn't exist
         self.logger.warning("Virtual environment not found, using system python")
-        return "python"
+        return "python.exe"
 
     def _create_test_runner(self, test_class):
         """Create a test runner function for a test class"""

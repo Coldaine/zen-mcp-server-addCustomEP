@@ -399,6 +399,7 @@ def configure_providers():
     from providers.openrouter import OpenRouterProvider
     from providers.shared import ProviderType
     from providers.xai import XAIModelProvider
+    from providers.zai import ZAIProvider
     from utils.model_restrictions import get_restriction_service
 
     valid_providers = []
@@ -453,6 +454,13 @@ def configure_providers():
         valid_providers.append("X.AI (GROK)")
         has_native_apis = True
         logger.info("X.AI API key found - GROK models available")
+
+    # Check for Z.AI API key
+    zai_key = get_env("ZAI_API_KEY")
+    if zai_key and zai_key != "your_zai_api_key_here":
+        valid_providers.append("Z.AI")
+        has_native_apis = True
+        logger.info("Z.AI API key found - Z.AI models available")
 
     # Check for DIAL API key
     dial_key = get_env("DIAL_API_KEY")
@@ -512,6 +520,10 @@ def configure_providers():
             ModelProviderRegistry.register_provider(ProviderType.XAI, XAIModelProvider)
             registered_providers.append(ProviderType.XAI.value)
             logger.debug(f"Registered provider: {ProviderType.XAI.value}")
+        if zai_key and zai_key != "your_zai_api_key_here":
+            ModelProviderRegistry.register_provider(ProviderType.ZAI, ZAIProvider)
+            registered_providers.append(ProviderType.ZAI.value)
+            logger.debug(f"Registered provider: {ProviderType.ZAI.value}")
         if dial_key and dial_key != "your_dial_api_key_here":
             ModelProviderRegistry.register_provider(ProviderType.DIAL, DIALModelProvider)
             registered_providers.append(ProviderType.DIAL.value)

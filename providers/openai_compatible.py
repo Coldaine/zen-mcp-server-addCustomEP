@@ -158,10 +158,10 @@ class OpenAICompatibleProvider(ModelProvider):
             default_pool = 1800.0  # 30 minutes for local models
             logging.info(f"Using extended timeouts for local endpoint: {self.base_url}")
         elif self.base_url:
-            default_connect = 45.0  # 45 seconds for custom remote endpoints
-            default_read = 900.0  # 15 minutes for custom remote endpoints
-            default_write = 900.0  # 15 minutes for custom remote endpoints
-            default_pool = 900.0  # 15 minutes for custom remote endpoints
+            default_connect = 60.0  # 1 minute for custom remote endpoints
+            default_read = 1800.0  # 30 minutes for custom remote endpoints
+            default_write = 1800.0  # 30 minutes for custom remote endpoints
+            default_pool = 1800.0  # 30 minutes for custom remote endpoints
             logging.info(f"Using extended timeouts for custom endpoint: {self.base_url}")
 
         # Allow override via kwargs or environment variables in future, for now...
@@ -284,7 +284,7 @@ class OpenAICompatibleProvider(ModelProvider):
                         # Normal production client
                         http_client = httpx.Client(
                             timeout=timeout_config,
-                            follow_redirects=True,
+                            follow_redirects=False,
                         )
 
                     # Keep client initialization minimal to avoid proxy parameter conflicts

@@ -1,0 +1,26 @@
+{
+  "models": [
+    {
+      "model_name": "glm-4.6",
+      "friendly_name": "Z.AI (GLM-4.6)",
+      "aliases": [
+        "glm-4.6",
+        "glm4.6",
+        "glm46",
+        "flash"
+      ],
+      "intelligence_score": 14,
+      "description": "GLM-4.6 (200K context, 128K output) - Advanced Chinese AI model with strong coding and reasoning capabilities",
+      "context_window": 200000,
+      "max_output_tokens": 128000,
+      "supports_extended_thinking": false,
+      "supports_system_prompts": true,
+      "supports_streaming": true,
+      "supports_function_calling": true,
+      "supports_json_mode": true,
+      "supports_images": false,
+      "supports_temperature": true,
+      "max_image_size_mb": 0.0
+    }
+  ]
+}

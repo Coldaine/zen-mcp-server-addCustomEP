@@ -40,6 +40,7 @@ class ModelProviderRegistry:
         ProviderType.OPENAI,  # Direct OpenAI access
         ProviderType.AZURE,  # Azure-hosted OpenAI deployments
         ProviderType.XAI,  # Direct X.AI GROK access
+        ProviderType.ZAI, # Direct Z.AI access
         ProviderType.DIAL,  # DIAL unified API access
         ProviderType.CUSTOM,  # Local/self-hosted models
         ProviderType.OPENROUTER,  # Catch-all for cloud models
@@ -123,6 +124,25 @@ class ModelProviderRegistry:
             if gemini_base_url:
                 provider_kwargs["base_url"] = gemini_base_url
                 logging.info(f"Initialized Gemini provider with custom endpoint: {gemini_base_url}")
+            provider = provider_class(**provider_kwargs)
+        elif provider_type == ProviderType.OPENAI:
+            # For OpenAI, check if custom base URL is configured (e.g., for z.ai)
+            if not api_key:
+                return None
+            openai_base_url = get_env("OPENAI_BASE_URL")
+            provider_kwargs = {"api_key": api_key}
+            if openai_base_url:
+                provider_kwargs["base_url"] = openai_base_url
+                logging.info(f"Initialized OpenAI provider with custom endpoint: {openai_base_url}")
+            provider = provider_class(**provider_kwargs)
+        elif provider_type == ProviderType.ZAI:
+            if not api_key:
+                return None
+            zai_base_url = get_env("ZAI_BASE_URL") or "https://api.z.ai/api/paas/v4/"
+            provider_kwargs = {"api_key": api_key}
+            if zai_base_url:
+                provider_kwargs["base_url"] = zai_base_url
+                logging.info(f"Initialized ZAI provider with custom endpoint: {zai_base_url}")
             provider = provider_class(**provider_kwargs)
         elif provider_type == ProviderType.AZURE:
             if not api_key:
@@ -336,6 +356,7 @@ class ModelProviderRegistry:
             ProviderType.OPENAI: "OPENAI_API_KEY",
             ProviderType.AZURE: "AZURE_OPENAI_API_KEY",
             ProviderType.XAI: "XAI_API_KEY",
+            ProviderType.ZAI: "ZAI_API_KEY",
             ProviderType.OPENROUTER: "OPENROUTER_API_KEY",
             ProviderType.CUSTOM: "CUSTOM_API_KEY",  # Can be empty for providers that don't need auth
             ProviderType.DIAL: "DIAL_API_KEY",
