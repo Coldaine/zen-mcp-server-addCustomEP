@@ -100,7 +100,27 @@ Bifrost/LiteLLM Gateway (single endpoint)
     └─→ 10+ more providers
 ```
 
-### 3. Tool Consolidation Analysis
+### 3. CLI Integration Options
+
+**Finding: Existing MCP CLI Servers Available**
+
+Based on January 2025 research, there are **existing MCP servers** that provide CLI/terminal functionality:
+
+**Available MCP CLI Servers:**
+- **interactive-terminal** (ttommyth) - Interactive terminal for AI agents, no security restrictions
+- **cli-mcp-server** (MladenSU) - Secure execution with customizable policies
+- **terminal** (weidwonder) - Terminal MCP server
+- **cmd-line** (andresthor) - Command line MCP server
+
+**Recommended Approach:** Use **interactive-terminal MCP server** instead of building CLI execution from scratch. This provides:
+- ✅ Battle-tested implementation
+- ✅ Community-maintained
+- ✅ No security restrictions (perfect for solo dev)
+- ✅ Simple integration (proxy calls from our MCP server)
+
+See `docs/CLI_INTEGRATION.md` for detailed implementation guide.
+
+### 4. Tool Consolidation Analysis
 
 **Finding: 16 tools → 9 tools (50% code reduction)**
 
@@ -708,132 +728,60 @@ REMOTE_CLI_WHITELIST=systemctl,docker,kubectl,tail,ls,df,git
 
 ---
 
-## CLI Security Options
+## CLI Integration Approach
 
-### Recommended: Tiered Security Model
+### Use Existing MCP CLI Server (Recommended)
 
-**Tier 1: Safe Commands (Auto-Approved)**
-- Read-only operations: `ls`, `cat`, `tail`, `head`, `grep`
-- Status checks: `git status`, `docker ps`, `systemctl status`, `df -h`
-- Version info: `python --version`, `npm --version`
+For solo developer use, **no security restrictions are needed**. Simply use the **interactive-terminal MCP server**:
 
-**Tier 2: Moderate Risk (Logged + Alerting)**
-- Test execution: `pytest`, `npm test`
-- Build operations: `npm run build`, `docker build`
-- Non-destructive git: `git diff`, `git log`
-
-**Tier 3: High Risk (Require Confirmation)**
-- Service management: `systemctl restart`, `docker-compose down`
-- Destructive git: `git reset`, `git clean`
-- Package installation: `npm install`, `pip install`
-
-**Tier 4: Blocked (Never Allowed)**
-- System destruction: `rm -rf /`, `mkfs`, `dd`
-- System control: `shutdown`, `reboot`
-- Fork bombs and malicious patterns
-
-### Implementation
-
+**Implementation:**
 ```python
-# security/cli_tiers.py
-CLI_SECURITY_TIERS = {
-    "tier1_safe": {
-        "allowed_prefixes": [
-            "ls", "cat", "tail", "head", "grep", "pwd", "whoami",
-            "git status", "git log", "git diff",
-            "docker ps", "docker images", "docker logs",
-            "systemctl status", "kubectl get", "kubectl describe",
-            "df -h", "free -h", "ps aux"
-        ],
-        "require_approval": False,
-        "log_execution": True
-    },
-    "tier2_moderate": {
-        "allowed_prefixes": [
-            "pytest", "npm test", "npm run",
-            "docker build", "docker-compose up",
-            "git fetch", "git pull"
-        ],
-        "require_approval": False,
-        "log_execution": True,
-        "send_alert": True
-    },
-    "tier3_high_risk": {
-        "allowed_prefixes": [
-            "systemctl restart", "systemctl stop",
-            "docker-compose down", "docker rm",
-            "git reset", "git clean",
-            "npm install", "pip install"
-        ],
-        "require_approval": True,  # Human-in-the-loop
-        "log_execution": True,
-        "send_alert": True
-    },
-    "tier4_blocked": {
-        "patterns": [
-            r"rm\s+-rf\s+/",
-            r":\(\)\{\s*:\|:&\s*\};:",
-            r"mkfs", r"dd\s+if=.*of=/dev/",
-            r"shutdown", r"reboot",
-            r"curl.*\|\s*sh", r"wget.*\|\s*sh"
-        ],
-        "always_block": True
-    }
-}
+# Proxy to interactive-terminal MCP server
+async def handle_execute_command(arguments):
+    # Connect to interactive-terminal MCP server
+    mcp_client = await connect_mcp_server("stdio", "npx", "@ttommyth/interactive-terminal")
 
-def validate_cli_command(cmd: str) -> Dict:
-    """Validate command against security tiers"""
-    # Check tier 4 (blocked)
-    for pattern in CLI_SECURITY_TIERS["tier4_blocked"]["patterns"]:
-        if re.search(pattern, cmd, re.IGNORECASE):
-            return {
-                "tier": 4,
-                "status": "blocked",
-                "reason": "Command matches blocked pattern"
-            }
+    # Call its execute tool
+    result = await mcp_client.call_tool("execute", {
+        "command": arguments["command"],
+        "cwd": arguments.get("working_directory", ".")
+    })
 
-    # Check tier 3 (high risk)
-    for prefix in CLI_SECURITY_TIERS["tier3_high_risk"]["allowed_prefixes"]:
-        if cmd.lower().startswith(prefix):
-            return {
-                "tier": 3,
-                "status": "requires_approval",
-                "require_approval": True
-            }
+    return result
+```
 
-    # Check tier 2 (moderate)
-    for prefix in CLI_SECURITY_TIERS["tier2_moderate"]["allowed_prefixes"]:
-        if cmd.lower().startswith(prefix):
-            return {
-                "tier": 2,
-                "status": "allowed",
-                "send_alert": True
-            }
+**For Remote Execution (SSH):**
+```python
+import asyncssh
 
-    # Check tier 1 (safe)
-    for prefix in CLI_SECURITY_TIERS["tier1_safe"]["allowed_prefixes"]:
-        if cmd.lower().startswith(prefix):
-            return {
-                "tier": 1,
-                "status": "allowed"
-            }
-
-    # Unknown command - default to tier 3
-    return {
-        "tier": 3,
-        "status": "requires_approval",
-        "reason": "Unknown command, requires approval"
-    }
+async def execute_remote_command(host: str, command: str, key_path: str) -> dict:
+    """Execute command on remote host via SSH (no restrictions)"""
+    async with asyncssh.connect(
+        hostname=host,
+        username=user,
+        client_keys=[key_path]
+    ) as conn:
+        result = await conn.run(command, check=False)
+        return {
+            "command": command,
+            "exit_code": result.exit_status,
+            "stdout": result.stdout,
+            "stderr": result.stderr
+        }
 ```
 
 **Configuration:**
 ```bash
 # .env
-CLI_SECURITY_LEVEL=tier2  # tier1 (safe only), tier2 (+ moderate), tier3 (+ high risk)
-CLI_REQUIRE_APPROVAL=false  # Enable human-in-the-loop for tier 3
-CLI_AUDIT_LOG_PATH=logs/cli_audit.log
-CLI_ALERT_WEBHOOK=https://your-alert-endpoint.com/webhook
+CLI_ENABLED=true
+CLI_DEFAULT_TIMEOUT=60
+
+# Remote CLI (SSH)
+REMOTE_CLI_ENABLED=true
+SSH_KEY_PATH=~/.ssh/id_rsa
 ```
+
+See `docs/CLI_INTEGRATION.md` for complete implementation options.
 
 ---
 
@@ -864,11 +812,11 @@ CLI_ALERT_WEBHOOK=https://your-alert-endpoint.com/webhook
 - [ ] Test with Bifrost/LiteLLM deployment
 
 #### Week 6: CLI Execution
-- [ ] Implement `remote_cli_agent()` with SSH support
-- [ ] Implement `is_safe_remote_command()` security validation
-- [ ] Create CLI security tier system
-- [ ] Add audit logging
-- [ ] Test remote execution
+- [ ] Implement CLI proxy to interactive-terminal MCP server
+- [ ] Implement `remote_cli_agent()` with SSH support (asyncssh)
+- [ ] Add command execution logging
+- [ ] Test local execution (via MCP proxy)
+- [ ] Test remote execution (SSH)
 
 #### Week 7: Testing
 - [ ] Migrate existing tests to LangGraph architecture
@@ -919,14 +867,13 @@ CLI_ALERT_WEBHOOK=https://your-alert-endpoint.com/webhook
     __init__.py
     client.py               # Bifrost/LiteLLM client
 
-/security/
+/cli/
     __init__.py
-    cli_tiers.py            # CLI security tiers
-    validators.py           # Command validators
+    mcp_proxy.py            # Proxy to interactive-terminal MCP
+    remote_executor.py      # SSH-based remote execution
 
 /config/
     models.yaml             # Runtime model configuration
-    cli_security.yaml       # CLI security configuration
 
 server.py                   # Updated MCP server entry point
 requirements.txt            # Updated dependencies
@@ -948,8 +895,8 @@ langgraph>=0.2.0
 langgraph-checkpoint-redis>=0.1.0
 redis>=5.0.0
 
-# SSH for remote CLI
-paramiko>=3.0.0
+# SSH for remote CLI (async)
+asyncssh>=2.14.0
 
 # HTTP client for gateway
 requests>=2.31.0
@@ -1053,12 +1000,11 @@ SSH_KEY_PATH=~/.ssh/id_rsa
 SSH_KNOWN_HOSTS_PATH=~/.ssh/known_hosts
 
 # ============================================================================
-# CLI Security
+# CLI Execution
 # ============================================================================
-CLI_SECURITY_LEVEL=tier2
-CLI_REQUIRE_APPROVAL=false
+CLI_ENABLED=true
+CLI_DEFAULT_TIMEOUT=60
 CLI_AUDIT_LOG_PATH=logs/cli_audit.log
-CLI_ALERT_WEBHOOK=
 
 # ============================================================================
 # Legacy Configuration (can be removed after migration)
