@@ -4,7 +4,7 @@
 
 This document provides comprehensive guidance on memory implementation for the LangGraph-based Zen MCP Server, comparing **Redis** and **Pinecone** as memory backends, and explaining when to use each.
 
-Based on January 2025 research, **Redis has native LangGraph integration** and is the recommended choice for agent checkpointing and short-term memory, while **Pinecone** excels at large-scale vector similarity search for long-term semantic memory.
+Based on **November 2025 research**, **Redis has native LangGraph integration** and is the recommended choice for agent checkpointing and short-term memory. **Redis 8.0+ now includes RedisJSON and RediSearch by default**, making setup even simpler. **Pinecone** excels at large-scale vector similarity search for long-term semantic memory.
 
 ---
 
@@ -138,7 +138,11 @@ results = await store.search(
 )
 ```
 
-### Redis Vector Search (2025 Updates)
+### Redis Vector Search (November 2025 Updates)
+
+**Major Improvement: Redis 8.0+ includes JSON and Search by default!**
+- No need to install RedisJSON and RediSearch separately
+- Just `brew install redis` and you're ready
 
 **Key improvements:**
 - **int8 quantization**: 75% memory reduction, 30% faster search, 99.99% accuracy

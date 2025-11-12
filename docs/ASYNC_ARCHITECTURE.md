@@ -9,7 +9,11 @@ This document outlines the asynchronous architecture for the LangGraph-based Zen
 - Remote CLI execution
 - Responsive MCP server
 
-Based on January 2025 research, async patterns in LangGraph require careful handling of context propagation, error boundaries, and state consistency.
+Based on **November 2025 research**, async in LangGraph is **much simpler than expected**:
+
+> **"You don't need to change anything about your graph to add async support"**
+
+Just use `ainvoke` instead of `invoke` - LangGraph handles the rest automatically! This document covers async patterns, but LangGraph's built-in async support handles most complexity for you.
 
 ---
 

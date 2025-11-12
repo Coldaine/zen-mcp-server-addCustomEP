@@ -13,17 +13,33 @@ This document outlines the **complete refactor** of the Zen MCP Server from a tr
 
 ---
 
-## Research Findings
+## Research Findings (Updated November 2025)
 
-### 1. LangGraph State Persistence
+### 1. LangGraph 1.0.2 - Production Ready!
 
-**Decision: Redis**
+**Released: October 29, 2025**
 
-After researching modern LangGraph options, **Redis is the recommended choice**:
+LangGraph 1.0.2 is the **first stable major release** with no breaking changes until 2.0:
 
-- **Official support**: `langgraph-checkpoint-redis` from Redis Labs
+- **Production-ready**: Stable API, safe for production deployments
+- **Node-level caching**: Cache individual node results for performance optimization
+- **Deferred nodes**: Execute nodes after all upstream paths complete
+- **Type-safe streaming**: LangGraph.js v0.3 improvements
+- **Better interrupts**: Returned in .invoke() and "values" stream modes
+
+**Installation:**
+```bash
+pip install langgraph>=1.0.2
+```
+
+### 2. LangGraph State Persistence (Redis)
+
+**Decision: Redis with simplified setup**
+
+Redis 8.0+ now includes **RedisJSON and RediSearch by default** - no extra installation needed!
+
+- **Official support**: `langgraph-checkpoint-redis` v0.1.0 (redesigned Aug 2025)
 - **Performance**: <1ms latency for state operations
-- **Version 0.1.0**: Complete redesign optimized for in-memory data store
 - **Features**:
   - `RedisSaver`/`AsyncRedisSaver` for thread-level persistence
   - `ShallowRedisSaver` for latest checkpoint only
@@ -33,6 +49,12 @@ After researching modern LangGraph options, **Redis is the recommended choice**:
 
 **Installation:**
 ```bash
+# Redis 8.0+ includes JSON and Search by default!
+brew install redis  # macOS
+# or
+apt-get install redis  # Linux
+
+# Python packages
 pip install langgraph-checkpoint-redis redis
 ```
 
@@ -49,12 +71,7 @@ checkpointer = RedisSaver(redis_client)
 graph = create_supervisor_graph().compile(checkpointer=checkpointer)
 ```
 
-**Alternatives considered:**
-- PostgreSQL: Heavier, slower, overkill for MCP server use case
-- SQLite: Not suitable for concurrent access
-- In-memory: Loses state on restart
-
-### 2. Bifrost vs LiteLLM Integration
+### 3. Bifrost vs LiteLLM Integration
 
 **Decision: Support Both (Bifrost Preferred)**
 
@@ -100,27 +117,37 @@ Bifrost/LiteLLM Gateway (single endpoint)
     └─→ 10+ more providers
 ```
 
-### 3. CLI Integration Options
+### 4. CLI Integration Options
 
-**Finding: Existing MCP CLI Servers Available**
+**Finding: Brand New MCP CLI Servers (November 2025)**
 
-Based on January 2025 research, there are **existing MCP servers** that provide CLI/terminal functionality:
+Multiple MCP CLI servers were released in **November 2025**:
 
-**Available MCP CLI Servers:**
-- **interactive-terminal** (ttommyth) - Interactive terminal for AI agents, no security restrictions
-- **cli-mcp-server** (MladenSU) - Secure execution with customizable policies
-- **terminal** (weidwonder) - Terminal MCP server
-- **cmd-line** (andresthor) - Command line MCP server
+**Latest MCP CLI Servers:**
+- **MCP CLI by chrishayuk** (Nov 10, 2025) - **RECOMMENDED!**
+  - Just released 1 day ago!
+  - Most feature-rich: chat mode, interactive mode, command mode
+  - Streaming responses, automated tool usage
+  - Natural language CLI interaction
 
-**Recommended Approach:** Use **interactive-terminal MCP server** instead of building CLI execution from scratch. This provides:
-- ✅ Battle-tested implementation
-- ✅ Community-maintained
+- **cli-mcp** (Nov 4, 2025) - Minimal MCP client CLI
+  - Works with Cursor mcp.json config
+  - Simple, lightweight
+
+- **mcp-use-cli** - Natural language MCP interaction
+
+- **cli-mcp-server** (MladenSU) - Secure execution with policies
+
+**Recommended Approach:** Use **chrishayuk/mcp-cli** (Nov 10, 2025) - the latest and most feature-rich option:
+- ✅ Just released (most up-to-date)
+- ✅ Feature-rich (3 modes: chat, interactive, command)
+- ✅ Streaming support
+- ✅ Well-documented
 - ✅ No security restrictions (perfect for solo dev)
-- ✅ Simple integration (proxy calls from our MCP server)
 
 See `docs/CLI_INTEGRATION.md` for detailed implementation guide.
 
-### 4. Tool Consolidation Analysis
+### 5. Tool Consolidation Analysis
 
 **Finding: 16 tools → 9 tools (50% code reduction)**
 
@@ -730,21 +757,21 @@ REMOTE_CLI_WHITELIST=systemctl,docker,kubectl,tail,ls,df,git
 
 ## CLI Integration Approach
 
-### Use Existing MCP CLI Server (Recommended)
+### Use Latest MCP CLI Server (Recommended)
 
-For solo developer use, **no security restrictions are needed**. Simply use the **interactive-terminal MCP server**:
+For solo developer use, **no security restrictions are needed**. Simply use the **chrishayuk/mcp-cli server** (Nov 10, 2025):
 
 **Implementation:**
 ```python
-# Proxy to interactive-terminal MCP server
+# Proxy to chrishayuk/mcp-cli server
 async def handle_execute_command(arguments):
-    # Connect to interactive-terminal MCP server
-    mcp_client = await connect_mcp_server("stdio", "npx", "@ttommyth/interactive-terminal")
+    # Connect to MCP CLI server
+    mcp_client = await connect_mcp_server("stdio", "npx", "mcp-cli")
 
     # Call its execute tool
-    result = await mcp_client.call_tool("execute", {
+    result = await mcp_client.call_tool("execute_command", {
         "command": arguments["command"],
-        "cwd": arguments.get("working_directory", ".")
+        "working_directory": arguments.get("working_directory", ".")
     })
 
     return result
@@ -790,11 +817,12 @@ See `docs/CLI_INTEGRATION.md` for complete implementation options.
 ### Big Bang Migration - 8 Week Plan
 
 #### Week 1-2: Foundation
-- [ ] Add LangGraph dependencies (`langgraph`, `langgraph-checkpoint-redis`, `redis`)
-- [ ] Add Bifrost/LiteLLM client (`requests` with OpenAI-compatible API)
-- [ ] Add SSH library (`paramiko`)
+- [ ] Add LangGraph 1.0.2 dependencies (`langgraph>=1.0.2`, `langgraph-checkpoint-redis`, `redis`)
+- [ ] Install Redis 8.0+ (includes JSON and Search by default)
+- [ ] Add Bifrost/LiteLLM client (`aiohttp` for async HTTP)
+- [ ] Add SSH library (`asyncssh` for async SSH)
 - [ ] Create `AgentState` schema
-- [ ] Set up Redis for checkpointing
+- [ ] Set up Redis for checkpointing (RedisSaver, AsyncRedisSaver)
 - [ ] Create supervisor graph skeleton
 
 #### Week 3-4: Tool Consolidation
@@ -812,7 +840,8 @@ See `docs/CLI_INTEGRATION.md` for complete implementation options.
 - [ ] Test with Bifrost/LiteLLM deployment
 
 #### Week 6: CLI Execution
-- [ ] Implement CLI proxy to interactive-terminal MCP server
+- [ ] Install chrishayuk/mcp-cli (Nov 10, 2025): `npm install -g mcp-cli`
+- [ ] Implement CLI proxy to mcp-cli server
 - [ ] Implement `remote_cli_agent()` with SSH support (asyncssh)
 - [ ] Add command execution logging
 - [ ] Test local execution (via MCP proxy)
@@ -869,7 +898,7 @@ See `docs/CLI_INTEGRATION.md` for complete implementation options.
 
 /cli/
     __init__.py
-    mcp_proxy.py            # Proxy to interactive-terminal MCP
+    mcp_proxy.py            # Proxy to chrishayuk/mcp-cli server
     remote_executor.py      # SSH-based remote execution
 
 /config/
@@ -890,10 +919,10 @@ mcp>=1.0.0
 pydantic>=2.0.0
 python-dotenv>=1.0.0
 
-# LangGraph
-langgraph>=0.2.0
+# LangGraph (1.0.2 - Production Ready!)
+langgraph>=1.0.2
 langgraph-checkpoint-redis>=0.1.0
-redis>=5.0.0
+redis>=5.0.0  # Redis 8.0+ includes JSON and Search by default
 
 # SSH for remote CLI (async)
 asyncssh>=2.14.0

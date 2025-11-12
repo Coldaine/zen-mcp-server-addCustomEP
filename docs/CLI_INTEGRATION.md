@@ -2,47 +2,54 @@
 
 ## Overview
 
-This document outlines the strategy for integrating interactive CLI/terminal capabilities into the LangGraph-based Zen MCP Server. Based on research conducted in January 2025, there are **existing MCP servers** that provide terminal/CLI functionality that we can leverage instead of building from scratch.
+This document outlines the strategy for integrating interactive CLI/terminal capabilities into the LangGraph-based Zen MCP Server. Based on **fresh research conducted in November 2025**, there are **brand new MCP servers** that provide terminal/CLI functionality that we can leverage instead of building from scratch.
 
 ---
 
-## Existing MCP CLI Servers
+## Latest MCP CLI Servers (November 2025)
 
-### 1. **interactive-terminal** (ttommyth)
-- **Repository**: Available on playbooks.com/mcp
+### 1. **MCP CLI by chrishayuk** (Nov 10, 2025) - **RECOMMENDED!**
+- **Repository**: https://github.com/chrishayuk/mcp-cli
+- **Released**: November 10, 2025 (1 day ago!)
 - **Features**:
-  - Direct communication between LLMs and terminal
-  - Interactive dialogue through notifications
-  - Command-line prompts
-  - Cross-platform support
-  - No built-in security restrictions (perfect for solo dev use)
+  - **Chat Mode**: Conversational interface with streaming responses
+  - **Interactive Mode**: Command-driven shell interface
+  - **Command Mode**: Unix-friendly for scriptable automation
+  - Automated tool usage
+  - Natural language CLI interaction
+  - Most feature-rich option available
+- **Installation**: `npm install -g mcp-cli`
 
-### 2. **cli-mcp-server** (MladenSU)
+### 2. **cli-mcp** (Nov 4, 2025)
+- **Repository**: Available on LobeHub
+- **Released**: November 4, 2025 (1 week ago)
+- **Features**:
+  - Minimal MCP client CLI
+  - Works with existing Cursor mcp.json config files
+  - Call tools from local (stdio) and remote (HTTP) MCP servers
+  - Simple, lightweight
+
+### 3. **mcp-use-cli**
+- **Repository**: https://github.com/mcp-use/mcp-use-cli
+- **Features**:
+  - CLI for interacting with MCP servers using natural language
+  - Connect to any MCP server with any LLM from terminal
+
+### 4. **cli-mcp-server** (MladenSU)
 - **Repository**: https://github.com/MladenSU/cli-mcp-server
 - **Features**:
   - Secure execution with customizable security policies
   - Command-line interface for MCP clients
   - Configurable command restrictions
-
-### 3. **terminal** (weidwonder)
-- **Repository**: Available on playbooks.com/mcp
-- **Features**:
-  - Terminal MCP server for AI agents
-  - Direct terminal access
-
-### 4. **cmd-line** (andresthor)
-- **Repository**: Available on playbooks.com/mcp
-- **Features**:
-  - Command line MCP server
-  - Simple command execution
+  - Command whitelisting, path validation
 
 ---
 
-## Recommended Approach: Use Existing MCP Server
+## Recommended Approach: Use chrishayuk/mcp-cli (Nov 10, 2025)
 
-### Option 1: Interactive Terminal MCP (RECOMMENDED)
+### Latest MCP CLI Server (RECOMMENDED)
 
-Instead of building CLI execution into our LangGraph agent, we can **use an existing MCP CLI server** and have our agents call it as a standard MCP tool.
+Instead of building CLI execution into our LangGraph agent, we can **use the latest MCP CLI server** (released Nov 10, 2025) and have our agents call it as a standard MCP tool.
 
 **Architecture:**
 ```
@@ -51,26 +58,33 @@ Claude CLI
 Zen MCP Server (LangGraph Agents)
     ↓
     ├─→ Tool: analyze, debug, codereview, etc.
-    └─→ Tool: execute_command (proxied to interactive-terminal MCP)
+    └─→ Tool: cli_execute (proxied to chrishayuk/mcp-cli)
             ↓
-        interactive-terminal MCP Server
+        chrishayuk/mcp-cli MCP Server
             ↓
         Terminal/Bash Execution
 ```
 
 **Benefits:**
+- **Latest technology**: Just released Nov 10, 2025 (most up-to-date)
+- **Feature-rich**: 3 modes (chat, interactive, command)
+- **Streaming support**: Real-time output
 - **No reinvention**: Use battle-tested MCP server
-- **Maintained**: Community-maintained, gets updates
+- **Maintained**: Actively developed, gets updates
 - **Separation of concerns**: CLI execution is separate service
-- **Simpler**: We just proxy to another MCP server
-- **No security needed**: Interactive terminal has no restrictions (perfect for solo dev)
+- **No security needed**: Perfect for solo dev use
+
+**Installation:**
+```bash
+npm install -g mcp-cli
+```
 
 **Implementation:**
 ```python
-# In server.py - add tool that proxies to interactive-terminal MCP
+# In server.py - add tool that proxies to mcp-cli
 {
-    "name": "execute_command",
-    "description": "Execute shell commands locally or remotely",
+    "name": "cli_execute",
+    "description": "Execute shell commands locally using MCP CLI",
     "inputSchema": {
         "type": "object",
         "properties": {
@@ -81,21 +95,28 @@ Zen MCP Server (LangGraph Agents)
             "working_directory": {
                 "type": "string",
                 "description": "Working directory"
+            },
+            "mode": {
+                "type": "string",
+                "enum": ["chat", "interactive", "command"],
+                "default": "command",
+                "description": "Execution mode"
             }
         },
         "required": ["command"]
     }
 }
 
-# Handler proxies to interactive-terminal MCP server
-async def handle_execute_command(arguments):
-    # Connect to interactive-terminal MCP server
-    mcp_client = await connect_mcp_server("stdio", "npx", "@ttommyth/interactive-terminal")
+# Handler proxies to mcp-cli server
+async def handle_cli_execute(arguments):
+    # Connect to mcp-cli server
+    mcp_client = await connect_mcp_server("stdio", "npx", "mcp-cli")
 
     # Call its execute tool
-    result = await mcp_client.call_tool("execute", {
+    result = await mcp_client.call_tool("execute_command", {
         "command": arguments["command"],
-        "cwd": arguments.get("working_directory", ".")
+        "working_directory": arguments.get("working_directory", "."),
+        "mode": arguments.get("mode", "command")
     })
 
     return result
@@ -314,10 +335,10 @@ MCP_CLI_SERVER_ARGS=@ttommyth/interactive-terminal
 ## Recommended Implementation Plan
 
 ### Phase 1: Local CLI via MCP Server (Week 1)
-1. Install `interactive-terminal` MCP server: `npm install -g @ttommyth/interactive-terminal`
-2. Add `execute_command` tool to Zen MCP Server
-3. Proxy calls to interactive-terminal MCP
-4. Test with simple commands
+1. Install `mcp-cli` (Nov 10, 2025): `npm install -g mcp-cli`
+2. Add `cli_execute` tool to Zen MCP Server
+3. Proxy calls to mcp-cli server
+4. Test with simple commands in all 3 modes (chat, interactive, command)
 
 ### Phase 2: Remote CLI via SSH (Week 2)
 1. Build SSH proxy using `paramiko`
