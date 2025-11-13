@@ -1,31 +1,26 @@
 # Documentation Index
 
-This index provides an overview of the documentation structure for Zen MCP Server after the complete refactoring. The focus is on the new goals: Kilo integration, consensus with 3 models, headless CLI, live qwen testing, and additional endpoints.
+This index summarizes the active documentation for Coldaine’s augmented fork of Zen MCP Server. Use it with the documentation register to keep track of ownership and review status.
 
 ## Active Documentation
 
-- **getting-started.md**: Quick setup guide for cloning, env config, and running the server.
-- **configuration.md**: Environment variables, tool configuration, and API key setup.
-- **tools/consensus.md**: Details on the consensus tool, including parallel calls and stances.
-- **tools/chat.md**: Basic chat tool usage.
-- **tools/planner.md**: Planner tool for breaking down tasks.
-- **refactor/CLIInstructions.md**: Verbatim --help outputs for headless CLI tools (gemini, qwen, codex, claude).
+- **Documentation Register (`docs/documentation-register.md`)** – Inventory of every doc, owner, and last-reviewed date. Update this first when adding or retiring docs.
+- **Review Framework (`docs/documentation-review-framework.md`)** – Governance process for monthly audits, scoring criteria, and remediation rules.
+- **Repository Overview (`README.md`)** – Fork goals, quick start, and setup; pair with `AGENTS.md` for contributor guidelines.
+- **Implementation Planning**:
+  - `docs/implementation-plan.md` – Current phased work plan.
+  - `docs/langgraph_architecture.md` – Target architecture for LangGraph agents.
+  - `docs/langgraph_refactor_plan.md` – Big-bang migration research and milestones.
+- **Execution Enablers**:
+  - `docs/CLI_INTEGRATION.md` – MCP CLI integration research (chrishayuk/mcp-cli, cli-mcp, etc.).
+  - `docs/ASYNC_ARCHITECTURE.md` – Async execution strategies.
+  - `docs/MEMORY_ARCHITECTURE.md` – Redis-based state management decisions.
+  - `docs/OBSERVABILITY.md` – Tracing and monitoring approaches.
+  - `docs/CONSOLIDATION_SUMMARY.txt` / `docs/TOOL_CONSOLIDATION_ANALYSIS.md` – Tool reduction findings.
+- **Custom Model Guidance (`docs/custom_models.md`)** – How to manage `conf/custom_models.json`.
+- **CLI Reference (`docs/refactor/CLIInstructions.md`)** – Captured `--help` output for headless CLI providers.
+- **Tool Guides (`docs/tools/*.md`)** – Legacy individual tool prompts and behaviors; keep until LangGraph consolidation lands.
 
-## Archive (Old Files from Original Repo)
-- adding_providers.md
-- adding_tools.md
-- advanced-usage.md
-- ai-collaboration.md
-- ai_banter.md
-- context-revival.md
-- contributions.md
-- docker-deployment.md
-- gemini-setup.md
-- locale-configuration.md
-- logging.md
-- testing.md
-- troubleshooting.md
-- vcr-testing.md
-- wsl-setup.md
+## Archive (Historical References)
 
-For historical reference, see docs/Archive/. The refactoring prioritizes simplicity for personal use.
+All legacy files live in `docs/Archive/` (adding_providers.md, configuration.md, docker-deployment.md, etc.). They originate from the upstream project and should not be followed without re-validation. When in doubt, prefer the active documents above and migrate any still-relevant material into the current structure.

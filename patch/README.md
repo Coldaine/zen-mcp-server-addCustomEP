@@ -1,6 +1,6 @@
 # Cross-Platform Compatibility Patches
 
-This directory contains patch scripts to improve the cross-platform compatibility of the zen-mcp server.
+This directory contains patch scripts that keep Coldaine’s augmented zen-mcp fork aligned across platforms. Apply them here—not in the upstream project—because the fixes assume the custom providers, scripts, and directory layout unique to this fork.
 
 ## Files
 

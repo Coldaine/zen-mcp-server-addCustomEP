@@ -1,0 +1,234 @@
+================================================================================
+                  ZEN MCP SERVER - TOOL CONSOLIDATION ANALYSIS
+                              EXECUTIVE SUMMARY
+================================================================================
+
+CURRENT STATE: 16 Tools
+  - 4 Utility/Simple Tools (chat, challenge, listmodels, version)
+  - 7 Analysis Workflow Tools (analyze, debug, codereview, refactor, secaudit, precommit, tracer)
+  - 3 Generation Tools (testgen, docgen) + 2 Generation components
+  - 3 Reasoning Tools (thinkdeep, planner, consensus)
+
+================================================================================
+                              KEY FINDINGS
+================================================================================
+
+1. ANALYSIS TOOLS (HIGH REDUNDANCY - 85-90% OVERLAP)
+   ┌─────────────────────────────────────────────────────────┐
+   │ 7 tools share the same workflow infrastructure:         │
+   │                                                          │
+   │ • analyze        ~595 lines                             │
+   │ • debug          ~595 lines                             │
+   │ • codereview     ~743 lines                             │
+   │ • refactor       ~600+ lines                            │
+   │ • secaudit       ~600+ lines                            │
+   │ • precommit      ~600+ lines                            │
+   │ • tracer         ~600+ lines                            │
+   │                                                          │
+   │ Total: 4,300+ lines of largely duplicated code         │
+   │                                                          │
+   │ Shared patterns:                                        │
+   │  ✓ Step-by-step investigation (step_number, findings)   │
+   │  ✓ Issue tracking with severity (6 of 7 tools)          │
+   │  ✓ Confidence-based completion (6 of 7 tools)           │
+   │  ✓ Expert analysis integration (6 of 7 tools)           │
+   │  ✓ Files & context tracking (all 7 tools)              │
+   └─────────────────────────────────────────────────────────┘
+
+   CONSOLIDATION RECOMMENDATION: HIGH PRIORITY
+   → Consolidate 7 into 1 "UniversalAnalyzer" with modes
+   → Save: 3,900-4,100 lines of code (50% reduction)
+   → Effort: 3-4 weeks
+   → Benefit: Easier maintenance, consistent UX
+
+2. GENERATION TOOLS (MODERATE REDUNDANCY - 60-70% OVERLAP)
+   ┌─────────────────────────────────────────────────────────┐
+   │ 3 tools with shared workflow structure:                 │
+   │                                                          │
+   │ • testgen        ~600+ lines (test generation)          │
+   │ • docgen         ~700+ lines (documentation)            │
+   │ • refactor       (part of analysis tools)               │
+   │                                                          │
+   │ Total: 1,300+ lines with 60-70% shared code            │
+   │                                                          │
+   │ Different expert analysis needs & field semantics       │
+   └─────────────────────────────────────────────────────────┘
+
+   CONSOLIDATION RECOMMENDATION: MEDIUM PRIORITY
+   → Consolidate 3 into 1 "CodeGenerator" with modes
+   → Save: 600-700 lines of code
+   → Effort: 1-2 weeks
+   → Benefit: Consistency, shared workflow logic
+
+3. REASONING TOOLS (LOW REDUNDANCY - 40-50% OVERLAP)
+   ┌─────────────────────────────────────────────────────────┐
+   │ 3 fundamentally different tools:                        │
+   │                                                          │
+   │ • thinkdeep      Investigation → Expert validation      │
+   │ • planner        Planning with branching (self-contained)
+   │ • consensus      Multi-model consultation               │
+   │                                                          │
+   │ Unique mechanics prevent effective consolidation        │
+   └─────────────────────────────────────────────────────────┘
+
+   CONSOLIDATION RECOMMENDATION: LOW PRIORITY (KEEP SEPARATE)
+   → Low consolidation benefit (~40-50%)
+   → Unique paradigms valuable for users
+   → Keep as-is: thinkdeep, planner, consensus
+
+4. UTILITY TOOLS (NO REDUNDANCY)
+   ┌─────────────────────────────────────────────────────────┐
+   │ 4 non-redundant utility tools:                          │
+   │                                                          │
+   │ • chat           General conversation                   │
+   │ • challenge      Critical thinking wrapper              │
+   │ • listmodels     Model availability display             │
+   │ • version        Server version info                    │
+   └─────────────────────────────────────────────────────────┘
+
+   CONSOLIDATION RECOMMENDATION: NONE (KEEP SEPARATE)
+   → Each provides unique functionality
+   → No overlapping code
+
+================================================================================
+                        CONSOLIDATION OPPORTUNITIES
+================================================================================
+
+BEFORE CONSOLIDATION:
+┌─────────────────────────────────────────────────────────────────────┐
+│ 16 Tools                                                            │
+│ ├── 4 Utility Tools (chat, challenge, listmodels, version)         │
+│ ├── 7 Analysis Tools (analyze, debug, codereview, refactor,        │
+│ │                    secaudit, precommit, tracer)                  │
+│ ├── 2 Generation Tools (testgen, docgen)                           │
+│ └── 3 Reasoning Tools (thinkdeep, planner, consensus)              │
+└─────────────────────────────────────────────────────────────────────┘
+
+AFTER CONSOLIDATION (RECOMMENDED):
+┌─────────────────────────────────────────────────────────────────────┐
+│ 9 Tools                                                             │
+│ ├── 4 Utility Tools (unchanged)                                    │
+│ ├── 1 Universal Analyzer with 7 modes                              │
+│ │   (code_analysis, debug, review, refactor, security, precommit, trace)
+│ ├── 1 Code Generator with 2 modes                                  │
+│ │   (tests, documentation)                                         │
+│ └── 3 Reasoning Tools (unchanged)                                  │
+└─────────────────────────────────────────────────────────────────────┘
+
+BACKWARD COMPATIBILITY:
+  All 16 tool names kept working via compatibility aliases
+  Users can continue using old tool names while underlying code consolidates
+
+================================================================================
+                         IMPLEMENTATION ROADMAP
+================================================================================
+
+PHASE 1 - PREPARATION (Week 1)
+  □ Extract shared infrastructure to base classes
+  □ Create consolidated schema builders
+  □ Document tool configuration options
+
+PHASE 2 - ANALYSIS CONSOLIDATION (Weeks 2-4)
+  □ Create UniversalAnalyzer base
+  □ Migrate 7 analysis tools into unified tool with modes
+  □ Create backward-compatible aliases
+
+PHASE 3 - GENERATION CONSOLIDATION (Week 5)
+  □ Create CodeGenerator base
+  □ Migrate testgen and docgen into unified tool with modes
+  □ Create backward-compatible aliases
+
+PHASE 4 - TESTING (Week 6)
+  □ Full test suite verification
+  □ Backward compatibility testing
+  □ Performance validation
+
+PHASE 5 - DOCUMENTATION (Week 7)
+  □ Update user documentation
+  □ Migration guide
+  □ Deprecation notices
+
+================================================================================
+                            IMPACT ANALYSIS
+================================================================================
+
+CODE REDUCTION:
+  • Analysis tools: 4,300+ → 700 lines (84% reduction)
+  • Generation tools: 1,300+ → 500 lines (62% reduction)
+  • Total: ~4,100 lines saved (estimated 50% reduction for these tools)
+
+MAINTENANCE BURDEN:
+  • From 16 tools to 9 conceptual tools (44% reduction)
+  • Shared testing infrastructure (fewer test cases)
+  • Single system prompt registry instead of 7
+  • Unified expert analysis logic
+
+USER EXPERIENCE:
+  • Backward compatible - all existing tool names work
+  • More consistent behavior across analysis tools
+  • Easier to understand tool capabilities (clear modes)
+  • No learning curve for existing users
+
+DEVELOPMENT EFFORT:
+  • Priority 1 (Analysis): 3-4 weeks
+  • Priority 2 (Generation): 1-2 weeks
+  • Total: 4-6 weeks
+  • Risk level: MEDIUM (mitigated with aliases)
+
+================================================================================
+                         RECOMMENDATION SUMMARY
+================================================================================
+
+PRIMARY RECOMMENDATION: IMPLEMENT PRIORITY 1 (ANALYSIS CONSOLIDATION)
+  
+  Why:
+    ✓ Highest code redundancy (85-90%)
+    ✓ Significant maintenance burden reduction (50%)
+    ✓ Largest savings opportunity (~3,900 lines)
+    ✓ Clear migration path with backward compatibility
+    ✓ Reasonable effort-to-benefit ratio
+
+  Implementation:
+    1. Create UniversalAnalyzer tool with 7 modes
+    2. Migrate analyze → "code_analysis" mode
+    3. Migrate debug → "debug" mode
+    4. Migrate codereview → "code_review" mode
+    5. Migrate refactor → "refactor" mode
+    6. Migrate secaudit → "security_audit" mode
+    7. Migrate precommit → "precommit" mode
+    8. Migrate tracer → "trace" mode
+    9. Keep old tool names as aliases
+
+SECONDARY RECOMMENDATION: IMPLEMENT PRIORITY 2 (GENERATION CONSOLIDATION)
+  
+  When: After Priority 1 consolidation
+  Why: 
+    ✓ Good code cleanup opportunity
+    ✓ Easier after Priority 1 pattern established
+    ✓ Moderate effort investment
+
+MAINTAIN CURRENT STATE FOR: Utility & Reasoning Tools
+  
+  thinkdeep, planner, consensus remain separate (unique paradigms)
+  chat, challenge, listmodels, version remain separate (utility functions)
+
+================================================================================
+                            CONCLUSION
+================================================================================
+
+The Zen MCP Server can be effectively consolidated from 16 to 9 tools by
+consolidating workflow tools that share the same architecture. This
+consolidation:
+
+  ✓ Reduces code maintenance burden by 50%
+  ✓ Saves ~3,900-4,100 lines of duplicated code
+  ✓ Maintains backward compatibility through aliases
+  ✓ Improves consistency across analysis workflows
+  ✓ Requires 4-6 weeks of development effort
+  ✓ Presents MEDIUM risk, easily mitigated with aliases
+
+Recommendation: Proceed with Priority 1 consolidation immediately.
+
+Full technical report available in: docs/TOOL_CONSOLIDATION_ANALYSIS.md
+
+================================================================================

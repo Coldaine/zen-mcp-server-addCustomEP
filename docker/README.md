@@ -1,5 +1,7 @@
 # Zen MCP Server - Docker Setup
 
+These Docker instructions target Coldaine’s augmented fork of zen-mcp-server (this repository). Images built here include the fork’s custom providers, LangGraph planning artifacts, and CLI defaults; do not mix them with upstream images because configuration expectations differ.
+
 ## Quick Start
 
 ### 1. Prerequisites
