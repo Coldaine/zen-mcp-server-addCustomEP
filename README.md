@@ -1,6 +1,11 @@
-# Zen MCP Server – Complete Refactoring
+# Zen MCP Server – Coldaine Augmented Fork
 
-Zen MCP Server is a refactored Model Context Protocol (MCP) server for AI development workflows. This is a complete refactoring from the original BeehiveInnovations/zen-mcp-server, now under Coldaine ownership. The focus is on performance, flexibility, and local/CLI integration for personal use.
+This repository is Coldaine’s maintained and augmented fork of the original BeehiveInnovations/zen-mcp-server. It layers extensive planning for LangGraph-based multi-agent flows, custom provider endpoints, and tooling that reflects Coldaine’s local-first, CLI-centric workflows. Treat this repo as the authoritative source for the fork—documentation and scripts no longer mirror upstream defaults.
+
+## Fork Scope
+- Adds comprehensive research docs (LangGraph architecture, tool consolidation, CLI integration) that chart the upcoming multi-agent refactor.
+- Maintains custom model registries (`conf/custom_models.json`) and consensus defaults tuned for Coldaine’s API keys and infrastructure.
+- Ships extra helper scripts (`patch/`, `docker/scripts/`, PowerShell variants) to keep the fork cross-platform and reproducible without upstream dependencies.
 
 ## Key Goals
 1. Default to Kilo Code API for OpenRouter models (interchangeable substitution with fallback).
