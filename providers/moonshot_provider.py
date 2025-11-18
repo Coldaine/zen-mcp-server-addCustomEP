@@ -2,8 +2,7 @@
 
 import os
 
-from .base import ModelCapabilities, ProviderType
-from .openai_compatible import OpenAICompatibleProvider
+from .base import ModelCapabilities, OpenAICompatibleProvider, ProviderType
 
 
 class MoonshotProvider(OpenAICompatibleProvider):
@@ -21,11 +20,10 @@ class MoonshotProvider(OpenAICompatibleProvider):
         # Moonshot supports kimi-k2 series
         return model_name.startswith("kimi-") or model_name == "kimi-k2-instruct"
 
-    def get_capabilities(self, model_name: str) -> ModelCapabilities:
-        """Get model capabilities for Moonshot models."""
+    def get_model_capabilities(self, model_name: str) -> ModelCapabilities:
+        # Basic capabilities from _ModelLibrary.json or default
         return ModelCapabilities(
             model_name=model_name,
-            friendly_name="Moonshot",
             provider=ProviderType.MOONSHOT,
             context_window=262144,
             max_output_tokens=32768,

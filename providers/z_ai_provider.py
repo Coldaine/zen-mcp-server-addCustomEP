@@ -2,8 +2,7 @@
 
 import os
 
-from .base import ModelCapabilities, ProviderType, RangeTemperatureConstraint
-from .openai_compatible import OpenAICompatibleProvider
+from .base import ModelCapabilities, OpenAICompatibleProvider, ProviderType, RangeTemperatureConstraint
 
 
 class ZAIProvider(OpenAICompatibleProvider):
@@ -23,11 +22,10 @@ class ZAIProvider(OpenAICompatibleProvider):
         # Z.AI supports glm-4.5 series
         return model_name.startswith("glm-") or model_name == "glm-4.5"
 
-    def get_capabilities(self, model_name: str) -> ModelCapabilities:
-        """Get model capabilities for Z.AI models."""
+    def get_model_capabilities(self, model_name: str) -> ModelCapabilities:
+        # Basic capabilities from _ModelLibrary.json or default
         return ModelCapabilities(
             model_name=model_name,
-            friendly_name="Z.AI",
             provider=ProviderType.Z_AI,
             context_window=262144,
             max_output_tokens=32768,

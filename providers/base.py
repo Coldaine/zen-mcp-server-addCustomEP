@@ -26,10 +26,6 @@ class ProviderType(Enum):
     OPENROUTER = "openrouter"
     CUSTOM = "custom"
     DIAL = "dial"
-    KILO = "kilo"
-    MOONSHOT = "moonshot"
-    Z_AI = "z_ai"
-    QWEN = "qwen"
 
 
 class TemperatureConstraint(ABC):
