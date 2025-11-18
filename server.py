@@ -388,9 +388,13 @@ def configure_providers():
     from providers.custom import CustomProvider
     from providers.dial import DIALModelProvider
     from providers.gemini import GeminiModelProvider
+    from providers.kilo_provider import KiloProvider
+    from providers.moonshot_provider import MoonshotProvider
     from providers.openai_provider import OpenAIModelProvider
     from providers.openrouter import OpenRouterProvider
+    from providers.qwen_provider import QwenProvider
     from providers.xai import XAIModelProvider
+    from providers.z_ai_provider import ZAIProvider
     from utils.model_restrictions import get_restriction_service
 
     valid_providers = []
@@ -431,6 +435,35 @@ def configure_providers():
         valid_providers.append("DIAL")
         has_native_apis = True
         logger.info("DIAL API key found - DIAL models available")
+
+    # Check for Z.AI API key
+    z_ai_key = os.getenv("Z_AI_API_KEY")
+    if z_ai_key and z_ai_key != "your_z_ai_api_key_here":
+        valid_providers.append("Z.AI (GLM)")
+        has_native_apis = True
+        logger.info("Z.AI API key found - GLM models available")
+
+    # Check for Moonshot API key
+    moonshot_key = os.getenv("MOONSHOT_API_KEY")
+    if moonshot_key and moonshot_key != "your_moonshot_api_key_here":
+        valid_providers.append("Moonshot (Kimi)")
+        has_native_apis = True
+        logger.info("Moonshot API key found - Kimi models available")
+
+    # Check for Qwen API key
+    qwen_key = os.getenv("QWEN_API_KEY")
+    if qwen_key and qwen_key != "your_qwen_api_key_here":
+        valid_providers.append("Qwen")
+        has_native_apis = True
+        logger.info("Qwen API key found - Qwen models available")
+
+    # Check for Kilo API key
+    kilo_key = os.getenv("KILO_API_KEY")
+    has_kilo = False
+    if kilo_key and kilo_key != "your_kilo_api_key_here":
+        valid_providers.append("Kilo (OpenRouter substitute)")
+        has_kilo = True
+        logger.info("Kilo API key found - OpenRouter models via Kilo available")
 
     # Check for OpenRouter API key
     openrouter_key = os.getenv("OPENROUTER_API_KEY")
@@ -473,6 +506,16 @@ def configure_providers():
             ModelProviderRegistry.register_provider(ProviderType.XAI, XAIModelProvider)
         if dial_key and dial_key != "your_dial_api_key_here":
             ModelProviderRegistry.register_provider(ProviderType.DIAL, DIALModelProvider)
+        if z_ai_key and z_ai_key != "your_z_ai_api_key_here":
+            ModelProviderRegistry.register_provider(ProviderType.Z_AI, ZAIProvider)
+        if moonshot_key and moonshot_key != "your_moonshot_api_key_here":
+            ModelProviderRegistry.register_provider(ProviderType.MOONSHOT, MoonshotProvider)
+        if qwen_key and qwen_key != "your_qwen_api_key_here":
+            ModelProviderRegistry.register_provider(ProviderType.QWEN, QwenProvider)
+
+    # 1.5. Kilo provider (OpenRouter substitute)
+    if has_kilo:
+        ModelProviderRegistry.register_provider(ProviderType.KILO, KiloProvider)
 
     # 2. Custom provider second (for local/private models)
     if has_custom:

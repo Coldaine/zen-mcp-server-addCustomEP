@@ -24,11 +24,21 @@ class KiloProvider(OpenAICompatibleProvider):
 
         return OpenRouterModelRegistry().resolve(model_name) is not None
 
-    def get_model_capabilities(self, model_name: str) -> ModelCapabilities:
+    def get_capabilities(self, model_name: str) -> ModelCapabilities:
+        """Get model capabilities for Kilo-proxied models."""
         # Delegate to OpenRouter registry for capabilities, as Kilo forwards to OpenRouter
         from .openrouter_registry import OpenRouterModelRegistry
 
         config = OpenRouterModelRegistry().resolve(model_name)
         if config:
+            # Update provider to KILO while keeping other capabilities
+            config.provider = ProviderType.KILO
             return config
-        return ModelCapabilities(model_name=model_name, provider=ProviderType.KILO)
+        # Fallback for unknown models
+        return ModelCapabilities(
+            model_name=model_name,
+            friendly_name="Kilo",
+            provider=ProviderType.KILO,
+            context_window=128000,
+            max_output_tokens=32768,
+        )
