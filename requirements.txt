@@ -5,6 +5,15 @@ pydantic>=2.0.0
 python-dotenv>=1.0.0
 importlib-resources>=5.0.0; python_version<"3.9"
 
+# LangGraph and state management
+langgraph>=1.0.2  # LangGraph orchestration framework
+langgraph-checkpoint-redis>=0.1.0  # Redis checkpointing for state persistence
+redis>=5.0.0  # Redis client (Redis 8.0+ includes JSON and Search by default)
+
+# Gateway and configuration
+aiohttp>=3.9.0  # Async HTTP client for gateway communication
+pyyaml>=6.0.0  # Runtime YAML configuration
+
 # Development dependencies (install with pip install -r requirements-dev.txt)
 # pytest>=7.4.0
 # pytest-asyncio>=0.21.0

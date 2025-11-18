@@ -1,0 +1,67 @@
+# Runtime model configuration for LangGraph
+# This file can be edited without restarting the server
+
+models:
+  # Gateway configuration
+  gateway:
+    endpoint: "${UNIFIED_LLM_GATEWAY}"  # Bifrost/LiteLLM endpoint
+    api_key: "${UNIFIED_LLM_API_KEY}"   # Gateway API key
+    timeout: 120
+    retry_attempts: 3
+    retry_delay: 2
+
+  # Auto model routing rules
+  auto_routing:
+    enabled: true
+    rules:
+      # Large files → high-context model
+      - condition: "file_size > 50000"
+        model: "gemini-2.0-flash"
+        reason: "Large file requires high-context model"
+
+      # Deep reasoning → reasoning model
+      - condition: "tool_mode == 'deep_reasoning'"
+        model: "o3"
+        reason: "Deep reasoning requires o3 model"
+
+      # Security audit → specialized model
+      - condition: "tool_mode.startswith('analyze:security')"
+        model: "claude-3-5-sonnet"
+        reason: "Security audit benefits from Claude's analysis"
+
+      # Performance analysis
+      - condition: "'performance' in str(request_data).lower()"
+        model: "gemini-2.0-flash"
+        reason: "Performance analysis needs fast model"
+
+      # Default fallback
+      - condition: "default"
+        model: "gemini-2.0-flash"
+        reason: "Default balanced model"
+
+  # Available models (reference)
+  available_models:
+    - name: "gemini-2.0-flash"
+      provider: "google"
+      context_window: 1000000
+      cost_per_1k_tokens: 0.0001
+      supports_thinking: false
+
+    - name: "gpt-4o"
+      provider: "openai"
+      context_window: 128000
+      cost_per_1k_tokens: 0.005
+      supports_thinking: false
+
+    - name: "claude-3-5-sonnet"
+      provider: "anthropic"
+      context_window: 200000
+      cost_per_1k_tokens: 0.003
+      supports_thinking: true
+
+    - name: "o3"
+      provider: "openai"
+      context_window: 128000
+      cost_per_1k_tokens: 0.01
+      supports_thinking: true
+      thinking_budgets: ["low", "medium", "high"]
