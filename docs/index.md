@@ -8,9 +8,9 @@ This index summarizes the active documentation for Coldaine’s augmented fork o
 - **Review Framework (`docs/documentation-review-framework.md`)** – Governance process for monthly audits, scoring criteria, and remediation rules.
 - **Repository Overview (`README.md`)** – Fork goals, quick start, and setup; pair with `AGENTS.md` for contributor guidelines.
 - **Implementation Planning**:
-  - `docs/implementation-plan.md` – Current phased work plan.
+  - `docs/MIGRATION_MASTER_PLAN.md` – **Single Source of Truth** for the LangGraph migration.
   - `docs/langgraph_architecture.md` – Target architecture for LangGraph agents.
-  - `docs/langgraph_refactor_plan.md` – Big-bang migration research and milestones.
+  - `docs/langgraph_refactor_plan.md` – Detailed research and milestones.
 - **Execution Enablers**:
   - `docs/CLI_INTEGRATION.md` – MCP CLI integration research (chrishayuk/mcp-cli, cli-mcp, etc.).
   - `docs/ASYNC_ARCHITECTURE.md` – Async execution strategies.
