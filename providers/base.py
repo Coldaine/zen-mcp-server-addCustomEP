@@ -7,7 +7,7 @@ import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Iterator, Optional
 
 if TYPE_CHECKING:
     from tools.models import ToolModelCategory
@@ -226,6 +226,31 @@ class ModelProvider(ABC):
 
         Returns:
             ModelResponse with generated content and metadata
+        """
+        pass
+
+    @abstractmethod
+    def generate_stream(
+        self,
+        prompt: str,
+        model_name: str,
+        system_prompt: Optional[str] = None,
+        temperature: float = 0.3,
+        max_output_tokens: Optional[int] = None,
+        **kwargs,
+    ) -> Iterator[ModelResponse]:
+        """Generate content using the model in streaming mode.
+
+        Args:
+            prompt: User prompt to send to the model
+            model_name: Name of the model to use
+            system_prompt: Optional system prompt for model behavior
+            temperature: Sampling temperature (0-2)
+            max_output_tokens: Maximum tokens to generate
+            **kwargs: Provider-specific parameters
+
+        Yields:
+            ModelResponse objects containing content deltas
         """
         pass
 

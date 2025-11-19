@@ -6,7 +6,7 @@ import logging
 import os
 import time
 from abc import abstractmethod
-from typing import Optional
+from typing import Iterator, Optional
 from urllib.parse import urlparse
 
 from openai import OpenAI
@@ -44,6 +44,9 @@ class OpenAICompatibleProvider(ModelProvider):
         self.base_url = base_url
         self.organization = kwargs.get("organization")
         self.allowed_models = self._parse_allowed_models()
+        
+        # Flag to force usage of responses endpoint (for future-proofing)
+        self.use_responses_endpoint = kwargs.get("use_responses_endpoint", False)
 
         # Configure timeouts - especially important for custom/local endpoints
         self.timeout_config = self._configure_timeouts(**kwargs)
@@ -539,8 +542,8 @@ class OpenAICompatibleProvider(ModelProvider):
                     continue  # Skip unsupported parameters for reasoning models
                 completion_params[key] = value
 
-        # Check if this is o3-pro and needs the responses endpoint
-        if resolved_model == "o3-pro":
+        # Check if this is o3-pro or if responses endpoint is forced
+        if resolved_model == "o3-pro" or self.use_responses_endpoint:
             # This model requires the /v1/responses endpoint
             # If it fails, we should not fall back to chat/completions
             return self._generate_with_responses_endpoint(
@@ -605,6 +608,123 @@ class OpenAICompatibleProvider(ModelProvider):
         error_msg = f"{self.FRIENDLY_NAME} API error for model {model_name} after {actual_attempts} attempt{'s' if actual_attempts > 1 else ''}: {str(last_exception)}"
         logging.error(error_msg)
         raise RuntimeError(error_msg) from last_exception
+
+    def generate_stream(
+        self,
+        prompt: str,
+        model_name: str,
+        system_prompt: Optional[str] = None,
+        temperature: float = 0.3,
+        max_output_tokens: Optional[int] = None,
+        images: Optional[list[str]] = None,
+        **kwargs,
+    ) -> Iterator[ModelResponse]:
+        """Generate content using the OpenAI-compatible API in streaming mode.
+
+        Args:
+            prompt: User prompt to send to the model
+            model_name: Name of the model to use
+            system_prompt: Optional system prompt for model behavior
+            temperature: Sampling temperature
+            max_output_tokens: Maximum tokens to generate
+            **kwargs: Additional provider-specific parameters
+
+        Yields:
+            ModelResponse objects containing content deltas
+        """
+        # Validate model name against allow-list
+        if not self.validate_model_name(model_name):
+            raise ValueError(f"Model '{model_name}' not in allowed models list. Allowed models: {self.allowed_models}")
+
+        # Get effective temperature for this model
+        effective_temperature = self.get_effective_temperature(model_name, temperature)
+
+        # Only validate if temperature is not None (meaning the model supports it)
+        if effective_temperature is not None:
+            # Validate parameters with the effective temperature
+            self.validate_parameters(model_name, effective_temperature)
+
+        # Prepare messages
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+
+        # Prepare user message with text and potentially images
+        user_content = []
+        user_content.append({"type": "text", "text": prompt})
+
+        # Add images if provided and model supports vision
+        if images and self._supports_vision(model_name):
+            for image_path in images:
+                try:
+                    image_content = self._process_image(image_path)
+                    if image_content:
+                        user_content.append(image_content)
+                except Exception as e:
+                    logging.warning(f"Failed to process image {image_path}: {e}")
+                    continue
+        elif images and not self._supports_vision(model_name):
+            logging.warning(f"Model {model_name} does not support images, ignoring {len(images)} image(s)")
+
+        # Add user message
+        if len(user_content) == 1:
+            messages.append({"role": "user", "content": prompt})
+        else:
+            messages.append({"role": "user", "content": user_content})
+
+        # Prepare completion parameters
+        completion_params = {
+            "model": model_name,
+            "messages": messages,
+            "stream": True,
+        }
+
+        # Check model capabilities once to determine parameter support
+        resolved_model = self._resolve_model_name(model_name)
+
+        # Use the effective temperature we calculated earlier
+        if effective_temperature is not None:
+            completion_params["temperature"] = effective_temperature
+            supports_temperature = True
+        else:
+            supports_temperature = False
+
+        if max_output_tokens and supports_temperature:
+            completion_params["max_tokens"] = max_output_tokens
+
+        # Add any additional OpenAI-specific parameters
+        for key, value in kwargs.items():
+            if key in ["top_p", "frequency_penalty", "presence_penalty", "seed", "stop"]:
+                if not supports_temperature and key in ["top_p", "frequency_penalty", "presence_penalty"]:
+                    continue
+                completion_params[key] = value
+
+        # Note: We skip the o3-pro responses endpoint check here as it likely doesn't support streaming
+        # If o3-pro is requested in streaming mode, we try standard chat completions
+
+        try:
+            # Generate stream
+            stream = self.client.chat.completions.create(**completion_params)
+
+            for chunk in stream:
+                if chunk.choices and chunk.choices[0].delta.content:
+                    content = chunk.choices[0].delta.content
+                    yield ModelResponse(
+                        content=content,
+                        model_name=model_name,
+                        friendly_name=self.FRIENDLY_NAME,
+                        provider=self.get_provider_type(),
+                        metadata={
+                            "id": chunk.id,
+                            "created": chunk.created,
+                            "model": chunk.model,
+                        },
+                    )
+
+        except Exception as e:
+            error_msg = f"{self.FRIENDLY_NAME} streaming error for model {model_name}: {str(e)}"
+            logging.error(error_msg)
+            raise RuntimeError(error_msg) from e
 
     def count_tokens(self, text: str, model_name: str) -> int:
         """Count tokens for the given text.
