@@ -331,6 +331,41 @@ class TestConsensusTool:
         result = tool.customize_workflow_response(response_data, request)
         assert result["consensus_workflow_status"] == "ready_for_synthesis"
 
+    @pytest.mark.asyncio
+    async def test_concurrent_execution(self):
+        """Test concurrent execution of models."""
+        import json
+        tool = ConsensusTool()
+
+        # Mock _consult_model to return immediately with a result
+        async def mock_consult(model_config, request):
+            return {
+                "model": model_config["model"],
+                "stance": model_config.get("stance", "neutral"),
+                "status": "success",
+                "verdict": "Mock verdict",
+                "metadata": {},
+            }
+
+        tool._consult_model = mock_consult
+
+        arguments = {
+            "step": "Initial analysis",
+            "step_number": 1,
+            "total_steps": 2,
+            "next_step_required": True,
+            "findings": "Analysis complete",
+            "models": [{"model": "flash", "stance": "neutral"}, {"model": "o3-mini", "stance": "for"}],
+        }
+
+        results = await tool.execute_workflow(arguments)
+
+        # Verify response
+        response_data = json.loads(results[0].text)
+        assert response_data["consensus_complete"] is True
+        assert len(response_data["complete_consensus"]["all_model_responses"]) == 2
+        assert response_data["metadata"]["execution_mode"] == "concurrent"
+
 
 if __name__ == "__main__":
     import unittest

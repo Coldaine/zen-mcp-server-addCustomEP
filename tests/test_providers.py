@@ -36,7 +36,8 @@ class TestModelProviderRegistry:
 
         registry = ModelProviderRegistry()
         assert ProviderType.GOOGLE in registry._providers
-        assert registry._providers[ProviderType.GOOGLE] == GeminiModelProvider
+        # Registry now stores a list of providers
+        assert registry._providers[ProviderType.GOOGLE] == [GeminiModelProvider]
 
     @patch.dict(os.environ, {"GEMINI_API_KEY": "test-key"})
     def test_get_provider(self):

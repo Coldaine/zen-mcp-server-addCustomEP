@@ -39,8 +39,36 @@ class OpenRouterProvider(OpenAICompatibleProvider):
             api_key: OpenRouter API key
             **kwargs: Additional configuration
         """
+        # Determine if we are using Kilo API
+        self._using_kilo_api = False
         base_url = "https://openrouter.ai/api/v1"
+
+        kilo_key = os.getenv("KILO_API_KEY")
+        openrouter_key = os.getenv("OPENROUTER_API_KEY")
+
+        # Check if the provided key matches KILO_API_KEY
+        if kilo_key and api_key == kilo_key:
+            self._using_kilo_api = True
+            base_url = "https://api.kilocodex.com/v1"  # Direct Kilo
+            logging.info("Using direct Kilo API endpoint")
+        elif openrouter_key and api_key == openrouter_key:
+            # Use Kilo proxy for OpenRouter
+            base_url = "https://api.kilocode.ai/api/openrouter/"
+            logging.info("Using Kilo proxy for OpenRouter")
+
         super().__init__(api_key, base_url=base_url, **kwargs)
+
+        # Configure headers based on endpoint
+        if self._using_kilo_api:
+            # Clear proxy headers for direct Kilo
+            self.DEFAULT_HEADERS = {}
+        else:
+            # Add proxy headers
+            self.DEFAULT_HEADERS = {
+                "HTTP-Referer": os.getenv("OPENROUTER_REFERER", "https://github.com/BeehiveInnovations/zen-mcp-server"),
+                "X-Title": os.getenv("OPENROUTER_TITLE", "Zen MCP Server"),
+                "X-KiloCode-Version": os.getenv("KILO_CODE_VERSION", "1.0.0"),
+            }
 
         # Initialize model registry
         if OpenRouterProvider._registry is None:
@@ -59,6 +87,12 @@ class OpenRouterProvider(OpenAICompatibleProvider):
         Returns:
             Resolved OpenRouter model name
         """
+        # Handle kilo: prefix
+        if model_name.startswith("kilo:"):
+            actual_model = model_name[5:]
+            logging.info(f"Resolved kilo: alias '{model_name}' to '{actual_model}'")
+            return actual_model
+
         # Try to resolve through registry
         config = self._registry.resolve(model_name)
 

@@ -15,8 +15,10 @@ Key features:
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
+import time
 from typing import TYPE_CHECKING, Any
 
 from pydantic import Field, model_validator
@@ -423,8 +425,31 @@ of the evidence, even when it strongly points in one direction.""",
 
         return response_data
 
+    async def _consult_model_with_timing(self, model_config: dict, request) -> dict:
+        """Consult a model and track execution time."""
+        start_time = time.time()
+        try:
+            result = await self._consult_model(model_config, request)
+            latency_ms = int((time.time() - start_time) * 1000)
+            result["latency_ms"] = latency_ms
+            return result
+        except Exception as e:
+            latency_ms = int((time.time() - start_time) * 1000)
+            return {
+                "model": model_config.get("model", "unknown"),
+                "stance": model_config.get("stance", "neutral"),
+                "status": "error",
+                "error": str(e),
+                "latency_ms": latency_ms,
+            }
+
+    async def run_models_concurrently(self, model_specs: list[dict], request):
+        """Run multiple model consultations concurrently."""
+        tasks = [asyncio.create_task(self._consult_model_with_timing(spec, request)) for spec in model_specs]
+        return await asyncio.gather(*tasks, return_exceptions=True)
+
     async def execute_workflow(self, arguments: dict[str, Any]) -> list:
-        """Override execute_workflow to handle model consultations between steps."""
+        """Override execute_workflow to handle concurrent model consultations."""
 
         # Store arguments
         self._current_arguments = arguments
@@ -432,92 +457,67 @@ of the evidence, even when it strongly points in one direction.""",
         # Validate request
         request = self.get_workflow_request_model()(**arguments)
 
-        # On first step, store the models to consult
+        # On first step, run everything concurrently
         if request.step_number == 1:
-            # Store the original proposal from step 1 - this is what all models should see
+            # Store the original proposal
             self.original_proposal = request.step
-            self.initial_prompt = request.step  # Keep for backward compatibility
+            self.initial_prompt = request.step
             self.models_to_consult = request.models or []
+
+            # Run concurrently
+            logger.info(f"Starting concurrent consultation of {len(self.models_to_consult)} models")
+            results = await self.run_models_concurrently(self.models_to_consult, request)
+
+            # Normalize results
             self.accumulated_responses = []
-            # Set total steps: len(models) (each step includes consultation + response)
-            request.total_steps = len(self.models_to_consult)
-
-        # For all steps (1 through total_steps), consult the corresponding model
-        if request.step_number <= request.total_steps:
-            # Calculate which model to consult for this step
-            model_idx = request.step_number - 1  # 0-based index
-
-            if model_idx < len(self.models_to_consult):
-                # Consult the model for this step
-                model_response = await self._consult_model(self.models_to_consult[model_idx], request)
-
-                # Add to accumulated responses
-                self.accumulated_responses.append(model_response)
-
-                # Include the model response in the step data
-                response_data = {
-                    "status": "model_consulted",
-                    "step_number": request.step_number,
-                    "total_steps": request.total_steps,
-                    "model_consulted": model_response["model"],
-                    "model_stance": model_response.get("stance", "neutral"),
-                    "model_response": model_response,
-                    "current_model_index": model_idx + 1,
-                    "next_step_required": request.step_number < request.total_steps,
-                }
-
-                # Add CLAI Agent's analysis to step 1
-                if request.step_number == 1:
-                    response_data["agent_analysis"] = {
-                        "initial_analysis": request.step,
-                        "findings": request.findings,
-                    }
-                    response_data["status"] = "analysis_and_first_model_consulted"
-
-                # Check if this is the final step
-                if request.step_number == request.total_steps:
-                    response_data["status"] = "consensus_workflow_complete"
-                    response_data["consensus_complete"] = True
-                    response_data["complete_consensus"] = {
-                        "initial_prompt": self.original_proposal if self.original_proposal else self.initial_prompt,
-                        "models_consulted": [
-                            f"{m['model']}:{m.get('stance', 'neutral')}" for m in self.accumulated_responses
-                        ],
-                        "total_responses": len(self.accumulated_responses),
-                        "consensus_confidence": "high",
-                    }
-                    response_data["next_steps"] = (
-                        "CONSENSUS GATHERING IS COMPLETE. Synthesize all perspectives and present:\n"
-                        "1. Key points of AGREEMENT across models\n"
-                        "2. Key points of DISAGREEMENT and why they differ\n"
-                        "3. Your final consolidated recommendation\n"
-                        "4. Specific, actionable next steps for implementation\n"
-                        "5. Critical risks or concerns that must be addressed"
+            for spec, result in zip(self.models_to_consult, results):
+                if isinstance(result, Exception):
+                    self.accumulated_responses.append(
+                        {
+                            "model": spec.get("model", "unknown"),
+                            "stance": spec.get("stance", "neutral"),
+                            "status": "error",
+                            "error": str(result),
+                            "latency_ms": 0,
+                        }
                     )
                 else:
-                    response_data["next_steps"] = (
-                        f"Model {model_response['model']} has provided its {model_response.get('stance', 'neutral')} "
-                        f"perspective. Please analyze this response and call {self.get_name()} again with:\n"
-                        f"- step_number: {request.step_number + 1}\n"
-                        f"- findings: Summarize key points from this model's response"
-                    )
+                    self.accumulated_responses.append(result)
 
-                # Add accumulated responses for tracking
-                response_data["accumulated_responses"] = self.accumulated_responses
+            # Construct response
+            response_data = {
+                "status": "consensus_workflow_complete",
+                "consensus_complete": True,
+                "complete_consensus": {
+                    "initial_prompt": self.original_proposal,
+                    "models_consulted": [
+                        f"{m['model']}:{m.get('stance', 'neutral')}" for m in self.accumulated_responses
+                    ],
+                    "total_responses": len(self.accumulated_responses),
+                    "consensus_confidence": "high",
+                    "all_model_responses": self.accumulated_responses,
+                },
+                "next_steps": (
+                    "CONSENSUS GATHERING IS COMPLETE. Synthesize all perspectives and present:\n"
+                    "1. Key points of AGREEMENT across models\n"
+                    "2. Key points of DISAGREEMENT and why they differ\n"
+                    "3. Your final consolidated recommendation\n"
+                    "4. Specific, actionable next steps for implementation\n"
+                    "5. Critical risks or concerns that must be addressed"
+                ),
+            }
 
-                # Add metadata (since we're bypassing the base class metadata addition)
-                model_name = self.get_request_model_name(request)
-                provider = self.get_model_provider(model_name)
-                response_data["metadata"] = {
-                    "tool_name": self.get_name(),
-                    "model_name": model_name,
-                    "model_used": model_name,
-                    "provider_used": provider.get_provider_type().value,
-                }
+            # Add metadata
+            response_data["metadata"] = {
+                "tool_name": self.get_name(),
+                "workflow_type": "concurrent_multi_model_consensus",
+                "execution_mode": "concurrent",
+                "model_count": len(self.accumulated_responses),
+            }
 
-                return [TextContent(type="text", text=json.dumps(response_data, indent=2, ensure_ascii=False))]
+            return [TextContent(type="text", text=json.dumps(response_data, indent=2, ensure_ascii=False))]
 
-        # Otherwise, use standard workflow execution
+        # Fallback for legacy calls (shouldn't happen if clients use step 1 correctly)
         return await super().execute_workflow(arguments)
 
     async def _consult_model(self, model_config: dict, request) -> dict:

@@ -1,9 +1,11 @@
 """Model provider registry for managing available providers."""
 
+from __future__ import annotations
+
 import json
 import logging
 import os
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from .base import ModelProvider, ProviderType
 
@@ -33,48 +35,82 @@ class ModelProviderRegistry:
             logging.debug("REGISTRY: Creating new registry instance")
             cls._instance = super().__new__(cls)
             # Initialize instance dictionaries on first creation
-            cls._instance._providers = {}
-            cls._instance._initialized_providers = {}
+            # Map ProviderType -> list of provider classes
+            cls._instance._providers: dict[ProviderType, list[type[ModelProvider]]] = {}
+            # Map ProviderType -> list of initialized provider instances (aligned by index)
+            cls._instance._initialized_providers: dict[ProviderType, list[ModelProvider | None]] = {}
             logging.debug(f"REGISTRY: Created instance {cls._instance}")
         return cls._instance
 
     @classmethod
-    def register_provider(cls, provider_type: ProviderType, provider_class: type[ModelProvider]) -> None:
+    def register_provider(
+        cls,
+        provider_type: ProviderType,
+        provider_class: type[ModelProvider],
+        append: bool = False,
+    ) -> None:
         """Register a new provider class.
 
         Args:
             provider_type: Type of the provider (e.g., ProviderType.GOOGLE)
             provider_class: Class that implements ModelProvider interface
+            append: If True, append to existing providers instead of overwriting.
+                   Useful for multi-CLI scenarios where multiple providers of the same type
+                   (e.g., CUSTOM) need to coexist.
         """
         instance = cls()
-        instance._providers[provider_type] = provider_class
+        if provider_type not in instance._providers:
+            instance._providers[provider_type] = []
+
+        if append:
+            instance._providers[provider_type].append(provider_class)
+        else:
+            # Default behavior: Overwrite existing registration (fixes regression)
+            instance._providers[provider_type] = [provider_class]
+            # Clear initialized instances for this type since class changed
+            instance._initialized_providers.pop(provider_type, None)
 
     @classmethod
-    def get_provider(cls, provider_type: ProviderType, force_new: bool = False) -> Optional[ModelProvider]:
+    def get_provider(
+        cls, provider_type: ProviderType, force_new: bool = False, index: int = 0
+    ) -> ModelProvider | None:
         """Get an initialized provider instance.
 
         Args:
             provider_type: Type of provider to get
             force_new: Force creation of new instance instead of using cached
+            index: Index of the provider to get (for multi-provider types)
 
         Returns:
             Initialized ModelProvider instance or None if not available
         """
         instance = cls()
 
-        # Return cached instance if available and not forcing new
-        if not force_new and provider_type in instance._initialized_providers:
-            return instance._initialized_providers[provider_type]
-
         # Check if provider class is registered
-        if provider_type not in instance._providers:
+        if provider_type not in instance._providers or not instance._providers[provider_type]:
             return None
+
+        if index >= len(instance._providers[provider_type]):
+            return None
+
+        # Initialize storage for this type if needed
+        if provider_type not in instance._initialized_providers:
+            instance._initialized_providers[provider_type] = [None] * len(instance._providers[provider_type])
+
+        # Extend storage if new providers were appended
+        current_list = instance._initialized_providers[provider_type]
+        if len(current_list) < len(instance._providers[provider_type]):
+            current_list.extend([None] * (len(instance._providers[provider_type]) - len(current_list)))
+
+        # Return cached instance if available and not forcing new
+        if not force_new and current_list[index] is not None:
+            return current_list[index]
 
         # Get API key from environment
         api_key = cls._get_api_key_for_provider(provider_type)
 
         # Get provider class or factory function
-        provider_class = instance._providers[provider_type]
+        provider_class = instance._providers[provider_type][index]
 
         # For custom providers, handle special initialization requirements
         if provider_type == ProviderType.CUSTOM:
@@ -101,12 +137,12 @@ class ModelProviderRegistry:
             provider = provider_class(api_key=api_key)
 
         # Cache the instance
-        instance._initialized_providers[provider_type] = provider
+        instance._initialized_providers[provider_type][index] = provider
 
         return provider
 
     @classmethod
-    def get_provider_for_model(cls, model_name: str) -> Optional[ModelProvider]:
+    def get_provider_for_model(cls, model_name: str) -> ModelProvider | None:
         """Get provider instance for a specific model name.
 
         Provider priority order:
@@ -130,13 +166,16 @@ class ModelProviderRegistry:
         for provider_type in cls.PROVIDER_PRIORITY_ORDER:
             if provider_type in instance._providers:
                 logging.debug(f"Found {provider_type} in registry")
-                # Get or create provider instance
-                provider = cls.get_provider(provider_type)
-                if provider and provider.validate_model_name(model_name):
-                    logging.debug(f"{provider_type} validates model {model_name}")
-                    return provider
-                else:
-                    logging.debug(f"{provider_type} does not validate model {model_name}")
+                # Iterate through all providers of this type (e.g., multiple CLIs)
+                provider_list = instance._providers[provider_type]
+                for i in range(len(provider_list)):
+                    # Get or create provider instance
+                    provider = cls.get_provider(provider_type, index=i)
+                    if provider and provider.validate_model_name(model_name):
+                        logging.debug(f"{provider_type} (index {i}) validates model {model_name}")
+                        return provider
+                    else:
+                        logging.debug(f"{provider_type} (index {i}) does not validate model {model_name}")
             else:
                 logging.debug(f"{provider_type} not found in registry")
 
@@ -167,40 +206,43 @@ class ModelProviderRegistry:
         instance = cls()
 
         for provider_type in instance._providers:
-            provider = cls.get_provider(provider_type)
-            if not provider:
-                continue
-
-            try:
-                available = provider.list_models(respect_restrictions=respect_restrictions)
-            except NotImplementedError:
-                logging.warning("Provider %s does not implement list_models", provider_type)
-                continue
-
-            for model_name in available:
-                # =====================================================================================
-                # CRITICAL: Prevent double restriction filtering (Fixed Issue #98)
-                # =====================================================================================
-                # Previously, both the provider AND registry applied restrictions, causing
-                # double-filtering that resulted in "no models available" errors.
-                #
-                # Logic: If respect_restrictions=True, provider already filtered models,
-                # so registry should NOT filter them again.
-                # TEST COVERAGE: tests/test_provider_routing_bugs.py::TestOpenRouterAliasRestrictions
-                # =====================================================================================
-                if (
-                    restriction_service
-                    and not respect_restrictions  # Only filter if provider didn't already filter
-                    and not restriction_service.is_allowed(provider_type, model_name)
-                ):
-                    logging.debug("Model %s filtered by restrictions", model_name)
+            # Iterate through all providers of this type
+            provider_count = len(instance._providers[provider_type])
+            for i in range(provider_count):
+                provider = cls.get_provider(provider_type, index=i)
+                if not provider:
                     continue
-                models[model_name] = provider_type
+
+                try:
+                    available = provider.list_models(respect_restrictions=respect_restrictions)
+                except NotImplementedError:
+                    logging.warning("Provider %s (index %d) does not implement list_models", provider_type, i)
+                    continue
+
+                for model_name in available:
+                    # =====================================================================================
+                    # CRITICAL: Prevent double restriction filtering (Fixed Issue #98)
+                    # =====================================================================================
+                    # Previously, both the provider AND registry applied restrictions, causing
+                    # double-filtering that resulted in "no models available" errors.
+                    #
+                    # Logic: If respect_restrictions=True, provider already filtered models,
+                    # so registry should NOT filter them again.
+                    # TEST COVERAGE: tests/test_provider_routing_bugs.py::TestOpenRouterAliasRestrictions
+                    # =====================================================================================
+                    if (
+                        restriction_service
+                        and not respect_restrictions  # Only filter if provider didn't already filter
+                        and not restriction_service.is_allowed(provider_type, model_name)
+                    ):
+                        logging.debug("Model %s filtered by restrictions", model_name)
+                        continue
+                    models[model_name] = provider_type
 
         return models
 
     @classmethod
-    def get_available_model_names(cls, provider_type: Optional[ProviderType] = None) -> list[str]:
+    def get_available_model_names(cls, provider_type: ProviderType | None = None) -> list[str]:
         """Get list of available model names, optionally filtered by provider.
 
         This respects model restrictions automatically.
@@ -221,7 +263,7 @@ class ModelProviderRegistry:
             return list(available_models.keys())
 
     @classmethod
-    def _get_api_key_for_provider(cls, provider_type: ProviderType) -> Optional[str]:
+    def _get_api_key_for_provider(cls, provider_type: ProviderType) -> str | None:
         """Get API key for a provider from environment variables.
 
         Args:
@@ -230,6 +272,19 @@ class ModelProviderRegistry:
         Returns:
             API key string or None if not found
         """
+        # Special handling for OpenRouter/Kilo priority
+        if provider_type == ProviderType.OPENROUTER:
+            kilo_key = os.getenv("KILO_API_KEY")
+            openrouter_key = os.getenv("OPENROUTER_API_KEY")
+            kilo_preferred = os.getenv("KILO_PREFERRED", "").lower() in ("true", "1", "yes")
+
+            if kilo_preferred and kilo_key:
+                return kilo_key
+            if openrouter_key:
+                return openrouter_key
+            # Fallback to Kilo key if OpenRouter key is missing
+            return kilo_key
+
         key_mapping = {
             ProviderType.GOOGLE: "GEMINI_API_KEY",
             ProviderType.OPENAI: "OPENAI_API_KEY",
@@ -281,19 +336,14 @@ class ModelProviderRegistry:
         return allowed_models
 
     @classmethod
-    def get_preferred_fallback_model(cls, tool_category: Optional["ToolModelCategory"] = None) -> str:
-        """Get the preferred fallback model based on provider priority and tool category.
-
-        This method orchestrates model selection by:
-        1. Getting allowed models for each provider (respecting restrictions)
-        2. Asking providers for their preference from the allowed list
-        3. Falling back to first available model if no preference given
+    def get_preferred_fallback_model(cls, tool_category: ToolModelCategory | None = None) -> str:
+        """Get the preferred fallback model, optionally considering tool category.
 
         Args:
             tool_category: Optional category to influence model selection
 
         Returns:
-            Model name string for fallback use
+            Model name to use as fallback
         """
         from tools.models import ToolModelCategory
 
@@ -302,26 +352,32 @@ class ModelProviderRegistry:
 
         # Ask each provider for their preference in priority order
         for provider_type in cls.PROVIDER_PRIORITY_ORDER:
-            provider = cls.get_provider(provider_type)
-            if provider:
-                # 1. Registry filters the models first
-                allowed_models = cls._get_allowed_models_for_provider(provider, provider_type)
+            if provider_type not in cls._instance._providers:
+                continue
 
-                if not allowed_models:
-                    continue
+            # Iterate through all providers of this type
+            provider_count = len(cls._instance._providers[provider_type])
+            for i in range(provider_count):
+                provider = cls.get_provider(provider_type, index=i)
+                if provider:
+                    # 1. Registry filters the models first
+                    allowed_models = cls._get_allowed_models_for_provider(provider, provider_type)
 
-                # 2. Keep track of the first available model as fallback
-                if not first_available_model:
-                    first_available_model = sorted(allowed_models)[0]
+                    if not allowed_models:
+                        continue
 
-                # 3. Ask provider to pick from allowed list
-                preferred_model = provider.get_preferred_model(effective_category, allowed_models)
+                    # 2. Keep track of the first available model as fallback
+                    if not first_available_model:
+                        first_available_model = sorted(allowed_models)[0]
 
-                if preferred_model:
-                    logging.debug(
-                        f"Provider {provider_type.value} selected '{preferred_model}' for category '{effective_category.value}'"
-                    )
-                    return preferred_model
+                    # 3. Ask provider to pick from allowed list
+                    preferred_model = provider.get_preferred_model(effective_category, allowed_models)
+
+                    if preferred_model:
+                        logging.debug(
+                            f"Provider {provider_type.value} (index {i}) selected '{preferred_model}' for category '{effective_category.value}'"
+                        )
+                        return preferred_model
 
         # If no provider returned a preference, use first available model
         if first_available_model:
@@ -342,8 +398,12 @@ class ModelProviderRegistry:
         available = []
         instance = cls()
         for provider_type in instance._providers:
-            if cls.get_provider(provider_type) is not None:
-                available.append(provider_type)
+            # Check if ANY provider of this type has a key/is valid
+            provider_count = len(instance._providers[provider_type])
+            for i in range(provider_count):
+                if cls.get_provider(provider_type, index=i) is not None:
+                    available.append(provider_type)
+                    break
         return available
 
     @classmethod
@@ -385,7 +445,7 @@ def load_model_library():
 MODEL_LIBRARY = load_model_library()
 
 
-def get_provider_for_model(model_name: str) -> Optional[ModelProvider]:
+def get_provider_for_model(model_name: str) -> ModelProvider | None:
     """Get provider for a specific model name."""
     # Load model config from library
     model_config = MODEL_LIBRARY.get("models", {}).get(model_name)

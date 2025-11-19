@@ -111,6 +111,26 @@ class TestOpenRouterProvider:
             assert provider is not None
             assert isinstance(provider, OpenRouterProvider)
 
+    def test_kilo_integration(self):
+        """Test Kilo API integration."""
+        # Test direct Kilo
+        with patch.dict(os.environ, {"KILO_API_KEY": "kilo-key"}):
+            provider = OpenRouterProvider(api_key="kilo-key")
+            assert provider._using_kilo_api is True
+            assert provider.base_url == "https://api.kilocodex.com/v1"
+            assert provider.DEFAULT_HEADERS == {}
+
+        # Test Kilo proxy for OpenRouter
+        with patch.dict(os.environ, {"OPENROUTER_API_KEY": "or-key"}):
+            provider = OpenRouterProvider(api_key="or-key")
+            assert provider._using_kilo_api is False
+            assert provider.base_url == "https://api.kilocode.ai/api/openrouter/"
+            assert "X-KiloCode-Version" in provider.DEFAULT_HEADERS
+
+        # Test kilo: prefix resolution
+        provider = OpenRouterProvider(api_key="test-key")
+        assert provider._resolve_model_name("kilo:qwen-max") == "qwen-max"
+
 
 class TestOpenRouterAutoMode:
     """Test auto mode functionality when only OpenRouter is configured."""
